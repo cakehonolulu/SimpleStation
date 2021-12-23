@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /*
 	Sony Playstation 1 (PSX) CPU Header
@@ -17,4 +19,4 @@ typedef struct m_corewave_cw33300
 } m_mips_r3000a_t;
 
 // Defined in cpu.c
-extern m_mips_r3000a_t m_cpu;
+extern m_mips_r3000a_t *m_cpu;
