@@ -15,10 +15,20 @@ void m_cpu_init()
 		printf("Simplestation: Couldn't allocate CPU state struct, exiting...\n");
 		exit(EXIT_FAILURE);
 	}
+#ifdef DEBUG_CPU
+	else
+	{
+		printf("[CPU] Allocated CPU structure!\n");
+	}
+#endif
 }
 
 // Function to free the CPU struct after end-of-emulation
 void m_cpu_exit()
 {
 	free(m_cpu);
+
+#ifdef DEBUG_CPU
+	printf("[CPU] Freed CPU structure!\n");
+#endif
 }
