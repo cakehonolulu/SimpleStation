@@ -22,6 +22,21 @@ typedef struct m_corewave_cw33300
 	// Program Counter Register
 	uint32_t m_pc;
 
+	/*
+		High 32 bits of multiplication result
+		Remainder of division
+	*/
+	uint32_t m_hi;
+
+	/*
+		Low 32 bits of multiplication result
+		Quotient of division
+	*/
+	uint32_t m_lo;
+
+	/*
+		32 general prupose registers
+	*/
 	uint32_t m_registers[M_R3000_REGISTERS];
 
 } m_mips_r3000a_t;
@@ -31,6 +46,9 @@ extern m_mips_r3000a_t *m_cpu;
 
 // Register defines
 #define PC (m_cpu->m_pc)
+#define HI (m_cpu->m_hi)
+#define LO (m_cpu->m_lo)
+
 #define ZERO (m_cpu->m_registers[0])
 #define AT (m_cpu->m_registers[1])
 #define V0 (m_cpu->m_registers[2])
