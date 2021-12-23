@@ -34,21 +34,27 @@ BINARY := simplestation
 endif
 
 ifdef UNIX
-OBJECTS := $(shell find . -name '*.c')
+SOURCES := $(shell find . -name '*.c')
+OBJECTS = $(SOURCES:.c=.o)
 endif
 
 all: clean $(BINARY)
 
 $(BINARY): $(OBJECTS)
-	@echo "🚧 Building..."
+	@echo " 🚧 Linking..."
 ifdef UNIX
-	@$(CC) $(CFLAGS) $(SDLFLAGS) $^ -o $@ $(SDLFLAGS) $(LDFLAGS)
-	@echo "CC $<"
+	@echo " \033[0;36mLD \033[0msimplestation"
+	@$(CC) $(LDFLAGS)  -o $@ $(OBJECTS)
 endif
 ifdef WIN32
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
 endif
 
+%.o: %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo " \033[0;35mCC\033[0m $<"
+
 clean:
-	@echo "🧹 Cleaning..."
-	-@rm $(BINARY)
+	@echo " 🧹 Cleaning..."
+	-@rm -rf $(BINARY) ||:
+	-@rm -rf $(OBJECTS) ||:
