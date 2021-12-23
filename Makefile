@@ -42,7 +42,8 @@ all: clean $(BINARY)
 $(BINARY): $(OBJECTS)
 	@echo "🚧 Building..."
 ifdef UNIX
-	$(CC) $(CFLAGS) $(SDLFLAGS) $^ -o $@ $(SDLFLAGS) $(LDFLAGS)
+	@$(CC) $(CFLAGS) $(SDLFLAGS) $^ -o $@ $(SDLFLAGS) $(LDFLAGS)
+	@echo "CC $<"
 endif
 ifdef WIN32
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2

@@ -1,3 +1,6 @@
+#ifndef CPU_H
+#define CPU_H
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,3 +29,5 @@ extern m_mips_r3000a_t *m_cpu;
 /* Function definitions */
 void m_cpu_init();
 void m_cpu_exit();
+
+#endif /* CPU_H */
