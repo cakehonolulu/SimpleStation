@@ -24,6 +24,18 @@ void m_cpu_init()
 
 	// Point Program Counter to the initial BIOS address
 	PC = 0xbfc00000;
+
+	// High register to 0
+	HI = 0;
+
+	// Low register to 0
+	LO = 0;
+
+	// Set all registers to 0
+	for (uint8_t m_regs = 0; m_regs < (M_R3000_REGISTERS - 1); m_regs++)
+	{
+		m_cpu->m_registers[m_regs] = 0;
+	}
 }
 
 // Function to free the CPU struct after end-of-emulation
@@ -52,5 +64,5 @@ void m_cpu_decode()
 
 void m_cpu_execute()
 {
-	
+
 }
