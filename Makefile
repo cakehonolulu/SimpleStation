@@ -15,8 +15,8 @@ CFLAGS := -Wall -Wextra -std=c2x -Iinclude/
 SDLFLAGS = `sdl2-config --cflags --libs`
 LDFLAGS = -lm
 
-ifdef DBG_OPCODE
-CFLAGS += -DOPCODE_DEBUG
+ifdef DEBUG_CPU
+CFLAGS += -DDEBUG_CPU
 endif
 ifdef DGB
 CFLAGS += -g
