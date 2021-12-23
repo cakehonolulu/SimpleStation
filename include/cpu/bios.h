@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 /* Variables */
-extern int8_t *m_bios_buffer;
+extern uint8_t *m_bios_buffer;
 
 /* Function definitions */
 void m_bios_load(const char *m_bios_name);
