@@ -12,7 +12,8 @@ MINGW64 = x86_64-w64-mingw32-gcc-10-win32
 # Setup the basic compilation flags
 # Warn all, extra and compile for c23
 CFLAGS := -Wall -Wextra -std=c2x -Iinclude/
-SDLFLAGS = `sdl2-config --cflags --libs`
+SDLCFLAGS = `sdl2-config --cflags`
+SDLLDFLAGS = `sdl2-config --libs`
 LDFLAGS = -lm
 
 ifdef DEBUG_CPU
@@ -44,14 +45,14 @@ $(BINARY): $(OBJECTS)
 	@echo " 🚧 Linking..."
 ifdef UNIX
 	@echo " \033[0;36mLD \033[0msimplestation"
-	@$(CC) $(LDFLAGS)  -o $@ $(OBJECTS)
+	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(OBJECTS)
 endif
 ifdef WIN32
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
 endif
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(SDLCFLAGS) -c $< -o $@
 	@echo " \033[0;35mCC\033[0m $<"
 
 clean:
