@@ -33,10 +33,13 @@ ifdef UNIX
 BINARY := simplestation
 endif
 
+ifdef UNIX
+OBJECTS := $(shell find . -name '*.c')
+endif
+
 all: clean $(BINARY)
 
-ifdef WIN32
-$(BINARY): *.c
+$(BINARY): $(OBJECTS)
 	@echo "🚧 Building..."
 ifdef UNIX
 	$(CC) $(CFLAGS) $(SDLFLAGS) $^ -o $@ $(SDLFLAGS) $(LDFLAGS)
