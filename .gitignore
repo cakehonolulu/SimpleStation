@@ -1,0 +1,10 @@
+# Compiled Files
+*.out
+*.exe
+simplestation
+
+# Windows Library Files
+*.dll
+
+# Binary Files
+*.bin
