@@ -57,9 +57,11 @@ int main(int argc, char **argv)
 	// Initialize the CPU Subsystem
 	m_cpu_init();
 
-	uint32_t m_addr = READ32_BIOS(PC);
-
-	printf("0x%X\n", m_addr);
+	while (true)
+	{
+		// Fetch, decode, execute
+		m_psx_fde();
+	}
 
 	// Uninitialize the BIOS Subsystem
 	m_bios_close();

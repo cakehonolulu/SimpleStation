@@ -35,3 +35,22 @@ void m_cpu_exit()
 	printf("[CPU] Freed CPU structure!\n");
 #endif
 }
+
+void m_cpu_fetch()
+{
+	/* Fetch cycle */
+	uint32_t m_opcode = READ32_BIOS(PC);
+
+	printf("0x%x\n", m_opcode);
+	PC += 4;
+}
+
+void m_cpu_decode()
+{
+
+}
+
+void m_cpu_execute()
+{
+	
+}
