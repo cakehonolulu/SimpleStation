@@ -3,6 +3,18 @@
 // Declare a pointer to the CPU state structure
 m_mips_r3000a_t *m_cpu;
 
+// Current opcode
+uint32_t m_opcode = 0;
+
+// Current instruction (Opcode Bits [31:26])
+unsigned _BitInt(5) m_instruction = 0;
+
+// Current register index (Opcode Bits [20:16])
+unsigned _BitInt(4) m_regidx = 0;
+
+// Current immediate address (Opcode Bits [16:0])
+unsigned _BitInt(16) m_immediate = 0;
+
 // Function to initialize the CPU state
 void m_cpu_init()
 {
@@ -51,15 +63,27 @@ void m_cpu_exit()
 void m_cpu_fetch()
 {
 	/* Fetch cycle */
-	uint32_t m_opcode = READ32_BIOS(PC);
-
-	printf("0x%x\n", m_opcode);
-	PC += 4;
+	m_opcode = READ32_BIOS(PC);
 }
 
 void m_cpu_decode()
 {
+	/*
+		Opcode decoding:
 
+		1st *Obtain the instruction
+		2nd *Obtain the register index
+		3rd *Obtain the immediate value
+	*/
+	
+	// Instruction
+	m_instruction = m_opcode >> 26;
+
+	// Register index
+	m_regidx = ((m_opcode >> 16) & 0xff);
+
+	// Immediate
+	m_immediate = (m_opcode & 0xffff);
 }
 
 void m_cpu_execute()
