@@ -21,6 +21,9 @@ void m_cpu_init()
 		printf("[CPU] Allocated CPU structure!\n");
 	}
 #endif
+
+	// Point Program Counter to the initial BIOS address
+	PC = 0xbfc00000;
 }
 
 // Function to free the CPU struct after end-of-emulation

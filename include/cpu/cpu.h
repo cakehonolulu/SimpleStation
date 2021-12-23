@@ -21,6 +21,8 @@ typedef struct m_corewave_cw33300
 // Defined in cpu.c
 extern m_mips_r3000a_t *m_cpu;
 
+#define PC (m_cpu->m_pc)
+
 /* Function definitions */
 void m_cpu_init();
 void m_cpu_exit();
