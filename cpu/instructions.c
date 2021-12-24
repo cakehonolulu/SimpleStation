@@ -1,6 +1,6 @@
-#include <cpu/opcodes.h>
+#include <cpu/instructions.h>
 
-const struct m_corewave_cw33300_opcodes m_psx_opcodes[67] = {
+const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
 	{NULL, 0, NULL},	// 0x00
 	{NULL, 0, NULL},	// 0x00
 	{NULL, 0, NULL},	// 0x00
