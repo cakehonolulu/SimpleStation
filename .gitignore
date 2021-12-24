@@ -1,5 +1,6 @@
 # Compiled Files
 *.out
+*.o
 *.exe
 simplestation
 
