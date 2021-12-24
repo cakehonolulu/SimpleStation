@@ -84,6 +84,9 @@ void m_cpu_decode()
 
 	// Immediate
 	m_immediate = (m_opcode & 0xffff);
+
+	printf("OPCODE: 0x%x, instr: 0x%x, regidx: 0x%x, imm: 0x%x\n", m_opcode, m_instruction, m_regidx, m_immediate);
+	sleep(5);
 }
 
 void m_cpu_execute()
