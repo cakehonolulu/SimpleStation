@@ -5,8 +5,7 @@
 #include <stdlib.h>
 
 extern struct m_corewave_cw33300_instrs {
-	char *m_instr;
-	uint32_t m_operand;
+	uint8_t *m_instr;
 	void *m_funct;
 } const m_mips_r3000a_instrs_t[67];
 

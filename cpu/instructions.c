@@ -1,71 +1,71 @@
 #include <cpu/instructions.h>
 
 const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL},	// 0x00
-	{NULL, 0, NULL}		// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL},	// 0x00
+	{NULL, NULL}		// 0x00
 };
