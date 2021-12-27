@@ -88,12 +88,12 @@ void m_cpu_decode()
 
 void m_cpu_execute()
 {
-	printf("Opcode: 0x%06X, instr: 0x%x, regidx: 0x%x, imm: 0x%x\n", m_opcode, m_instruction, m_regidx, m_immediate);
+	printf("Opcode: 0x%06X, instr: 0x%x, regidx: 0x%x, imm: 0x%x\n", (uint32_t) m_opcode, (uint32_t) m_instruction, (uint32_t) m_regidx, (uint32_t) m_immediate);
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[m_instruction].m_funct == NULL)
 	{
-		printf("Unimplemented Opcode 0x%X\n", m_instruction);
+		printf("Unimplemented Opcode 0x%X\n", (uint32_t) m_instruction);
 		m_printregs();
 		exit(EXIT_FAILURE);
 	}

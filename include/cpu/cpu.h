@@ -3,6 +3,7 @@
 
 #include <memory/memory.h>
 #include <cpu/instructions.h>
+#include <debugger/debugger.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,7 +43,7 @@ typedef struct m_corewave_cw33300
 
 } m_mips_r3000a_t;
 
-static const int8_t *m_cpu_regnames[] = {
+static const char *m_cpu_regnames[] = {
 	"AT",
 	"V0",
 	"V1",
