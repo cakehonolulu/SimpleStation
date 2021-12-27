@@ -87,6 +87,13 @@ extern unsigned _BitInt(5) m_instruction;
 extern unsigned _BitInt(4) m_regidx;
 extern unsigned _BitInt(16) m_immediate;
 
+// Internal defines
+#define REGS (m_cpu->m_registers)
+#define INSTR ((uint32_t) m_instruction)
+#define RGIDX ((uint32_t) m_regidx)
+#define IMMDT ((uint32_t) m_immediate)
+#define REGVAL (RGIDX - 1)
+
 // Register defines
 #define PC (m_cpu->m_pc)
 #define HI (m_cpu->m_hi)
