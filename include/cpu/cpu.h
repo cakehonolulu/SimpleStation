@@ -42,6 +42,40 @@ typedef struct m_corewave_cw33300
 
 } m_mips_r3000a_t;
 
+static const int8_t *m_cpu_regnames[] = {
+	"AT",
+	"V0",
+	"V1",
+	"A0",
+	"A1",
+	"A2",
+	"A3",
+	"T0",
+	"T1",
+	"T2",
+	"T3",
+	"T4",
+	"T5",
+	"T6",
+	"T7",
+	"S0",
+	"S1",
+	"S2",
+	"S3",
+	"S4",
+	"S5",
+	"S6",
+	"S7",
+	"T8",
+	"T9",
+	"K0",
+	"K1",
+	"GP",
+	"SP",
+	"FP",
+	"RA"
+};
+
 // Register 0 ($zero) is static
 static const uint32_t m_zero = 0;
 
