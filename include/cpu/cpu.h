@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include <memory/memory.h>
+#include <cpu/instructions.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,6 +47,10 @@ static const uint32_t m_zero = 0;
 
 // Defined in cpu.c
 extern m_mips_r3000a_t *m_cpu;
+extern uint32_t m_opcode;
+extern unsigned _BitInt(5) m_instruction;
+extern unsigned _BitInt(4) m_regidx;
+extern unsigned _BitInt(16) m_immediate;
 
 // Register defines
 #define PC (m_cpu->m_pc)
