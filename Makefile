@@ -19,7 +19,10 @@ LDFLAGS = -lm
 ifdef DEBUG_CPU
 CFLAGS += -DDEBUG_CPU
 endif
-ifdef DGB
+ifdef DEBUG_INSTRUCTIONS
+CFLAGS += -DDEBUG_INSTRUCTIONS
+endif
+ifdef DBG
 CFLAGS += -g
 endif
 ifdef ASAN
