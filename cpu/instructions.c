@@ -72,6 +72,10 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
 
 void m_lui()
 {
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lui $%s, 0x%X\n", m_cpu_regnames[m_regidx - 1], (uint32_t) m_immediate);
+#endif
+
 	uint32_t v = (uint32_t) m_immediate << 16;
 
 	m_cpu->m_registers[m_regidx - 1] = v;
