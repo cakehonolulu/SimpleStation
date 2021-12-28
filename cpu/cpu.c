@@ -95,7 +95,7 @@ void m_cpu_execute()
 	// Check if the instruction is implemented
 	if (m_psx_instrs[m_instruction].m_funct == NULL)
 	{
-		printf("Unimplemented Opcode 0x%X\n", (uint32_t) m_instruction);
+		printf("Unimplemented Opcode 0x%02X\n", (uint32_t) m_instruction);
 		m_printregs();
 		m_bios_close();
 		m_cpu_exit();
