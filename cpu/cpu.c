@@ -88,7 +88,9 @@ void m_cpu_decode()
 
 void m_cpu_execute()
 {
+#ifdef DEBUG_CPU
 	printf("Opcode: 0x%06X, instr: 0x%x, regidx: 0x%x, imm: 0x%x\n", (uint32_t) m_opcode, (uint32_t) m_instruction, (uint32_t) m_regidx, (uint32_t) m_immediate);
+#endif
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[m_instruction].m_funct == NULL)
