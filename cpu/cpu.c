@@ -82,19 +82,19 @@ void m_cpu_decode()
 		3rd *Obtain the immediate value
 	*/
 	
-	// Instruction
+	// Instruction Value
 	m_instruction = m_opcode >> 26;
 
-	// Register index [Bits 25:21]
+	// Register index "RS" [Bits 25:21]
 	m_sregidx = ((m_opcode >> 21) & 0x1f);
 
-	// Register index [Bits 20:16]
+	// Register index "RT" [Bits 20:16]
 	m_tregidx = ((m_opcode >> 16) & 0x1f);
 
-	// Register index [Bits 15:11]
+	// Register index "RD" [Bits 15:11]
 	m_dregidx = ((m_opcode >> 11) & 0x1f);
 
-	// Immediate
+	// Immediate Value
 	m_immediate = (m_opcode & 0xffff);
 }
 
