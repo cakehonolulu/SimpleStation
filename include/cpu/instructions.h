@@ -12,6 +12,9 @@ extern struct m_corewave_cw33300_instrs {
 
 /* Instructions */
 
+// 0x0D
+void m_ori();
+
 // 0x0F
 void m_lui();
 

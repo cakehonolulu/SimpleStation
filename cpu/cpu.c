@@ -9,8 +9,14 @@ uint32_t m_opcode = 0;
 // Current instruction (Opcode Bits [31:26])
 unsigned _BitInt(5) m_instruction = 0;
 
+// Current register index (Opcode Bits [25:21])
+unsigned _BitInt(4) m_sregidx = 0;
+
 // Current register index (Opcode Bits [20:16])
-unsigned _BitInt(4) m_regidx = 0;
+unsigned _BitInt(4) m_tregidx = 0;
+
+// Current register index (Opcode Bits [15:11])
+unsigned _BitInt(4) m_dregidx = 0;
 
 // Current immediate address (Opcode Bits [16:0])
 unsigned _BitInt(16) m_immediate = 0;
@@ -44,7 +50,7 @@ void m_cpu_init()
 	LO = 0;
 
 	// Set all registers to 0
-	for (uint8_t m_regs = 0; m_regs < (M_R3000_REGISTERS - 1); m_regs++)
+	for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
 	{
 		m_cpu->m_registers[m_regs] = 0;
 	}
@@ -79,8 +85,14 @@ void m_cpu_decode()
 	// Instruction
 	m_instruction = m_opcode >> 26;
 
-	// Register index
-	m_regidx = ((m_opcode >> 16) & 0xff);
+	// Register index [Bits 25:21]
+	m_sregidx = ((m_opcode >> 21) & 0x1f);
+
+	// Register index [Bits 20:16]
+	m_tregidx = ((m_opcode >> 16) & 0x1f);
+
+	// Register index [Bits 15:11]
+	m_dregidx = ((m_opcode >> 11) & 0x1f);
 
 	// Immediate
 	m_immediate = (m_opcode & 0xffff);
