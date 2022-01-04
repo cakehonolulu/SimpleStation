@@ -11,6 +11,6 @@ extern uint8_t *m_bios_buffer;
 
 /* Function definitions */
 void m_bios_load(const char *m_bios_name);
-void m_bios_close();
+void m_bios_exit();
 
 #endif /* BIOS_H */

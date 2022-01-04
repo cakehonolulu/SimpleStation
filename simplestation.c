@@ -57,14 +57,17 @@ int main(int argc, char **argv)
 	// Initialize the CPU Subsystem
 	m_cpu_init();
 
+	// Initialize the Memory Subsystem
+	m_memory_init();
+
 	while (true)
 	{
 		// Fetch, decode, execute
 		m_psx_fde();
 	}
 
-	// Uninitialize the BIOS Subsystem
-	m_bios_close();
+	// Uninitialize the Memory Subsystem
+	m_memory_exit();
 
 	// Uninitialize the CPU Subsystem
 	m_cpu_exit();

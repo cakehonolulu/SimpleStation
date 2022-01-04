@@ -9,5 +9,6 @@
 #include <stdbool.h>
 
 #define KiB 1024
+#define MiB (KiB * KiB)
 
 #endif /* SIMPLESTATION_H */

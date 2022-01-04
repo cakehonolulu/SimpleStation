@@ -109,7 +109,7 @@ void m_cpu_execute()
 	{
 		printf("Unimplemented Opcode 0x%02X\n", (uint32_t) m_instruction);
 		m_printregs();
-		m_bios_close();
+		m_bios_exit();
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
 	}
