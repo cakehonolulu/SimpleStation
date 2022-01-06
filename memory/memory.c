@@ -55,7 +55,7 @@ void m_memory_exit()
 
 /*
 	Function:
-	m_memory_read(uint32_t m_memory_address, int8_t *m_memory_source)
+	m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 
 	Arguments:
 	-> m_memory_address: Acts as the memory pointer where the value will be read.
@@ -65,14 +65,14 @@ void m_memory_exit()
 	Reads a value at a determined memory address.
 	m_memory_source determines the buffer where it should look the value at.
 */
-uint32_t m_memory_read(uint32_t m_memory_address, int8_t *m_memory_source)
+uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 {
 	return *(uint32_t*)(m_memory_source + m_memory_address);
 }
 
 /*
 	Function:
-	m_memory_read_dword(uint32_t m_memory_offset)
+	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
@@ -80,7 +80,7 @@ uint32_t m_memory_read(uint32_t m_memory_address, int8_t *m_memory_source)
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_read_dword(uint32_t m_memory_offset)
+uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 {
 	// Calculate the absolute memory address to read at
 	uint32_t m_placeholder = m_memory_offset >> 29;
@@ -89,12 +89,31 @@ uint32_t m_memory_read_dword(uint32_t m_memory_offset)
 	// Check for a read in BIOS area
 	if (m_address < 0x1FC80000)
 	{
-		return m_memory_read(m_address & 0x7FFFF, m_mem_bios);
+		// Based on the m_size argument, select the memory size to be read
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0x7FFFF, m_mem_bios);
+
+			default:
+				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
 	}
 	else
 	{
-		printf("[MEMORY] Region not implemented!\n");
+		printf("[mem] Region not implemented!\n");
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		exit(1);
+		m_memory_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
 	}
 }
