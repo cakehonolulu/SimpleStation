@@ -76,6 +76,7 @@ uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
+	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
 
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
@@ -115,5 +116,45 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 		m_memory_exit();
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
+	}
+}
+
+/*
+	Function:
+	m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
+
+	Arguments:
+	-> m_memory_offset: Offset where to look the value at
+	-> m_value: Value to be written
+	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
+
+	Description:
+	Returns a double-word (32-bit value) located at that memory offset
+*/
+uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
+{
+	// Calculate the absolute memory address to write at
+	uint32_t m_placeholder = m_memory_offset >> 29;
+	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
+
+	if (m_address < 0x1F801080)
+	{
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_interrupts_write(m_address, m_value);
+
+			default:
+				printf("[mem] Unknown Memory Write Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
 	}
 }

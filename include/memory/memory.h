@@ -2,6 +2,7 @@
 #define MEMORY_H
 
 #include <cpu/bios.h>
+#include <cpu/interrupts.h>
 #include <simplestation.h>
 #include <stdint.h>
 
