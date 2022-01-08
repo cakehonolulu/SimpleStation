@@ -83,6 +83,15 @@ uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 */
 uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 {
+	// PSX doesn't permit unaligned memory reads
+	if (m_memory_offset % 4 != 0)
+	{
+		printf("[mem] Unaligned memory read detected! Exiting...\n");
+		m_memory_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+
 	// Calculate the absolute memory address to read at
 	uint32_t m_placeholder = m_memory_offset >> 29;
 	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
@@ -133,6 +142,15 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 */
 uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
 {
+	// PSX doesn't permit unaligned memory writes
+	if (m_memory_offset % 4 != 0)
+	{
+		printf("[mem] Unaligned memory write detected! Exiting...\n");
+		m_memory_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+
 	// Calculate the absolute memory address to write at
 	uint32_t m_placeholder = m_memory_offset >> 29;
 	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
