@@ -3,6 +3,12 @@
 uint32_t m_interrupt_stat;
 uint32_t m_interrupt_mask;
 
+void m_interrupts_init()
+{
+	m_interrupt_stat = 0;
+	m_interrupt_mask = 0;
+}
+
 uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val)
 {
 	uint32_t m_reg = m_int_addr & 0xF;

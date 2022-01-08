@@ -60,6 +60,9 @@ int main(int argc, char **argv)
 	// Initialize the Memory Subsystem
 	m_memory_init();
 
+	// Initialize the Interrupts Subsystem
+	m_interrupts_init();
+
 	while (true)
 	{
 		// Fetch, decode, execute
