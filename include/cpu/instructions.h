@@ -2,6 +2,7 @@
 #define INSTRUCTIONS_H
 
 #include <cpu/cpu.h>
+#include <memory/memory.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -11,6 +12,9 @@ extern struct m_corewave_cw33300_instrs {
 } const m_psx_instrs[67];
 
 /* Instructions */
+
+// 0x0B
+void m_sw();
 
 // 0x0D
 void m_ori();
