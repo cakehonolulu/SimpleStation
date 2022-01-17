@@ -24,6 +24,12 @@ unsigned _BitInt(16) m_immediate = 0;
 // Current immediate address (Opcode Bits [16:0])
 unsigned _BitInt(16) m_signed_immediate = 0;
 
+// Current shift immediate (Opcode Bits [10:6])
+unsigned _BitInt(5) m_subfunction = 0;
+
+// Current shift immediate (Opcode Bits [10:6])
+unsigned _BitInt(4) m_shift_immediate = 0;
+
 // Function to initialize the CPU state
 void m_cpu_init()
 {
@@ -99,6 +105,10 @@ void m_cpu_decode()
 
 	// Immediate Value
 	m_immediate = (m_opcode & 0xFFFF);
+
+	m_subfunction = m_opcode & 0x3F;
+
+	m_shift_immediate = (m_opcode >> 6) & 0x1F;
 
 	// Signed Immediate Value
 	m_signed_immediate = (uint32_t) ((int16_t) (m_opcode & 0xFFFF));
