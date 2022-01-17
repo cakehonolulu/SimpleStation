@@ -16,6 +16,9 @@ extern struct m_corewave_cw33300_instrs {
 // 0x00
 void m_sll();
 
+// 0x09
+void m_addiu();
+
 // 0x0B
 void m_sw();
 

@@ -1,73 +1,73 @@
 #include <cpu/instructions.h>
 
 const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
-	{"sll", m_sll},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{"sw", m_sw},	// 0x0B
-	{NULL, NULL},	// 0x00
-	{"ori", m_ori},	// 0x0D
-	{NULL, NULL},	// 0x00
-	{"lui", m_lui},	// 0x0F
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL},	// 0x00
-	{NULL, NULL}	// 0x00
+	{"sll", m_sll},		// 0x00
+	{NULL, NULL},		// 0x01
+	{NULL, NULL},		// 0x02
+	{NULL, NULL},		// 0x03
+	{NULL, NULL},		// 0x04
+	{NULL, NULL},		// 0x05
+	{NULL, NULL},		// 0x06
+	{NULL, NULL},		// 0x07
+	{NULL, NULL},		// 0x08
+	{"addiu", m_addiu},	// 0x09
+	{NULL, NULL},		// 0x00
+	{"sw", m_sw},		// 0x0B
+	{NULL, NULL},		// 0x00
+	{"ori", m_ori},		// 0x0D
+	{NULL, NULL},		// 0x00
+	{"lui", m_lui},		// 0x0F
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x00
+	{NULL, NULL}		// 0x00
 };
 
 void m_sll()
@@ -77,6 +77,17 @@ void m_sll()
 #endif
 
 	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
+
+	PC += 4;
+}
+
+void m_addiu()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
+#endif
+
+	REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
 
 	PC += 4;
 }
