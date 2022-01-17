@@ -120,7 +120,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	}
 	else
 	{
-		printf("[mem] Region not implemented!\n");
+		printf("[mem] memory_read: Region not implemented!\n");
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
 		m_memory_exit();
 		m_cpu_exit();
@@ -174,5 +174,13 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
 		}
+	}
+	else
+	{
+		printf("[mem] memory_write: Region not implemented!\n");
+		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
+		m_memory_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
 	}
 }
