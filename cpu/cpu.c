@@ -44,7 +44,7 @@ void m_cpu_init()
 #endif
 
 	// Point Program Counter to the initial BIOS address
-	PC = 0xbfc00000;
+	PC = 0xBFC00000;
 
 	// High register to 0
 	HI = 0;
@@ -89,22 +89,19 @@ void m_cpu_decode()
 	m_instruction = m_opcode >> 26;
 
 	// Register index "RS" [Bits 25:21]
-	m_sregidx = ((m_opcode >> 21) & 0x1f);
+	m_sregidx = ((m_opcode >> 21) & 0x1F);
 
 	// Register index "RT" [Bits 20:16]
-	m_tregidx = ((m_opcode >> 16) & 0x1f);
+	m_tregidx = ((m_opcode >> 16) & 0x1F);
 
 	// Register index "RD" [Bits 15:11]
-	m_dregidx = ((m_opcode >> 11) & 0x1f);
+	m_dregidx = ((m_opcode >> 11) & 0x1F);
 
 	// Immediate Value
-	m_immediate = (m_opcode & 0xffff);
+	m_immediate = (m_opcode & 0xFFFF);
 
-	int16_t m_signed;
-
-	m_signed = (m_opcode & 0xFFFF);
-
-	m_signed_immediate = (uint32_t) m_signed;
+	// Signed Immediate Value
+	m_signed_immediate = (uint32_t) ((int16_t) (m_opcode & 0xFFFF));
 }
 
 void m_cpu_execute()
