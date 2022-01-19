@@ -61,30 +61,22 @@ static const char *m_cpu_regnames[] = {
 // Defined in cpu.c
 extern m_mips_r3000a_t *m_cpu;
 extern uint32_t m_opcode;
-extern unsigned _BitInt(5) m_instruction;
-extern unsigned _BitInt(4) m_sregidx;
-extern unsigned _BitInt(4) m_tregidx;
-extern unsigned _BitInt(4) m_dregidx;
-extern unsigned _BitInt(16) m_immediate;
-extern unsigned _BitInt(16) m_signed_immediate;
-extern unsigned _BitInt(5) m_subfunction;
-extern unsigned _BitInt(4) m_shift_immediate;
-extern unsigned _BitInt(4) m_jump_immediate;
 
 // Internal defines
 #define REGS (m_cpu->m_registers)
-#define IMMDT ((uint32_t) m_immediate)
-#define SIMMDT ((uint32_t) m_signed_immediate)
-#define SUB ((uint32_t) m_subfunction)
-#define SHIFT ((uint32_t) m_shift_immediate)
-#define JIMMDT ((uint32_t) m_jump_immediate)
+#define INSTRUCTION ((uint32_t) (m_opcode >> 26))
+#define IMMDT ((uint32_t) (m_opcode & 0xFFFF))
+#define SIMMDT ((uint32_t) ((int16_t) (m_opcode & 0xFFFF)))
+#define SUB ((uint32_t) (m_opcode & 0x3F))
+#define SHIFT ((uint32_t) ((m_opcode >> 6) & 0x1F))
+#define JIMMDT ((uint32_t) (m_opcode & 0x3FFFFFF))
 
 // Operand Registers
-#define REGIDX_S ((uint32_t) m_sregidx)
-#define REGIDX_T ((uint32_t) m_tregidx)
+#define REGIDX_S ((uint32_t) ((m_opcode >> 21) & 0x1F))
+#define REGIDX_T ((uint32_t) ((m_opcode >> 16) & 0x1F))
 
 // Recieving Register
-#define REGIDX_D ((uint32_t) m_dregidx)
+#define REGIDX_D ((uint32_t) ((m_opcode >> 11) & 0x1F))
 
 // Register defines
 #define PC (m_cpu->m_pc)

@@ -22,13 +22,13 @@ void m_j();
 // 0x09
 void m_addiu();
 
-// 0x0B
-void m_sw();
-
 // 0x0D
 void m_ori();
 
 // 0x0F
 void m_lui();
+
+// 0x2B
+void m_sw();
 
 #endif /* INSTRUCTIONS_H */

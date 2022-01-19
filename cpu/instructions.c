@@ -12,39 +12,39 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
 	{NULL, NULL},		// 0x08
 	{"addiu", m_addiu},	// 0x09
 	{NULL, NULL},		// 0x00
-	{"sw", m_sw},		// 0x0B
+	{NULL, NULL},		// 0x0B
 	{NULL, NULL},		// 0x00
 	{"ori", m_ori},		// 0x0D
 	{NULL, NULL},		// 0x00
 	{"lui", m_lui},		// 0x0F
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
+	{NULL, NULL},		// 0x10
+	{NULL, NULL},		// 0x11
+	{NULL, NULL},		// 0x02
+	{NULL, NULL},		// 0x03
+	{NULL, NULL},		// 0x04
+	{NULL, NULL},		// 0x05
+	{NULL, NULL},		// 0x06
+	{NULL, NULL},		// 0x07
+	{NULL, NULL},		// 0x08
+	{NULL, NULL},		// 0x09
+	{NULL, NULL},		// 0x0A
+	{NULL, NULL},		// 0x0B
+	{NULL, NULL},		// 0x0C
+	{NULL, NULL},		// 0x0D
+	{NULL, NULL},		// 0x0E
+	{NULL, NULL},		// 0x0F
+	{NULL, NULL},		// 0x20
+	{NULL, NULL},		// 0x01
+	{NULL, NULL},		// 0x02
+	{NULL, NULL},		// 0x03
+	{NULL, NULL},		// 0x04
+	{NULL, NULL},		// 0x05
+	{NULL, NULL},		// 0x06
+	{NULL, NULL},		// 0x07
+	{NULL, NULL},		// 0x08
+	{NULL, NULL},		// 0x09
+	{NULL, NULL},		// 0x2A
+	{"sw", m_sw},		// 0x2B
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
@@ -82,10 +82,10 @@ void m_sll()
 void m_j()
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("PC: 0x%x; dst: 0x%x\n", PC, ((PC & 0xFC000000) | ((m_opcode & 0x3FFFFFF) * 4)));
+	printf("PC: 0x%x; dst: 0x%x\n", PC, ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4)));
 #endif
 
-	PC = ((PC & 0xFC000000) | ((m_opcode & 0x3FFFFFF) * 4));
+	PC = ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4));
 }
 
 void m_addiu()
