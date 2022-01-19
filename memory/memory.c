@@ -14,6 +14,8 @@ uint32_t m_memory_map[] = {
 	0xFFFFFFFF, 0xFFFFFFFF								// KSEG2: 1024MB
 };
 
+uint32_t m_memory_ram_config_reg = 0;
+
 /*
 	Function:
 	m_memory_init
@@ -102,7 +104,12 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
 
 	// Check for a read in BIOS area
-	if (m_address < 0x1FC80000)
+	if (m_address == 0x1F801060)
+	{
+		printf("[mem] RAM_SIZE Register: read -> 0x%X\n", m_memory_ram_config_reg);
+		return m_memory_ram_config_reg;
+	}
+	else if (m_address < 0x1FC80000)
 	{
 		// Based on the m_size argument, select the memory size to be read
 		switch (m_size)
@@ -160,7 +167,12 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	uint32_t m_placeholder = m_memory_offset >> 29;
 	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
 
-	if (m_address < 0x1F801080)
+	if (m_address == 0x1F801060)
+	{
+		printf("[mem] RAM_SIZE Register: write -> 0x%X\n", m_value);
+		m_memory_ram_config_reg = m_value;
+	}
+	else if (m_address < 0x1F801080)
 	{
 		switch (m_size)
 		{
