@@ -63,14 +63,10 @@ void m_cpu_fde()
 	// Increment Program Counter by 4
 	PC += 4;
 
-#ifdef DEBUG_CPU
-	printf("Opcode: 0x%06X, instr: 0x%x, regidx: 0x%x, imm: 0x%x\n", (uint32_t) m_opcode, (uint32_t) m_instruction, (uint32_t) m_regidx, (uint32_t) m_immediate);
-#endif
-
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
-		printf("Unimplemented Opcode 0x%02X\n", (uint32_t) INSTRUCTION);
+		printf("Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n", INSTRUCTION, m_opcode);
 		m_printregs();
 		m_bios_exit();
 		m_cpu_exit();
