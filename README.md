@@ -11,7 +11,11 @@
 * Runs on amd64 (x86_64 Intel/AMD PC)
 * Upstream compiler support (CLANG-14 & GCC-12)
 
-## To do:
+## Specs:
+#### 🟩 Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
+* 7 out of 126 instructions implemented
+
+## Roadmap:
 * Planned support for aarch64 Cortex-A72's ARMv8-A (Raspberry Pi 4 Model B)
 
 ## Documentation:
