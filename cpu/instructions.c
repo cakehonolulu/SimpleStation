@@ -1,74 +1,22 @@
 #include <cpu/instructions.h>
 
-const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
-	{"sll", m_sll},		// 0x00
-	{NULL, NULL},		// 0x01
-	{"j", m_j},			// 0x02
-	{NULL, NULL},		// 0x03
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{"addiu", m_addiu},	// 0x09
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x0B
-	{NULL, NULL},		// 0x00
-	{"ori", m_ori},		// 0x0D
-	{NULL, NULL},		// 0x00
-	{"lui", m_lui},		// 0x0F
-	{NULL, NULL},		// 0x10
-	{NULL, NULL},		// 0x11
-	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
-	{NULL, NULL},		// 0x0A
-	{NULL, NULL},		// 0x0B
-	{NULL, NULL},		// 0x0C
-	{NULL, NULL},		// 0x0D
-	{NULL, NULL},		// 0x0E
-	{NULL, NULL},		// 0x0F
-	{NULL, NULL},		// 0x20
-	{NULL, NULL},		// 0x01
-	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
-	{NULL, NULL},		// 0x2A
-	{"sw", m_sw},		// 0x2B
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL}		// 0x00
-};
+void m_exp()
+{
+	// Check if the instruction is implemented
+	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
+	{
+		printf("Unimplemented 0x00 Family Opcode: 0x%02X\n", (m_opcode & 0x3F));
+		m_printregs();
+		m_bios_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		// Execute the instruction
+		((void (*)(void))m_psx_extended_00[(m_opcode & 0x3F)].m_funct)();
+	}
+}
 
 void m_sll()
 {

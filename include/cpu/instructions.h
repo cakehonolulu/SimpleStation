@@ -9,11 +9,19 @@
 extern struct m_corewave_cw33300_instrs {
 	const char *m_instr;
 	void *m_funct;
-} const m_psx_instrs[67];
+} const m_psx_instrs[0x3F];
+
+extern struct m_corewave_cw33300_extended_00_instrs {
+	const char *m_instr;
+	void *m_funct;
+} const m_psx_extended_00[0x3F];
 
 /* Instructions */
 
 // 0x00
+void m_exp();
+
+// 0x00 -> 0x00
 void m_sll();
 
 // 0x02

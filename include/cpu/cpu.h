@@ -64,7 +64,7 @@ extern uint32_t m_opcode;
 
 // Internal defines
 #define REGS (m_cpu->m_registers)
-#define INSTRUCTION ((uint32_t) (m_opcode >> 26))
+#define INSTRUCTION ((uint32_t) (m_opcode >> 26) & 63)
 #define IMMDT ((uint32_t) (m_opcode & 0xFFFF))
 #define SIMMDT ((uint32_t) ((int16_t) (m_opcode & 0xFFFF)))
 #define SUB ((uint32_t) (m_opcode & 0x3F))
@@ -118,9 +118,7 @@ extern uint32_t m_opcode;
 
 /* Function definitions */
 void m_cpu_init();
+void m_cpu_fde();
 void m_cpu_exit();
-void m_cpu_fetch();
-void m_cpu_decode();
-void m_cpu_execute();
 
 #endif /* CPU_H */
