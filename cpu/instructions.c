@@ -18,6 +18,18 @@ void m_exp()
 	}
 }
 
+/*
+	SLL (MIPS I)
+
+	Format:
+	SLL rd, rt, sa
+
+	Description:
+	To left shift a word by a fixed number of bits.
+	The contents of the low-order 32-bit word of GPR rt are shifted left, inserting zeroes
+	into the emptied bits; the word result is placed in GPR rd. The bit shift count is
+	specified by sa. If rd is a 64-bit register, the result word is sign-extended.
+*/
 void m_sll()
 {
 #ifdef DEBUG_INSTRUCTIONS
@@ -27,15 +39,41 @@ void m_sll()
 	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
 }
 
+/*
+	J (MIPS I)
+
+	Format:
+	J target
+
+	Description:
+	To branch within the current 256 MB aligned region
+	This is a PC-region branch (not PC-relative); the effective target address is in the
+	“current” 256 MB aligned region. The low 28 bits of the target address is the instr_index
+	field shifted left 2 bits. The remaining upper bits are the corresponding bits of the
+	address of the instruction in the delay slot (not the branch itself).
+	Jump to the effective target address. Execute the instruction following the jump, in the
+	branch delay slot, before jumping
+*/
 void m_j()
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("PC: 0x%x; dst: 0x%x\n", PC, ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4)));
+	printf("j 0x%x\n", PC, ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4)));
 #endif
 
 	PC = ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4));
 }
 
+/*
+	ADDIU (MIPS I)
+
+	Format:
+	ADDIU rt, rs, immediate
+
+	Description:
+	The 16-bit signed immediate is added to the 32-bit value in GPR rs and the 32-bit
+	arithmetic result is placed into GPR rt.
+	No Integer Overflow exception occurs under any circumstances.
+*/
 void m_addiu()
 {
 #ifdef DEBUG_INSTRUCTIONS
@@ -45,6 +83,17 @@ void m_addiu()
 	REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
 }
 
+/*
+	SW (MIPS I)
+
+	Format:
+	SW rt, offset(base)
+
+	Description:
+	The least-significant 32-bit word of register rt is stored in memory at the location
+	specified by the aligned effective address. The 16-bit signed offset is added to the
+	contents of GPR base to form the effective address.
+*/
 void m_sw()
 {
 #ifdef DEBUG_INSTRUCTIONS
