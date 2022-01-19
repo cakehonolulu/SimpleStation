@@ -57,10 +57,14 @@ void m_sll()
 void m_j()
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("j 0x%x\n", PC, ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4)));
+	printf("j 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	PC = ((PC & 0xF0000000) | ((m_opcode & 0x3FFFFFF) * 4));
+	/*
+		According to simias, the immediate value is shifted 2 times to the right,
+		but psx spx wiki specifies the immediate jump value is multiplied by 4
+	*/
+	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
 
 /*
