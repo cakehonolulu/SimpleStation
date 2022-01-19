@@ -21,6 +21,7 @@ uint32_t m_memory_map[] = {
 };
 
 uint32_t m_memory_ram_config_reg = 0;
+uint32_t m_memory_cache_control_reg = 0;
 
 /*
 	Function:
@@ -196,6 +197,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				exit(EXIT_FAILURE);
 		}
 	}
+	else if (m_address == 0xFFFE0130)
+	{
+		printf("[mem] Cache Control Register: read -> 0x%X\n", m_memory_cache_control_reg);
+		return m_memory_cache_control_reg;
+	}
 	else
 	{
 		printf("[mem] memory_read: Region not implemented!\n");
@@ -299,6 +305,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
 		}
+	}
+	else if (m_address == 0xFFFE0130)
+	{
+		printf("[mem] Cache Control Register: write -> 0x%X\n", m_value);
+		m_memory_cache_control_reg = m_value;
 	}
 	else
 	{
