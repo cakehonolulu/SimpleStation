@@ -3,6 +3,12 @@
 // PSX RAM Memory Buffer
 int8_t *m_mem_ram;
 
+// PSX Scratchpad RAM
+int8_t *m_mem_scratchpad;
+
+// PSX Memory Control 1 RAM
+int8_t *m_mem_memctl1;
+
 // PSX BIOS Memory Buffer
 int8_t *m_mem_bios;
 
@@ -28,7 +34,14 @@ uint32_t m_memory_ram_config_reg = 0;
 */
 void m_memory_init()
 {
+	// 2 MiB Total
 	m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
+
+	// 1 KiB Total
+	m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
+
+	// 0x20 Total (0x1F801020 - 0x1F801000)
+	m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
 
 	if (!m_mem_ram)
 	{
@@ -50,6 +63,12 @@ void m_memory_exit()
 {
 	// Free the RAM Buffer
 	free(m_mem_ram);
+
+	// Free the Scratchpad Buffer
+	free(m_mem_scratchpad);
+
+	// Free the Memory Control 1 Buffer
+	free(m_mem_memctl1);
 
 	// Exit the BIOS Subsystem (Frees the BIOS Memory)
 	m_bios_exit();
@@ -75,6 +94,11 @@ uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 	uint8_t b3 = *(uint8_t*)(m_memory_source + (m_memory_address + 3));
 
 	return (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
+}
+
+uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source)
+{
+	*(uint32_t *) (m_memory_address + m_memory_source) = m_value;
 }
 
 /*
@@ -109,7 +133,49 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 		printf("[mem] RAM_SIZE Register: read -> 0x%X\n", m_memory_ram_config_reg);
 		return m_memory_ram_config_reg;
 	}
-	else if (m_address < 0x1FC80000)
+	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
+	{
+		// Based on the m_size argument, select the memory size to be read
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0x3FF, m_mem_scratchpad);
+
+			default:
+				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
+	}
+	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
+	{
+		// Based on the m_size argument, select the memory size to be read
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0xF, m_mem_memctl1);
+
+			default:
+				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
+	}
+	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
 		// Based on the m_size argument, select the memory size to be read
 		switch (m_size)
@@ -172,7 +238,49 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		printf("[mem] RAM_SIZE Register: write -> 0x%X\n", m_value);
 		m_memory_ram_config_reg = m_value;
 	}
-	else if (m_address < 0x1F801080)
+	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
+	{
+		// Based on the m_size argument, select the memory size to be read
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_write_dword(m_address & 0x3FF, m_value, m_mem_scratchpad);
+
+			default:
+				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
+	}
+	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
+	{
+		// Based on the m_size argument, select the memory size to be read
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_write_dword(m_address & 0xF, m_value, m_mem_memctl1);
+
+			default:
+				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				m_memory_exit();
+				m_cpu_exit();
+				exit(EXIT_FAILURE);
+		}
+	}
+	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
 		switch (m_size)
 		{
