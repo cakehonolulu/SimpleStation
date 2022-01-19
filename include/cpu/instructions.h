@@ -24,6 +24,9 @@ void m_exp();
 // 0x00 -> 0x00
 void m_sll();
 
+// 0x00 -> 0x25
+void m_or();
+
 // 0x02
 void m_j();
 

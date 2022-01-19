@@ -40,6 +40,26 @@ void m_sll()
 }
 
 /*
+	OR (MIPS I)
+
+	Format:
+	OR rd, rs, rt
+
+	Description:
+	To do a bitwise logical OR.
+	The contents of GPR rs are combined with the contents of GPR rt in a bitwise logical
+	OR operation. The result is placed into GPR rd.
+*/
+void m_or()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
+}
+
+/*
 	J (MIPS I)
 
 	Format:
