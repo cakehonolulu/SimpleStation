@@ -118,7 +118,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	// PSX doesn't permit unaligned memory reads
 	if (m_memory_offset % 4 != 0)
 	{
-		printf("[mem] Unaligned memory read detected! Exiting...\n");
+		printf(RED "[mem] Unaligned memory read detected! Exiting...\n" NORMAL);
 		m_memory_exit();
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
@@ -131,7 +131,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	// Check for a read in BIOS area
 	if (m_address == 0x1F801060)
 	{
-		printf("[mem] RAM_SIZE Register: read -> 0x%X\n", m_memory_ram_config_reg);
+		printf(YELLOW "[mem] RAM_SIZE Register: read -> 0x%X\n" NORMAL, m_memory_ram_config_reg);
 		return m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
@@ -149,7 +149,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0x3FF, m_mem_scratchpad);
 
 			default:
-				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -170,7 +170,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0xF, m_mem_memctl1);
 
 			default:
-				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -191,7 +191,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0x7FFFF, m_mem_bios);
 
 			default:
-				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -199,12 +199,12 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf("[mem] Cache Control Register: read -> 0x%X\n", m_memory_cache_control_reg);
+		printf(YELLOW "[mem] Cache Control Register: read -> 0x%X\n" NORMAL, m_memory_cache_control_reg);
 		return m_memory_cache_control_reg;
 	}
 	else
 	{
-		printf("[mem] memory_read: Region not implemented!\n");
+		printf(RED "[mem] memory_read: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
 		m_memory_exit();
 		m_cpu_exit();
@@ -229,7 +229,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	// PSX doesn't permit unaligned memory writes
 	if (m_memory_offset % 4 != 0)
 	{
-		printf("[mem] Unaligned memory write detected! Exiting...\n");
+		printf(RED "[mem] Unaligned memory write detected! Exiting...\n" NORMAL);
 		m_memory_exit();
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
@@ -241,7 +241,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 	if (m_address == 0x1F801060)
 	{
-		printf("[mem] RAM_SIZE Register: write -> 0x%X\n", m_value);
+		printf(YELLOW "[mem] RAM_SIZE Register: write -> 0x%X\n" NORMAL, m_value);
 		m_memory_ram_config_reg = m_value;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
@@ -259,7 +259,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_memory_write_dword(m_address & 0x3FF, m_value, m_mem_scratchpad);
 
 			default:
-				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -280,7 +280,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_memory_write_dword(m_address & 0xF, m_value, m_mem_memctl1);
 
 			default:
-				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -300,7 +300,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_interrupts_write(m_address, m_value);
 
 			default:
-				printf("[mem] Unknown Memory Write Size! (%d)\n", m_size);
+				printf(RED "[mem] Unknown Memory Write Size! (%d)\n" NORMAL, m_size);
 				m_memory_exit();
 				m_cpu_exit();
 				exit(EXIT_FAILURE);
@@ -308,12 +308,12 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf("[mem] Cache Control Register: write -> 0x%X\n", m_value);
+		printf(YELLOW "[mem] Cache Control Register: write -> 0x%X\n" NORMAL, m_value);
 		m_memory_cache_control_reg = m_value;
 	}
 	else
 	{
-		printf("[mem] memory_write: Region not implemented!\n");
+		printf(RED "[mem] memory_write: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
 		m_memory_exit();
 		m_cpu_exit();
