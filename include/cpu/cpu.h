@@ -69,6 +69,7 @@ extern unsigned _BitInt(16) m_immediate;
 extern unsigned _BitInt(16) m_signed_immediate;
 extern unsigned _BitInt(5) m_subfunction;
 extern unsigned _BitInt(4) m_shift_immediate;
+extern unsigned _BitInt(4) m_jump_immediate;
 
 // Internal defines
 #define REGS (m_cpu->m_registers)
@@ -76,6 +77,7 @@ extern unsigned _BitInt(4) m_shift_immediate;
 #define SIMMDT ((uint32_t) m_signed_immediate)
 #define SUB ((uint32_t) m_subfunction)
 #define SHIFT ((uint32_t) m_shift_immediate)
+#define JIMMDT ((uint32_t) m_jump_immediate)
 
 // Operand Registers
 #define REGIDX_S ((uint32_t) m_sregidx)

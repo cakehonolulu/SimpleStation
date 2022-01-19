@@ -3,7 +3,7 @@
 const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
 	{"sll", m_sll},		// 0x00
 	{NULL, NULL},		// 0x01
-	{NULL, NULL},		// 0x02
+	{"j", m_j},			// 0x02
 	{NULL, NULL},		// 0x03
 	{NULL, NULL},		// 0x04
 	{NULL, NULL},		// 0x05
@@ -77,8 +77,15 @@ void m_sll()
 #endif
 
 	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
+}
 
-	PC += 4;
+void m_j()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("PC: 0x%x; dst: 0x%x\n", PC, ((PC & 0xFC000000) | ((m_opcode & 0x3FFFFFF) * 4)));
+#endif
+
+	PC = ((PC & 0xFC000000) | ((m_opcode & 0x3FFFFFF) * 4));
 }
 
 void m_addiu()
@@ -88,8 +95,6 @@ void m_addiu()
 #endif
 
 	REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
-
-	PC += 4;
 }
 
 void m_sw()
@@ -99,8 +104,6 @@ void m_sw()
 #endif
 
 	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword);
-
-	PC += 4;
 }
 
 /*
@@ -125,9 +128,6 @@ void m_ori()
 	{
 		REGS[REGIDX_T] = (REGS[REGIDX_S] | IMMDT);
 	}
-
-	// Increment Program Counter by 4
-	PC += 4;
 }
 
 /*
@@ -153,7 +153,4 @@ void m_lui()
 		// Bit shift by 16 the immediate value and place it at the register pointed by the index
 		REGS[REGIDX_T] = (IMMDT << 16);
 	}
-	
-	// Increment Program Counter by 4
-	PC += 4;
 }

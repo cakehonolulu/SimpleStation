@@ -30,6 +30,9 @@ unsigned _BitInt(5) m_subfunction = 0;
 // Current shift immediate (Opcode Bits [10:6])
 unsigned _BitInt(4) m_shift_immediate = 0;
 
+// Current shift immediate (Opcode Bits [10:6])
+unsigned _BitInt(4) m_jump_immediate = 0;
+
 // Function to initialize the CPU state
 void m_cpu_init()
 {
@@ -75,10 +78,17 @@ void m_cpu_exit()
 #endif
 }
 
+uint32_t m_next_instr = 0;
+
 void m_cpu_fetch()
 {
+	m_opcode = m_next_instr;
+
 	/* Fetch cycle */
-	m_opcode = READ32_BIOS(PC);
+	m_next_instr = READ32_BIOS(PC);
+	
+	// Increment Program Counter by 4
+	PC += 4;
 }
 
 void m_cpu_decode()
@@ -112,6 +122,8 @@ void m_cpu_decode()
 
 	// Signed Immediate Value
 	m_signed_immediate = (uint32_t) ((int16_t) (m_opcode & 0xFFFF));
+
+	m_jump_immediate = (uint32_t) (m_opcode & 0x3FFFFFF);
 }
 
 void m_cpu_execute()
