@@ -16,6 +16,11 @@ extern struct m_corewave_cw33300_extended_00_instrs {
 	void *m_funct;
 } const m_psx_extended_00[0x3F];
 
+extern struct m_corewave_cw33300_cop0_instrs {
+	const char *m_instr;
+	void *m_funct;
+} const m_psx_cop0[0x5];
+
 /* Instructions */
 
 // 0x00
@@ -32,6 +37,9 @@ void m_j();
 
 // 0x09
 void m_addiu();
+
+// 0x10
+void m_cop0();
 
 // 0x0D
 void m_ori();

@@ -18,6 +18,24 @@ void m_exp()
 	}
 }
 
+void m_cop0()
+{
+	// Check if the instruction is implemented
+	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
+	{
+		printf("Unimplemented Coprocessor 0 Opcode: 0x%02X\n", REGIDX_S);
+		m_printregs();
+		m_bios_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		// Execute the instruction
+		((void (*)(void))m_psx_cop0[REGIDX_S].m_funct)();
+	}
+}
+
 /*
 	SLL (MIPS I)
 
