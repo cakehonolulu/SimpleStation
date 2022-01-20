@@ -14,6 +14,8 @@ void m_cpu_init()
 	// Malloc the CPU-state struct
 	m_cpu = (m_mips_r3000a_t*) malloc(sizeof(m_mips_r3000a_t));
 
+	m_cpu_cop0_init();
+
 	// Check for malloc completion
 	if (!m_cpu)
 	{
@@ -46,6 +48,8 @@ void m_cpu_init()
 // Function to free the CPU struct after end-of-emulation
 void m_cpu_exit()
 {
+	m_cpu_cop0_exit();
+	
 	free(m_cpu);
 
 #ifdef DEBUG_CPU

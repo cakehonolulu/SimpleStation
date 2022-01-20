@@ -137,5 +137,5 @@ const struct m_corewave_cw33300_cop0_instrs m_psx_cop0[0x5] = {
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
 	{NULL, NULL},		// 0x03
-	{NULL, NULL}		// 0x00
+	{"mtc0", m_mtc0}	// 0x04
 };
