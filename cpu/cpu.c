@@ -66,7 +66,7 @@ void m_cpu_fde()
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
-		printf("Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n", INSTRUCTION, m_opcode);
+		printf(RED "Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
 		m_printregs();
 		m_bios_exit();
 		m_cpu_exit();

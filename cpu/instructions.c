@@ -5,7 +5,7 @@ void m_exp()
 	// Check if the instruction is implemented
 	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
 	{
-		printf("Unimplemented 0x00 Family Opcode: 0x%02X\n", (m_opcode & 0x3F));
+		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_opcode & 0x3F));
 		m_printregs();
 		m_bios_exit();
 		m_cpu_exit();
@@ -23,7 +23,7 @@ void m_cop0()
 	// Check if the instruction is implemented
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
 	{
-		printf("Unimplemented Coprocessor 0 Opcode: 0x%02X\n", REGIDX_S);
+		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\n" NORMAL, REGIDX_S);
 		m_printregs();
 		m_bios_exit();
 		m_cpu_exit();
