@@ -14,8 +14,11 @@ MINGW64 = x86_64-w64-mingw32-gcc-10-win32
 CFLAGS := -Wall -Wextra -std=c2x -Iinclude/
 SDLCFLAGS = `sdl2-config --cflags`
 SDLLDFLAGS = `sdl2-config --libs`
-LDFLAGS = -lm
+LDFLAGS := -lm
 
+ifdef LD_MOLD
+LDFLAGS += -fuse-ld=mold
+endif
 ifdef DEBUG_CPU
 CFLAGS += -DDEBUG_CPU
 endif
