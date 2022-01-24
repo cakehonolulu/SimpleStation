@@ -32,6 +32,9 @@ void m_cpu_cop0_exit()
 
 void m_mtc0()
 {
-	COP0_REGS[] = 
-	exit(1);
+#ifdef DEBUG_INSTRUCTIONS
+	printf("mtc0 $%s, $%s\n", m_cpu_regnames[REGIDX_T], m_cop0_regnames[REGIDX_D]);
+#endif
+
+	COP0_REGS[REGIDX_D] = REGS[REGIDX_T];
 }
