@@ -17,6 +17,12 @@ void m_cpu_cop0_init()
 		printf("[CPU] Allocated CPU's Coprocessor 0 structure!\n");
 	}
 #endif
+
+	// Set all Coprocessor 0 Registers to 0
+	for (uint8_t m_cop0_regs = 0; m_cop0_regs < M_R3000_COP0_REGISTERS; m_cop0_regs++)
+	{
+		m_cpu_cop0->m_registers[m_cop0_regs] = 0;
+	}
 }
 
 void m_cpu_cop0_exit()

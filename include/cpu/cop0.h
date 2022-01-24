@@ -4,9 +4,11 @@
 #include <cpu/instructions.h>
 #include <stdint.h>
 
+#define M_R3000_COP0_REGISTERS 32
+
 typedef struct m_corewave_cw33300_cop0
 {
-	uint32_t m_registers[1];
+	uint32_t m_registers[M_R3000_COP0_REGISTERS];
 
 } m_mips_r3000a_cop0_t;
 
