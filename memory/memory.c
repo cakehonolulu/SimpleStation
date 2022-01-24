@@ -99,7 +99,7 @@ uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 
 uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source)
 {
-	*(uint32_t *) (m_memory_address + m_memory_source) = m_value;
+	return *(uint32_t *) (m_memory_address + m_memory_source) = m_value;
 }
 
 /*
@@ -210,6 +210,9 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
 	}
+
+	printf(YELLOW "[mem] memory_read: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
+	return 0;
 }
 
 /*
@@ -242,7 +245,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	if (m_address == 0x1F801060)
 	{
 		printf(YELLOW "[mem] RAM_SIZE Register: write -> 0x%X\n" NORMAL, m_value);
-		m_memory_ram_config_reg = m_value;
+		return m_memory_ram_config_reg = m_value;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
@@ -309,7 +312,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	else if (m_address == 0xFFFE0130)
 	{
 		printf(YELLOW "[mem] Cache Control Register: write -> 0x%X\n" NORMAL, m_value);
-		m_memory_cache_control_reg = m_value;
+		return m_memory_cache_control_reg = m_value;
 	}
 	else
 	{
@@ -319,4 +322,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		m_cpu_exit();
 		exit(EXIT_FAILURE);
 	}
+
+	printf(YELLOW "[mem] memory_write: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
+	return 0;
 }
