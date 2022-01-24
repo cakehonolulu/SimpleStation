@@ -2,6 +2,7 @@
 #define COP0_H
 
 #include <cpu/instructions.h>
+#include <cpu/cpu.h>
 #include <stdint.h>
 
 #define M_R3000_COP0_REGISTERS 32
@@ -13,6 +14,8 @@ typedef struct m_corewave_cw33300_cop0
 } m_mips_r3000a_cop0_t;
 
 extern m_mips_r3000a_cop0_t *m_cpu_cop0;
+
+#define COP0_REGS (m_cpu_cop0->m_registers)
 
 void m_cpu_cop0_init();
 void m_cpu_cop0_exit();

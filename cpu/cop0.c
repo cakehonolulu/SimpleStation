@@ -32,6 +32,6 @@ void m_cpu_cop0_exit()
 
 void m_mtc0()
 {
-	printf("!\n");
+	COP0_REGS[] = 
 	exit(1);
 }
