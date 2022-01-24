@@ -21,4 +21,9 @@ uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val)
 	{
 		return m_interrupt_mask = m_int_val & 0x7FF;
 	}
+	else
+	{
+		printf(YELLOW "[int] Abnormal branch in emulator logic, bugs and glitches can occurr!\n" NORMAL);
+		return m_reg;
+	}
 }
