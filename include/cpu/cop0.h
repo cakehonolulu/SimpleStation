@@ -16,6 +16,7 @@ typedef struct m_corewave_cw33300_cop0
 extern m_mips_r3000a_cop0_t *m_cpu_cop0;
 
 #define COP0_REGS (m_cpu_cop0->m_registers)
+#define COP0_STATUS_REGISTER COP0_REGS[12]
 
 static const char *m_cop0_regnames[] = {
 	"cop0_0", "cop0_1", "cop0_2",

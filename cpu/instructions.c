@@ -142,6 +142,12 @@ void m_sw()
 	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
+	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	{
+		printf(YELLOW "[cpu] sw: Ignoring word store, cache is isolated...\n" NORMAL);
+		return;
+	}
+
 	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword);
 }
 
