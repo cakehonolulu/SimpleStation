@@ -46,8 +46,10 @@ void m_memory_init()
 
 	if (!m_mem_ram)
 	{
-		printf("Simplestation: Couldn't allocate PSX RAM Memory, exiting...");
+		printf("[MEM] init: Couldn't allocate PSX RAM Memory, exiting...");
 	}
+
+	m_simplestation.m_memory_state = ON;
 }
 
 /*
@@ -118,10 +120,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	// PSX doesn't permit unaligned memory reads
 	if (m_memory_offset % 4 != 0)
 	{
-		printf(RED "[mem] Unaligned memory read detected! Exiting...\n" NORMAL);
-		m_memory_exit();
-		m_cpu_exit();
-		exit(EXIT_FAILURE);
+		printf(RED "[MEM] read: Unaligned memory read! Exiting...\n" NORMAL);
+		m_simplestation_exit();
 	}
 
 	// Calculate the absolute memory address to read at
@@ -131,7 +131,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	// Check for a read in BIOS area
 	if (m_address == 0x1F801060)
 	{
-		printf(YELLOW "[mem] RAM_SIZE Register: read -> 0x%X\n" NORMAL, m_memory_ram_config_reg);
+		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_memory_ram_config_reg);
 		return m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
@@ -149,10 +149,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0x3FF, m_mem_scratchpad);
 
 			default:
-				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
+				m_simplestation_exit();
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -170,10 +168,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0xF, m_mem_memctl1);
 
 			default:
-				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
+				m_simplestation_exit();
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -191,26 +187,24 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 				return m_memory_read_dword(m_address & 0x7FFFF, m_mem_bios);
 
 			default:
-				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
-				goto m_memory_cleanup;
+				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
+				return m_simplestation_exit();
 		}
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf(YELLOW "[mem] Cache Control Register: read -> 0x%X\n" NORMAL, m_memory_cache_control_reg);
+		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg);
 		return m_memory_cache_control_reg;
 	}
 	else
 	{
-		printf(RED "[mem] memory_read: Region not implemented!\n" NORMAL);
+		printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		goto m_memory_cleanup;
+		return m_simplestation_exit();
 	}
 
-m_memory_cleanup:
-	m_memory_exit();
-	m_cpu_exit();
-	exit(EXIT_FAILURE);
+ 	printf(RED "[MEM] read: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
+ 	return m_simplestation_exit();
 }
 
 /*
@@ -230,10 +224,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	// PSX doesn't permit unaligned memory writes
 	if (m_memory_offset % 4 != 0)
 	{
-		printf(RED "[mem] Unaligned memory write detected! Exiting...\n" NORMAL);
-		m_memory_exit();
-		m_cpu_exit();
-		exit(EXIT_FAILURE);
+		printf(RED "[MEM] write: Unaligned memory write! Exiting...\n" NORMAL);
+		return m_simplestation_exit();
 	}
 
 	// Calculate the absolute memory address to write at
@@ -242,7 +234,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 	if (m_address == 0x1F801060)
 	{
-		printf(YELLOW "[mem] RAM_SIZE Register: write -> 0x%X\n" NORMAL, m_value);
+		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg, m_value);
 		return m_memory_ram_config_reg = m_value;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
@@ -260,10 +252,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_memory_write_dword(m_address & 0x3FF, m_value, m_mem_scratchpad);
 
 			default:
-				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+				return m_simplestation_exit();
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -281,10 +271,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_memory_write_dword(m_address & 0xF, m_value, m_mem_memctl1);
 
 			default:
-				printf(RED "[mem] Unknown Memory Read Size! (%d)\n" NORMAL, m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+				return m_simplestation_exit();
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -301,24 +289,22 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				return m_interrupts_write(m_address, m_value);
 
 			default:
-				printf(RED "[mem] Unknown Memory Write Size! (%d)\n" NORMAL, m_size);
-				goto m_memory_cleanup;
+				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+				return m_simplestation_exit();
 		}
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf(YELLOW "[mem] Cache Control Register: write -> 0x%X\n" NORMAL, m_value);
+		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg , m_value);
 		return m_memory_cache_control_reg = m_value;
 	}
 	else
 	{
-		printf(RED "[mem] memory_write: Region not implemented!\n" NORMAL);
+		printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		goto m_memory_cleanup;
+		return m_simplestation_exit();
 	}
 
-m_memory_cleanup:
-	m_memory_exit();
-	m_cpu_exit();
-	exit(EXIT_FAILURE);
+ 	printf(RED "[MEM] write: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
+	return m_simplestation_exit();
 }

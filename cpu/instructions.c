@@ -144,7 +144,7 @@ void m_sw()
 
 	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
 	{
-		printf(YELLOW "[cpu] sw: Ignoring word store, cache is isolated...\n" NORMAL);
+		printf(YELLOW "[CPU] sw: Ignoring word store, cache is isolated...\n" NORMAL);
 		return;
 	}
 

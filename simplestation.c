@@ -1,5 +1,7 @@
 #include <simplestation.h>
 
+m_simplestation_state m_simplestation;
+
 int main(int argc, char **argv)
 {
 	printf("SimpleStation - Multiplatform PSX Emulator\n");
@@ -69,10 +71,26 @@ int main(int argc, char **argv)
 		m_cpu_fde();
 	}
 
-	// Uninitialize the Memory Subsystem
-	m_memory_exit();
+	return m_simplestation_exit();
+}
 
-	// Uninitialize the CPU Subsystem
-	m_cpu_exit();
-	return 0;
+uint8_t m_simplestation_exit()
+{
+	if (m_simplestation.m_memory_state)
+	{
+		m_memory_exit();
+	}
+
+	if (m_simplestation.m_interrupts_state)
+	{
+		// Do nothing for now
+	}
+
+	if (m_simplestation.m_cpu_state)
+	{
+		m_cpu_exit();
+	}
+
+	exit(EXIT_FAILURE);
+	return 1;
 }

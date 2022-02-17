@@ -19,13 +19,13 @@ void m_cpu_init()
 	// Check for malloc completion
 	if (!m_cpu)
 	{
-		printf("Simplestation: Couldn't allocate CPU state struct, exiting...\n");
+		printf(RED "[CPU] init: Couldn't allocate CPU state struct, exiting...\n" NORMAL);
 		exit(EXIT_FAILURE);
 	}
 #ifdef DEBUG_CPU
 	else
 	{
-		printf("[CPU] Allocated CPU structure!\n");
+		printf("[CPU] init: Allocated CPU structure!\n");
 	}
 #endif
 
@@ -43,6 +43,8 @@ void m_cpu_init()
 	{
 		m_cpu->m_registers[m_regs] = 0;
 	}
+
+	m_simplestation.m_cpu_state = ON;
 }
 
 // Function to free the CPU struct after end-of-emulation
@@ -53,7 +55,7 @@ void m_cpu_exit()
 	free(m_cpu);
 
 #ifdef DEBUG_CPU
-	printf("[CPU] Freed CPU structure!\n");
+	printf("[CPU] exit: Freed CPU structure!\n");
 #endif
 }
 
@@ -70,11 +72,9 @@ void m_cpu_fde()
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
-		printf(RED "Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
+		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
 		m_printregs();
-		m_bios_exit();
-		m_cpu_exit();
-		exit(EXIT_FAILURE);
+		m_simplestation_exit();
 	}
 	else
 	{

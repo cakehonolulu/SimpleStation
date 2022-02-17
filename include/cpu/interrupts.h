@@ -1,4 +1,5 @@
 #include <ui/termcolour.h>
+#include <simplestation.h>
 #include <stdint.h>
 #include <stdio.h>
 

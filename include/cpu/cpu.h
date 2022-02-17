@@ -4,6 +4,7 @@
 #include <memory/memory.h>
 #include <cpu/instructions.h>
 #include <debugger/debugger.h>
+#include <simplestation.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
