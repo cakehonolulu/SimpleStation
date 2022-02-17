@@ -1,4 +1,6 @@
+#include <ui/termcolour.h>
 #include <stdint.h>
+#include <stdio.h>
 
 /* Defines */
 

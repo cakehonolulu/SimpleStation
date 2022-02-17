@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	while (true)
 	{
 		// Fetch, decode, execute
-		m_psx_fde();
+		m_cpu_fde();
 	}
 
 	// Uninitialize the Memory Subsystem

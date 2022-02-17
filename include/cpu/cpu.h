@@ -61,28 +61,34 @@ static const char *m_cpu_regnames[] = {
 // Defined in cpu.c
 extern m_mips_r3000a_t *m_cpu;
 extern uint32_t m_opcode;
-extern unsigned _BitInt(5) m_instruction;
-extern unsigned _BitInt(4) m_sregidx;
-extern unsigned _BitInt(4) m_tregidx;
-extern unsigned _BitInt(4) m_dregidx;
-extern unsigned _BitInt(16) m_immediate;
-extern unsigned _BitInt(16) m_signed_immediate;
-extern unsigned _BitInt(5) m_subfunction;
-extern unsigned _BitInt(4) m_shift_immediate;
 
 // Internal defines
 #define REGS (m_cpu->m_registers)
-#define IMMDT ((uint32_t) m_immediate)
-#define SIMMDT ((uint32_t) m_signed_immediate)
-#define SUB ((uint32_t) m_subfunction)
-#define SHIFT ((uint32_t) m_shift_immediate)
+#define INSTRUCTION ((uint32_t) (m_opcode >> 26) & 63)
 
-// Operand Registers
-#define REGIDX_S ((uint32_t) m_sregidx)
-#define REGIDX_T ((uint32_t) m_tregidx)
+// Current immediate address (Opcode Bits [16:0])
+#define IMMDT ((uint32_t) (m_opcode & 0xFFFF))
 
-// Recieving Register
-#define REGIDX_D ((uint32_t) m_dregidx)
+// Current signed immediate address (Opcode Bits [16:0])
+#define SIMMDT ((uint32_t) ((int16_t) (m_opcode & 0xFFFF)))
+
+// Current subfunction (Opcode Bits [10:6])
+#define SUB ((uint32_t) (m_opcode & 0x3F))
+
+// Current shift immediate (Opcode Bits [10:6])
+#define SHIFT ((uint32_t) ((m_opcode >> 6) & 0x1F))
+
+// Current jump immediate (Opcode Bits [10:6])
+#define JIMMDT ((uint32_t) (m_opcode & 0x3FFFFFF))
+
+// Operand Register (Opcode Bits [25:21])
+#define REGIDX_S ((uint32_t) ((m_opcode >> 21) & 0x1F))
+
+// Operand Register (Opcode Bits [20:16])
+#define REGIDX_T ((uint32_t) ((m_opcode >> 16) & 0x1F))
+
+// Recieving Register (Opcode Bits [15:11])
+#define REGIDX_D ((uint32_t) ((m_opcode >> 11) & 0x1F))
 
 // Register defines
 #define PC (m_cpu->m_pc)
@@ -124,9 +130,7 @@ extern unsigned _BitInt(4) m_shift_immediate;
 
 /* Function definitions */
 void m_cpu_init();
+void m_cpu_fde();
 void m_cpu_exit();
-void m_cpu_fetch();
-void m_cpu_decode();
-void m_cpu_execute();
 
 #endif /* CPU_H */

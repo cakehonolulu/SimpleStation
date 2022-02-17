@@ -1,75 +1,53 @@
 #include <cpu/instructions.h>
 
-const struct m_corewave_cw33300_instrs m_psx_instrs[67] = {
-	{"sll", m_sll},		// 0x00
-	{NULL, NULL},		// 0x01
-	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{"addiu", m_addiu},	// 0x09
-	{NULL, NULL},		// 0x00
-	{"sw", m_sw},		// 0x0B
-	{NULL, NULL},		// 0x00
-	{"ori", m_ori},		// 0x0D
-	{NULL, NULL},		// 0x00
-	{"lui", m_lui},		// 0x0F
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL}		// 0x00
-};
+void m_exp()
+{
+	// Check if the instruction is implemented
+	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
+	{
+		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_opcode & 0x3F));
+		m_printregs();
+		m_bios_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		// Execute the instruction
+		((void (*)(void))m_psx_extended_00[(m_opcode & 0x3F)].m_funct)();
+	}
+}
 
+void m_cop0()
+{
+	// Check if the instruction is implemented
+	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
+	{
+		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\n" NORMAL, REGIDX_S);
+		m_printregs();
+		m_bios_exit();
+		m_cpu_exit();
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		// Execute the instruction
+		((void (*)(void))m_psx_cop0[REGIDX_S].m_funct)();
+	}
+}
+
+/*
+	SLL (MIPS I)
+
+	Format:
+	SLL rd, rt, sa
+
+	Description:
+	To left shift a word by a fixed number of bits.
+	The contents of the low-order 32-bit word of GPR rt are shifted left, inserting zeroes
+	into the emptied bits; the word result is placed in GPR rd. The bit shift count is
+	specified by sa. If rd is a 64-bit register, the result word is sign-extended.
+*/
 void m_sll()
 {
 #ifdef DEBUG_INSTRUCTIONS
@@ -77,10 +55,67 @@ void m_sll()
 #endif
 
 	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
-
-	PC += 4;
 }
 
+/*
+	OR (MIPS I)
+
+	Format:
+	OR rd, rs, rt
+
+	Description:
+	To do a bitwise logical OR.
+	The contents of GPR rs are combined with the contents of GPR rt in a bitwise logical
+	OR operation. The result is placed into GPR rd.
+*/
+void m_or()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
+}
+
+/*
+	J (MIPS I)
+
+	Format:
+	J target
+
+	Description:
+	To branch within the current 256 MB aligned region
+	This is a PC-region branch (not PC-relative); the effective target address is in the
+	“current” 256 MB aligned region. The low 28 bits of the target address is the instr_index
+	field shifted left 2 bits. The remaining upper bits are the corresponding bits of the
+	address of the instruction in the delay slot (not the branch itself).
+	Jump to the effective target address. Execute the instruction following the jump, in the
+	branch delay slot, before jumping
+*/
+void m_j()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("j 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
+#endif
+
+	/*
+		According to simias, the immediate value is shifted 2 times to the right,
+		but psx spx wiki specifies the immediate jump value is multiplied by 4
+	*/
+	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+}
+
+/*
+	ADDIU (MIPS I)
+
+	Format:
+	ADDIU rt, rs, immediate
+
+	Description:
+	The 16-bit signed immediate is added to the 32-bit value in GPR rs and the 32-bit
+	arithmetic result is placed into GPR rt.
+	No Integer Overflow exception occurs under any circumstances.
+*/
 void m_addiu()
 {
 #ifdef DEBUG_INSTRUCTIONS
@@ -88,19 +123,32 @@ void m_addiu()
 #endif
 
 	REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
-
-	PC += 4;
 }
 
+/*
+	SW (MIPS I)
+
+	Format:
+	SW rt, offset(base)
+
+	Description:
+	The least-significant 32-bit word of register rt is stored in memory at the location
+	specified by the aligned effective address. The 16-bit signed offset is added to the
+	contents of GPR base to form the effective address.
+*/
 void m_sw()
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword);
+	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	{
+		printf(YELLOW "[cpu] sw: Ignoring word store, cache is isolated...\n" NORMAL);
+		return;
+	}
 
-	PC += 4;
+	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword);
 }
 
 /*
@@ -125,9 +173,6 @@ void m_ori()
 	{
 		REGS[REGIDX_T] = (REGS[REGIDX_S] | IMMDT);
 	}
-
-	// Increment Program Counter by 4
-	PC += 4;
 }
 
 /*
@@ -153,7 +198,4 @@ void m_lui()
 		// Bit shift by 16 the immediate value and place it at the register pointed by the index
 		REGS[REGIDX_T] = (IMMDT << 16);
 	}
-	
-	// Increment Program Counter by 4
-	PC += 4;
 }
