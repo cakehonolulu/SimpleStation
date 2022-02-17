@@ -113,19 +113,20 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf("[mem] Unknown Memory Read Size! (%d)\n", m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				goto m_memory_cleanup;
 		}
 	}
 	else
 	{
 		printf("[mem] memory_read: Region not implemented!\n");
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		m_memory_exit();
-		m_cpu_exit();
-		exit(EXIT_FAILURE);
+		goto m_memory_cleanup;
 	}
+
+m_memory_cleanup:
+	m_memory_exit();
+	m_cpu_exit();
+	exit(EXIT_FAILURE);
 }
 
 /*
@@ -170,17 +171,18 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf("[mem] Unknown Memory Write Size! (%d)\n", m_size);
-				m_memory_exit();
-				m_cpu_exit();
-				exit(EXIT_FAILURE);
+				goto m_memory_cleanup;
 		}
 	}
 	else
 	{
 		printf("[mem] memory_write: Region not implemented!\n");
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		m_memory_exit();
-		m_cpu_exit();
-		exit(EXIT_FAILURE);
+		goto m_memory_cleanup;
 	}
+
+m_memory_cleanup:
+	m_memory_exit();
+	m_cpu_exit();
+	exit(EXIT_FAILURE);
 }

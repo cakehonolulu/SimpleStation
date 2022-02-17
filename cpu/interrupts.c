@@ -21,4 +21,6 @@ uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val)
 	{
 		return m_interrupt_mask = m_int_val & 0x7FF;
 	}
+
+	return INTWERR;
 }
