@@ -36,6 +36,9 @@ void m_or();
 // 0x02
 void m_j();
 
+// 0x05
+void m_bne();
+
 // 0x09
 void m_addiu();
 
