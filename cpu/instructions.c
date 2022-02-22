@@ -124,7 +124,7 @@ void m_bne()
 #ifdef DEBUG_INSTRUCTIONS
 	printf("bne $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], (SIMMDT) << 2);
 #endif
-
+	
 	/*
 		According to simias, we only need the 16-bit sign-extended immediate,
 		but MIPS Reference Manual specifies that we need to bit-shift it to the
@@ -133,6 +133,40 @@ void m_bne()
 	if (REGS[REGIDX_S] != REGS[REGIDX_T])
 	{
 		PC += ((SIMMDT) << 2);
+		PC -= 4;
+	}
+}
+
+/*
+	ADDI (MIPS I)
+
+	Format:
+	ADDI rt, rs, immediate
+
+	Description:
+	To add a constant to a 32-bit integer. If overflow occurs, then trap.
+	The 16-bit signed immediate is added to the 32-bit value in GPR rs to produce a 32-bit
+	result. If the addition results in 32-bit 2’s complement arithmetic overflow then the
+	destination register is not modified and an Integer Overflow exception occurs. If it
+	does not overflow, the 32-bit result is placed into GPR rt
+*/
+void m_addi()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("addi $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], SIMMDT);
+#endif
+
+	// TODO: Pre-C23, change accordingly when it releases
+	int32_t m_number;
+
+	if (__builtin_add_overflow(REGS[REGIDX_S], SIMMDT, &m_number))
+	{
+		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
+		m_simplestation_exit();
+	}
+	else
+	{
+		REGS[REGIDX_T] = m_number;
 	}
 }
 

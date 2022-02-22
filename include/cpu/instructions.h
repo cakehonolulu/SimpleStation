@@ -39,6 +39,9 @@ void m_j();
 // 0x05
 void m_bne();
 
+// 0x08
+void m_addi();
+
 // 0x09
 void m_addiu();
 
