@@ -9,12 +9,40 @@ void m_bios_load(const char *m_bios_name)
 	// Open the BIOS in Binary Mode and Read-Only
 	m_bios = fopen(m_bios_name, "rb");
 
-	// Get file size in bytes
-	fseek(m_bios, 0, SEEK_END);
-	size_t m_bios_size = ftell(m_bios);
-	fseek(m_bios, 0, SEEK_SET);
+	// Check if BIOS fopen() worked
+	if (!m_bios)
+	{
+		printf("BIOS File couldn't be opened!\nExiting...\n");
+		exit(EXIT_FAILURE);
+	}
 
-	// BIOS Files are exatcly 512KiB (524288 bytes)
+	// Get file size in bytes, also checks if fseek() succeeds
+	if (fseek(m_bios, 0, SEEK_END) != 0)
+	{
+		printf("Error seeking file bytes...\nExiting...\n");
+		fclose(m_bios);
+		exit(EXIT_FAILURE);
+	}
+
+	int32_t m_bios_size = ftell(m_bios);
+
+	// Check if ftell() returned a size number
+	if (m_bios_size == -1)
+	{
+		printf("Unable to get BIOS File size...\nExiting...\n");
+		fclose(m_bios);
+		exit(EXIT_FAILURE);
+	}
+
+	// Check if fseek() call succeeded
+	if (fseek(m_bios, 0, SEEK_SET) != 0)
+	{
+		printf("Error resetting file position...\nExiting...\n");
+		fclose(m_bios);
+		exit(EXIT_FAILURE);
+	}
+
+	// BIOS Files are exactly 512KiB (524288 bytes)
 	if ((m_bios_size / KiB) != 512)
 	{
 		printf("BIOS File Size not correct, check your BIOS file...\n");
@@ -29,6 +57,7 @@ void m_bios_load(const char *m_bios_name)
 	if (m_mem_bios == NULL)
 	{
 		printf("Simplestation: Couldn't allocate PSX BIOS Memory, exiting...");
+		fclose(m_bios);
 		exit(EXIT_FAILURE);
 	}
 
