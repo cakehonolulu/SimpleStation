@@ -191,6 +191,35 @@ void m_addiu()
 }
 
 /*
+	LW (MIPS I)
+
+	Format:
+	LW rt, offset(base)
+
+	Description:
+	To load a word from memory as a signed value
+	The contents of the 32-bit word at the memory location specified by the aligned
+	effective address are fetched, sign-extended to the GPR register length if necessary, and
+	placed in GPR rt. The 16-bit signed offset is added to the contents of GPR base to form
+	the effective address.
+*/
+void m_lw()
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lw $%s, %x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
+#endif
+
+	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	{
+		printf(YELLOW "[CPU] lw: Ignoring word store, cache is isolated...\n" NORMAL);
+		return;
+	}
+	
+	int32_t m_addr = (SIMMDT + REGS[REGIDX_S]);
+	REGS[REGIDX_T] = m_memory_read(m_addr, dword);
+}
+
+/*
 	SW (MIPS I)
 
 	Format:

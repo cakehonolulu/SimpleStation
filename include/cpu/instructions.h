@@ -54,6 +54,9 @@ void m_ori();
 // 0x0F
 void m_lui();
 
+// 0x23
+void m_lw();
+
 // 0x2B
 void m_sw();
 
