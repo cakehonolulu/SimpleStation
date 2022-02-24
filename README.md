@@ -13,10 +13,13 @@
 #### Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
 - [ ] 8 out of 126 instructions implemented
     - MIPS R3000 Coprocessor 0 _in-the-works_
+    - Instructions pipelining
 #### MIPS R3000 Disassembler
 * Currently works on PSX's BIOS
 #### Common Memory Bus
-* Handles PSX's memory read/writes
+* Byte, Word, Double Word MMU Read/Write Handling
+* Unaligned memory access handling
+* Memory loads and stores pipelining
 
 
 ## 👷🏼‍♂️ Roadmap
