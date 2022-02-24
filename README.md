@@ -6,21 +6,21 @@
 
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
-* Runs on amd64 (x86_64 Intel/AMD PC)
-* Upstream compiler support (CLANG-14 & GCC-12)
+* LLE Interpreter Emulator
+* Upstream compiler support (CLANG-15 & GCC-12)
 
 ## 🖥️ Specs
-#### 💖 Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
+#### Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
 - [ ] 8 out of 126 instructions implemented
     - MIPS R3000 Coprocessor 0 _in-the-works_
-#### 💖 MIPS R3000 Disassembler
-Currently works on PSX's BIOS
-#### 💖 Common Memory Bus
-Handles PSX's memory read/writes
+#### MIPS R3000 Disassembler
+* Currently works on PSX's BIOS
+#### Common Memory Bus
+* Handles PSX's memory read/writes
 
 
 ## 👷🏼‍♂️ Roadmap
-* Planned support for aarch64 Cortex-A72's ARMv8-A (Raspberry Pi 4 Model B)
+* MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
 
 ## 📃 Documentation
 * Integrated Device Technology, Inc. (1996). _IDT MIPS Microprocessor Family Software Reference Manual_. Wayback Machine. [https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf](https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf)
