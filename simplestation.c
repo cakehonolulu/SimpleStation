@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 				printf("Unknown argument: %s\n", argv[m_args]);
 			}
 		}
+#endif
 
 		// Check if BIOS file is specified
 		if (m_biosname)
@@ -72,7 +73,6 @@ int main(int argc, char **argv)
 
 			return m_simplestation_exit();
 		}
-	#endif
 	}
 }
 
