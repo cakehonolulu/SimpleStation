@@ -54,21 +54,22 @@ int main(int argc, char **argv)
 		if (m_biosname)
 		{
 			// Load the BIOS file
-			m_bios_load(m_biosname);
-
-			// Initialize the CPU Subsystem
-			m_cpu_init();
-
-			// Initialize the Memory Subsystem
-			m_memory_init();
-
-			// Initialize the Interrupts Subsystem
-			m_interrupts_init();
-
-			while (true)
+			if (m_bios_load(m_biosname) == 0)
 			{
-				// Fetch, decode, execute
-				m_cpu_fde();
+				// Initialize the CPU Subsystem
+				m_cpu_init();
+
+				// Initialize the Memory Subsystem
+				m_memory_init();
+
+				// Initialize the Interrupts Subsystem
+				m_interrupts_init();
+
+				while (true)
+				{
+					// Fetch, decode, execute
+					m_cpu_fde();
+				}
 			}
 
 			return m_simplestation_exit();
