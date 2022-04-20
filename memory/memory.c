@@ -121,7 +121,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	if (m_memory_offset % 4 != 0)
 	{
 		printf(RED "[MEM] read: Unaligned memory read! Exiting...\n" NORMAL);
-		m_simplestation_exit();
+		m_simplestation_exit(1);
 	}
 
 	// Calculate the absolute memory address to read at
@@ -150,7 +150,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit();
+				m_simplestation_exit(1);
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -169,7 +169,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit();
+				m_simplestation_exit(1);
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -188,7 +188,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit();
+				return m_simplestation_exit(1);
 		}
 	}
 	else if (m_address == 0xFFFE0130)
@@ -200,11 +200,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	{
 		printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit();
+		return m_simplestation_exit(1);
 	}
 
  	printf(RED "[MEM] read: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
- 	return m_simplestation_exit();
+ 	return m_simplestation_exit(1);
 }
 
 /*
@@ -225,7 +225,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	if (m_memory_offset % 4 != 0)
 	{
 		printf(RED "[MEM] write: Unaligned memory write! Exiting...\n" NORMAL);
-		return m_simplestation_exit();
+		return m_simplestation_exit(1);
 	}
 
 	// Calculate the absolute memory address to write at
@@ -253,7 +253,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit();
+				return m_simplestation_exit(1);
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -272,7 +272,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit();
+				return m_simplestation_exit(1);
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -290,7 +290,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit();
+				return m_simplestation_exit(1);
 		}
 	}
 	else if (m_address == 0xFFFE0130)
@@ -302,9 +302,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	{
 		printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit();
+		return m_simplestation_exit(1);
 	}
 
  	printf(RED "[MEM] write: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
-	return m_simplestation_exit();
+	return m_simplestation_exit(1);
 }

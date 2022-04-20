@@ -74,7 +74,7 @@ void m_cpu_fde()
 	{
 		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
 		m_printregs();
-		m_simplestation_exit();
+		m_simplestation_exit(1);
 	}
 	else
 	{

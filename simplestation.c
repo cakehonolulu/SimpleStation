@@ -71,13 +71,13 @@ int main(int argc, char **argv)
 					m_cpu_fde();
 				}
 			}
-
-			return m_simplestation_exit();
 		}
 	}
+	
+	return m_simplestation_exit(0);
 }
 
-uint8_t m_simplestation_exit()
+uint8_t m_simplestation_exit(uint8_t m_is_fatal)
 {
 	if (m_simplestation.m_memory_state)
 	{
@@ -94,6 +94,11 @@ uint8_t m_simplestation_exit()
 		m_cpu_exit();
 	}
 
-	exit(EXIT_FAILURE);
-	return 1;
+	if (m_is_fatal == 1)
+	{
+		printf(RED "Fatal error found, exiting...\n" NORMAL);
+		exit(EXIT_FAILURE);
+	}
+
+	return m_is_fatal;
 }

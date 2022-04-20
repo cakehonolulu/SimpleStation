@@ -25,5 +25,5 @@ uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val)
 	}
 
 	 printf(RED "[INT] write: Abnormal path in emulator code, continuing might break things; exiting...\n" NORMAL);
-	 return m_simplestation_exit();
+	 return m_simplestation_exit(1);
 }

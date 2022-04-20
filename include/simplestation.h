@@ -29,6 +29,6 @@ typedef struct
 extern m_simplestation_state m_simplestation;
 
 /* Functions */
-uint8_t m_simplestation_exit();
+uint8_t m_simplestation_exit(uint8_t m_is_fatal);
 
 #endif /* SIMPLESTATION_H */

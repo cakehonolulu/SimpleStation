@@ -162,7 +162,7 @@ void m_addi()
 	if (__builtin_add_overflow(REGS[REGIDX_S], SIMMDT, &m_number))
 	{
 		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
-		m_simplestation_exit();
+		m_simplestation_exit(1);
 	}
 	else
 	{
