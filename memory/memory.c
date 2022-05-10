@@ -5,18 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// PSX RAM Memory Buffer
-int8_t *m_mem_ram;
-
-// PSX Scratchpad RAM
-int8_t *m_mem_scratchpad;
-
-// PSX Memory Control 1 RAM
-int8_t *m_mem_memctl1;
-
-// PSX BIOS Memory Buffer
-int8_t *m_mem_bios;
-
 // PSX Memory Map Walktable
 uint32_t m_memory_map[] = {
 	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,		// KUSEG: 2048MB
@@ -24,9 +12,6 @@ uint32_t m_memory_map[] = {
 	0x1FFFFFFF,											// KSEG1:  512MB
 	0xFFFFFFFF, 0xFFFFFFFF								// KSEG2: 1024MB
 };
-
-uint32_t m_memory_ram_config_reg = 0;
-uint32_t m_memory_cache_control_reg = 0;
 
 /*
 	Function:
@@ -40,16 +25,21 @@ uint32_t m_memory_cache_control_reg = 0;
 */
 void m_memory_init(m_simplestation_state *m_simplestation)
 {
+	m_simplestation->m_memory = (m_psx_memory_t *) malloc(sizeof(m_psx_memory_t));
+
 	// 2 MiB Total
-	m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
+	m_simplestation->m_memory->m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
 
 	// 1 KiB Total
-	m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
+	m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
 
 	// 0x20 Total (0x1F801020 - 0x1F801000)
-	m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
+	m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
 
-	if (!m_mem_ram)
+	m_simplestation->m_memory->m_memory_ram_config_reg = 0;
+	m_simplestation->m_memory->m_memory_cache_control_reg = 0;
+
+	if (!m_simplestation->m_memory->m_mem_ram)
 	{
 		printf("[MEM] init: Couldn't allocate PSX RAM Memory, exiting...");
 	}
@@ -67,19 +57,19 @@ void m_memory_init(m_simplestation_state *m_simplestation)
 	Description:
 	Cleanly closes SimpleStation's Memory Subsystem.
 */
-void m_memory_exit()
+void m_memory_exit(m_simplestation_state *m_simplestation)
 {
 	// Free the RAM Buffer
-	free(m_mem_ram);
+	free(m_simplestation->m_memory->m_mem_ram);
 
 	// Free the Scratchpad Buffer
-	free(m_mem_scratchpad);
+	free(m_simplestation->m_memory->m_mem_scratchpad);
 
 	// Free the Memory Control 1 Buffer
-	free(m_mem_memctl1);
+	free(m_simplestation->m_memory->m_mem_memctl1);
 
 	// Exit the BIOS Subsystem (Frees the BIOS Memory)
-	m_bios_exit();
+	m_bios_exit(m_simplestation);
 }
 
 /*
@@ -136,8 +126,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	// Check for a read in BIOS area
 	if (m_address == 0x1F801060)
 	{
-		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_memory_ram_config_reg);
-		return m_memory_ram_config_reg;
+		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
+		return m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
@@ -151,7 +141,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0x3FF, m_mem_scratchpad);
+				return m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -170,7 +160,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0xF, m_mem_memctl1);
+				return m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -189,7 +179,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0x7FFFF, m_mem_bios);
+				return m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -198,8 +188,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg);
-		return m_memory_cache_control_reg;
+		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg);
+		return m_simplestation->m_memory->m_memory_cache_control_reg;
 	}
 	else
 	{
@@ -239,8 +229,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 	if (m_address == 0x1F801060)
 	{
-		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg, m_value);
-		return m_memory_ram_config_reg = m_value;
+		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
+		return m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
@@ -254,7 +244,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_memory_write_dword(m_address & 0x3FF, m_value, m_mem_scratchpad);
+				return m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -273,7 +263,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_memory_write_dword(m_address & 0xF, m_value, m_mem_memctl1);
+				return m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -300,8 +290,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 	else if (m_address == 0xFFFE0130)
 	{
-		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_memory_cache_control_reg , m_value);
-		return m_memory_cache_control_reg = m_value;
+		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg , m_value);
+		return m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
 	}
 	else
 	{

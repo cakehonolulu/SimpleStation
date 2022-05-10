@@ -63,6 +63,26 @@ typedef struct m_corewave_cw33300_cop0
 
 } m_mips_r3000a_cop0_t;
 
+typedef struct m_psx_memmory
+{
+	// PSX RAM Memory Buffer
+	int8_t *m_mem_ram;
+
+	// PSX Scratchpad RAM
+	int8_t *m_mem_scratchpad;
+
+	// PSX Memory Control 1 RAM
+	int8_t *m_mem_memctl1;
+
+	// PSX BIOS Memory Buffer
+	int8_t *m_mem_bios;
+	
+	// PSX Memory Registers
+	uint32_t m_memory_ram_config_reg;
+	uint32_t m_memory_cache_control_reg;
+
+} m_psx_memory_t;
+
 /* Structures */
 typedef struct
 {
@@ -71,6 +91,9 @@ typedef struct
 
 	// Declare a pointer to the CPU COP0 state structure
 	m_mips_r3000a_cop0_t *m_cpu_cop0;
+
+	// Declare a pointer to the PSX Memory state structure
+	m_psx_memory_t *m_memory;
 
 	bool m_memory_state;
 	bool m_interrupts_state;

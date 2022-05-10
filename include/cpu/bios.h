@@ -10,7 +10,7 @@
 extern uint8_t *m_bios_buffer;
 
 /* Function definitions */
-uint8_t m_bios_load(const char *m_bios_name);
-void m_bios_exit();
+uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_name);
+void m_bios_exit(m_simplestation_state *m_simplestation);
 
 #endif /* BIOS_H */

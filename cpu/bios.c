@@ -2,7 +2,7 @@
 #include <memory/memory.h>
 
 // Load the BIOS into a Byte Buffer
-uint8_t m_bios_load(const char *m_bios_name)
+uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_name)
 {
 	// Set up a BIOS File Descriptor
 	FILE *m_bios;
@@ -10,7 +10,7 @@ uint8_t m_bios_load(const char *m_bios_name)
 	// Status for the function
 	uint8_t m_status = 1;
 
-	// BIOS Filesize
+	// BIOS Filesizem_simplestation
 	int32_t m_bios_size;
 
 	// Open the BIOS in Binary Mode and Read-Only
@@ -37,15 +37,15 @@ uint8_t m_bios_load(const char *m_bios_name)
 								conditions will probably be ignored.
 					*/
 					if ((m_bios_size / KiB) == 512)
-					{		
+					{
 						// Allocate a buffer for the BIOS file
-						m_mem_bios = (int8_t*) malloc(sizeof(int8_t) * m_bios_size);
+						m_simplestation->m_memory->m_mem_bios = (int8_t*) malloc(sizeof(int8_t) * m_bios_size);
 
 						// Error out on memory exhaustion
-						if (m_mem_bios != NULL)
+						if (m_simplestation->m_memory->m_mem_bios != NULL)
 						{
 							// Load the file into host memory
-							fread(m_mem_bios, sizeof(int8_t), m_bios_size, m_bios);
+							fread(m_simplestation->m_memory->m_mem_bios, sizeof(int8_t), m_bios_size, m_bios);
 
 							// Check if file was loaded correctly into memory
 							if (!ferror(m_bios))
@@ -97,7 +97,7 @@ uint8_t m_bios_load(const char *m_bios_name)
 }
 
 // Free the BIOS Buffer
-void m_bios_exit()
+void m_bios_exit(m_simplestation_state *m_simplestation)
 {
-	free(m_mem_bios);
+	free(m_simplestation->m_memory->m_mem_bios);
 }

@@ -10,7 +10,7 @@ void m_exp(m_simplestation_state *m_simplestation)
 	{
 		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F));
 		m_printregs(m_simplestation);
-		m_bios_exit();
+		m_bios_exit(m_simplestation);
 		m_cpu_exit(m_simplestation);
 		exit(EXIT_FAILURE);
 	}
@@ -28,7 +28,7 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	{
 		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\n" NORMAL, REGIDX_S);
 		m_printregs(m_simplestation);
-		m_bios_exit();
+		m_bios_exit(m_simplestation);
 		m_cpu_exit(m_simplestation);
 		exit(EXIT_FAILURE);
 	}

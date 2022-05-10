@@ -17,7 +17,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation);
 uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source);
 void m_memory_init(m_simplestation_state *m_simplestation);
-void m_memory_exit();
+void m_memory_exit(m_simplestation_state *m_simplestation);
 
 extern int8_t *m_mem_ram;
 extern int8_t *m_mem_bios;

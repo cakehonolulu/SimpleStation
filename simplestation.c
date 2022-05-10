@@ -58,14 +58,14 @@ int main(int argc, char **argv)
 		// Check if BIOS file is specified
 		if (m_biosname)
 		{
+			// Initialize the Memory Subsystem
+			m_memory_init(&m_simplestation);
+
 			// Load the BIOS file
-			if (m_bios_load(m_biosname) == 0)
+			if (m_bios_load(&m_simplestation, m_biosname) == 0)
 			{
 				// Initialize the CPU Subsystem
 				m_cpu_init(&m_simplestation);
-
-				// Initialize the Memory Subsystem
-				m_memory_init(&m_simplestation);
 
 				// Initialize the Interrupts Subsystem
 				m_interrupts_init(&m_simplestation);
@@ -86,7 +86,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 {
 	if (m_simplestation->m_interrupts_state)
 	{
-		m_memory_exit();
+		m_memory_exit(m_simplestation);
 	}
 
 	if (m_simplestation->m_interrupts_state)
