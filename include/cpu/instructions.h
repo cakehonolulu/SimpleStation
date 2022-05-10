@@ -1,7 +1,6 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#include <cpu/cpu.h>
 #include <cpu/cop0.h>
 #include <memory/memory.h>
 #include <stdint.h>

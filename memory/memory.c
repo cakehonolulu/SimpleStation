@@ -1,4 +1,9 @@
 #include <memory/memory.h>
+#include <cpu/interrupts.h>
+#include <cpu/bios.h>
+#include <ui/termcolour.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // PSX RAM Memory Buffer
 int8_t *m_mem_ram;

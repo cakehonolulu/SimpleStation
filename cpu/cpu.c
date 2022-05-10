@@ -1,7 +1,7 @@
-#include <cpu/cpu.h>
 
-// Declare a pointer to the CPU state structure
-m_mips_r3000a_t *m_cpu;
+#include <memory/memory.h>
+#include <cpu/instructions.h>
+#include <debugger/debugger.h>
 
 // Current opcode
 uint32_t m_opcode = 0;
@@ -12,12 +12,12 @@ uint32_t m_next_opcode = 0;
 void m_cpu_init(m_simplestation_state *m_simplestation)
 {
 	// Malloc the CPU-state struct
-	m_cpu = (m_mips_r3000a_t*) malloc(sizeof(m_mips_r3000a_t));
+	m_simplestation->m_cpu = (m_mips_r3000a_t*) malloc(sizeof(m_mips_r3000a_t));
 
-	m_cpu_cop0_init();
+	m_cpu_cop0_init(m_simplestation);
 
 	// Check for malloc completion
-	if (!m_cpu)
+	if (!m_simplestation->m_cpu)
 	{
 		printf(RED "[CPU] init: Couldn't allocate CPU state struct, exiting...\n" NORMAL);
 		exit(EXIT_FAILURE);
@@ -41,18 +41,18 @@ void m_cpu_init(m_simplestation_state *m_simplestation)
 	// Set all registers to 0
 	for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
 	{
-		m_cpu->m_registers[m_regs] = 0;
+		m_simplestation->m_cpu->m_registers[m_regs] = 0;
 	}
 
 	m_simplestation->m_cpu_state = ON;
 }
 
 // Function to free the CPU struct after end-of-emulation
-void m_cpu_exit()
+void m_cpu_exit(m_simplestation_state *m_simplestation)
 {
-	m_cpu_cop0_exit();
+	m_cpu_cop0_exit(m_simplestation);
 	
-	free(m_cpu);
+	free(m_simplestation->m_cpu);
 
 #ifdef DEBUG_CPU
 	printf("[CPU] exit: Freed CPU structure!\n");
@@ -73,7 +73,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
 		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
-		m_printregs();
+		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
 	else

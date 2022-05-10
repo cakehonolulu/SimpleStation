@@ -1,6 +1,9 @@
 #include <simplestation.h>
 #include <cpu/cpu.h>
+#include <cpu/bios.h>
+#include <cpu/interrupts.h>
 #include <memory/memory.h>
+#include <ui/termcolour.h>
 
 int main(int argc, char **argv)
 {
@@ -93,7 +96,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 
 	if (m_simplestation->m_cpu_state)
 	{
-		m_cpu_exit();
+		m_cpu_exit(m_simplestation);
 	}
 
 	if (m_is_fatal == 1)

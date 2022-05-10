@@ -5,17 +5,9 @@
 #include <cpu/cpu.h>
 #include <stdint.h>
 
-#define M_R3000_COP0_REGISTERS 32
+extern m_simplestation_state *m_simplestation;
 
-typedef struct m_corewave_cw33300_cop0
-{
-	uint32_t m_registers[M_R3000_COP0_REGISTERS];
-
-} m_mips_r3000a_cop0_t;
-
-extern m_mips_r3000a_cop0_t *m_cpu_cop0;
-
-#define COP0_REGS (m_cpu_cop0->m_registers)
+#define COP0_REGS (m_simplestation->m_cpu_cop0->m_registers)
 #define COP0_STATUS_REGISTER COP0_REGS[12]
 
 static const char *m_cop0_regnames[] = {
@@ -38,10 +30,10 @@ static const char *m_cop0_regnames[] = {
 	"cop0_28", "cop0_29", "cop0_30", "cop0_31"
 };
 
-void m_cpu_cop0_init();
-void m_cpu_cop0_exit();
+void m_cpu_cop0_init(m_simplestation_state *m_simplestation);
+void m_cpu_cop0_exit(m_simplestation_state *m_simplestation);
 
 // 0x04
-void m_mtc0();
+void m_mtc0(m_simplestation_state *m_simplestation);
 
 #endif /* COP0_H */

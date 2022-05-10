@@ -1,4 +1,7 @@
 #include <cpu/instructions.h>
+#include <cpu/bios.h>
+#include <ui/termcolour.h>
+#include <debugger/debugger.h>
 
 void m_exp(m_simplestation_state *m_simplestation)
 {
@@ -6,9 +9,9 @@ void m_exp(m_simplestation_state *m_simplestation)
 	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
 	{
 		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_opcode & 0x3F));
-		m_printregs();
+		m_printregs(m_simplestation);
 		m_bios_exit();
-		m_cpu_exit();
+		m_cpu_exit(m_simplestation);
 		exit(EXIT_FAILURE);
 	}
 	else
@@ -24,9 +27,9 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
 	{
 		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\n" NORMAL, REGIDX_S);
-		m_printregs();
+		m_printregs(m_simplestation);
 		m_bios_exit();
-		m_cpu_exit();
+		m_cpu_exit(m_simplestation);
 		exit(EXIT_FAILURE);
 	}
 	else

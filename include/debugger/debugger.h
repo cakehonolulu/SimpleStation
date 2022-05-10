@@ -7,6 +7,6 @@
 #include <stdio.h>
 
 /* Function definitions */
-void m_printregs();
+void m_printregs(m_simplestation_state *m_simplestation);
 
 #endif /* DEBUGGER_H */
