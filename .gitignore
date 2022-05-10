@@ -9,3 +9,6 @@ simplestation
 
 # Binary Files
 *.bin
+
+# VSCodium Files
+.vscode/
