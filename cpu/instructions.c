@@ -6,9 +6,9 @@
 void m_exp(m_simplestation_state *m_simplestation)
 {
 	// Check if the instruction is implemented
-	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
+	if (m_psx_extended_00[(m_simplestation->m_cpu->m_opcode & 0x3F)].m_funct == NULL)
 	{
-		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_opcode & 0x3F));
+		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F));
 		m_printregs(m_simplestation);
 		m_bios_exit();
 		m_cpu_exit(m_simplestation);
@@ -17,7 +17,7 @@ void m_exp(m_simplestation_state *m_simplestation)
 	else
 	{
 		// Execute the instruction
-		((void (*)(m_simplestation_state *m_simplestation))m_psx_extended_00[(m_opcode & 0x3F)].m_funct)(m_simplestation);
+		((void (*)(m_simplestation_state *m_simplestation))m_psx_extended_00[(m_simplestation->m_cpu->m_opcode & 0x3F)].m_funct)(m_simplestation);
 	}
 }
 

@@ -48,6 +48,10 @@ typedef struct m_corewave_cw33300
 	*/
 	uint32_t m_registers[M_R3000_REGISTERS];
 
+	// Current opcode
+	uint32_t m_opcode;
+
+	uint32_t m_next_opcode;
 } m_mips_r3000a_t;
 
 

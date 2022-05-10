@@ -22,36 +22,35 @@ static const char *m_cpu_regnames[] = {
 };
 
 // Defined in cpu.c
-extern uint32_t m_opcode;
 extern m_simplestation_state *m_simplestation;
 
 // Internal defines
 #define REGS (m_simplestation->m_cpu->m_registers)
-#define INSTRUCTION ((uint32_t) (m_opcode >> 26) & 63)
+#define INSTRUCTION ((uint32_t) (m_simplestation->m_cpu->m_opcode >> 26) & 63)
 
 // Current immediate address (Opcode Bits [16:0])
-#define IMMDT ((uint32_t) (m_opcode & 0xFFFF))
+#define IMMDT ((uint32_t) (m_simplestation->m_cpu->m_opcode & 0xFFFF))
 
 // Current signed immediate address (Opcode Bits [16:0])
-#define SIMMDT ((uint32_t) ((int16_t) (m_opcode & 0xFFFF)))
+#define SIMMDT ((uint32_t) ((int16_t) (m_simplestation->m_cpu->m_opcode & 0xFFFF)))
 
 // Current subfunction (Opcode Bits [10:6])
-#define SUB ((uint32_t) (m_opcode & 0x3F))
+#define SUB ((uint32_t) (m_simplestation->m_cpu->m_opcode & 0x3F))
 
 // Current shift immediate (Opcode Bits [10:6])
-#define SHIFT ((uint32_t) ((m_opcode >> 6) & 0x1F))
+#define SHIFT ((uint32_t) ((m_simplestation->m_cpu->m_opcode >> 6) & 0x1F))
 
 // Current jump immediate (Opcode Bits [10:6])
-#define JIMMDT ((uint32_t) (m_opcode & 0x3FFFFFF))
+#define JIMMDT ((uint32_t) (m_simplestation->m_cpu->m_opcode & 0x3FFFFFF))
 
 // Operand Register (Opcode Bits [25:21])
-#define REGIDX_S ((uint32_t) ((m_opcode >> 21) & 0x1F))
+#define REGIDX_S ((uint32_t) ((m_simplestation->m_cpu->m_opcode >> 21) & 0x1F))
 
 // Operand Register (Opcode Bits [20:16])
-#define REGIDX_T ((uint32_t) ((m_opcode >> 16) & 0x1F))
+#define REGIDX_T ((uint32_t) ((m_simplestation->m_cpu->m_opcode >> 16) & 0x1F))
 
 // Recieving Register (Opcode Bits [15:11])
-#define REGIDX_D ((uint32_t) ((m_opcode >> 11) & 0x1F))
+#define REGIDX_D ((uint32_t) ((m_simplestation->m_cpu->m_opcode >> 11) & 0x1F))
 
 // Register defines
 #define PC (m_simplestation->m_cpu->m_pc)

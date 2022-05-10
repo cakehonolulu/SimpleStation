@@ -3,11 +3,6 @@
 #include <cpu/instructions.h>
 #include <debugger/debugger.h>
 
-// Current opcode
-uint32_t m_opcode = 0;
-
-uint32_t m_next_opcode = 0;
-
 // Function to initialize the CPU state
 void m_cpu_init(m_simplestation_state *m_simplestation)
 {
@@ -38,6 +33,10 @@ void m_cpu_init(m_simplestation_state *m_simplestation)
 	// Low register to 0
 	LO = 0;
 
+	m_simplestation->m_cpu->m_opcode = 0;
+
+	m_simplestation->m_cpu->m_next_opcode = 0;
+
 	// Set all registers to 0
 	for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
 	{
@@ -61,10 +60,10 @@ void m_cpu_exit(m_simplestation_state *m_simplestation)
 
 void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
-	m_opcode = m_next_opcode;
+	m_simplestation->m_cpu->m_opcode = m_simplestation->m_cpu->m_next_opcode;
 
 	/* Fetch cycle */
-	m_next_opcode = m_memory_read((PC), dword, m_simplestation);
+	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 	
 	// Increment Program Counter by 4
 	PC += 4;
@@ -72,7 +71,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
-		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
+		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
 		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
