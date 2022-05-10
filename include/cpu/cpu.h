@@ -1,10 +1,10 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <simplestation.h>
 #include <memory/memory.h>
 #include <cpu/instructions.h>
 #include <debugger/debugger.h>
-#include <simplestation.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -130,8 +130,8 @@ extern uint32_t m_opcode;
 #define RA (m_cpu->m_registers[31])
 
 /* Function definitions */
-void m_cpu_init();
-void m_cpu_fde();
+void m_cpu_init(m_simplestation_state *m_simplestation);
+void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit();
 
 #endif /* CPU_H */

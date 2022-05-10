@@ -1,6 +1,6 @@
 #include <cpu/instructions.h>
 
-void m_exp()
+void m_exp(m_simplestation_state *m_simplestation)
 {
 	// Check if the instruction is implemented
 	if (m_psx_extended_00[(m_opcode & 0x3F)].m_funct == NULL)
@@ -14,11 +14,11 @@ void m_exp()
 	else
 	{
 		// Execute the instruction
-		((void (*)(void))m_psx_extended_00[(m_opcode & 0x3F)].m_funct)();
+		((void (*)(m_simplestation_state *m_simplestation))m_psx_extended_00[(m_opcode & 0x3F)].m_funct)(m_simplestation);
 	}
 }
 
-void m_cop0()
+void m_cop0(m_simplestation_state *m_simplestation)
 {
 	// Check if the instruction is implemented
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
@@ -48,7 +48,7 @@ void m_cop0()
 	into the emptied bits; the word result is placed in GPR rd. The bit shift count is
 	specified by sa. If rd is a 64-bit register, the result word is sign-extended.
 */
-void m_sll()
+void m_sll(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
@@ -68,7 +68,7 @@ void m_sll()
 	The contents of GPR rs are combined with the contents of GPR rt in a bitwise logical
 	OR operation. The result is placed into GPR rd.
 */
-void m_or()
+void m_or(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
@@ -92,7 +92,7 @@ void m_or()
 	Jump to the effective target address. Execute the instruction following the jump, in the
 	branch delay slot, before jumping
 */
-void m_j()
+void m_j(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("j 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
@@ -119,7 +119,7 @@ void m_j()
 	If the contents of GPR rs and GPR rt are not equal, branch to the effective target address
 	after the instruction in the delay slot is executed.
 */
-void m_bne()
+void m_bne(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("bne $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], (SIMMDT) << 2);
@@ -150,7 +150,7 @@ void m_bne()
 	destination register is not modified and an Integer Overflow exception occurs. If it
 	does not overflow, the 32-bit result is placed into GPR rt
 */
-void m_addi()
+void m_addi(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("addi $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], SIMMDT);
@@ -162,7 +162,7 @@ void m_addi()
 	if (__builtin_add_overflow(REGS[REGIDX_S], SIMMDT, &m_number))
 	{
 		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
-		m_simplestation_exit(1);
+		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
@@ -181,7 +181,7 @@ void m_addi()
 	arithmetic result is placed into GPR rt.
 	No Integer Overflow exception occurs under any circumstances.
 */
-void m_addiu()
+void m_addiu(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
@@ -203,7 +203,7 @@ void m_addiu()
 	placed in GPR rt. The 16-bit signed offset is added to the contents of GPR base to form
 	the effective address.
 */
-void m_lw()
+void m_lw(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("lw $%s, %x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
@@ -216,7 +216,7 @@ void m_lw()
 	}
 	
 	int32_t m_addr = (SIMMDT + REGS[REGIDX_S]);
-	REGS[REGIDX_T] = m_memory_read(m_addr, dword);
+	REGS[REGIDX_T] = m_memory_read(m_addr, dword, m_simplestation);
 }
 
 /*
@@ -230,7 +230,7 @@ void m_lw()
 	specified by the aligned effective address. The 16-bit signed offset is added to the
 	contents of GPR base to form the effective address.
 */
-void m_sw()
+void m_sw(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
@@ -242,7 +242,7 @@ void m_sw()
 		return;
 	}
 
-	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword);
+	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword, m_simplestation);
 }
 
 /*
@@ -256,7 +256,7 @@ void m_sw()
 	The 16-bit immediate is zero-extended to the left and combined with the contents of
 	GPR rs in a bitwise logical OR operation. The result is placed into GPR rt. 
 */
-void m_ori()
+void m_ori(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("ori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
@@ -280,7 +280,7 @@ void m_ori()
 	The 16-bit immediate is shifted left 16 bits and concatenated with 16 bits of low-order
 	zeros. The 32-bit result is sign-extended and placed into GPR rt.
 */
-void m_lui()
+void m_lui(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("lui $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], IMMDT);

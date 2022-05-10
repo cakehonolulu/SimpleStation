@@ -1,4 +1,5 @@
 #include <cpu/bios.h>
+#include <memory/memory.h>
 
 // Load the BIOS into a Byte Buffer
 uint8_t m_bios_load(const char *m_bios_name)

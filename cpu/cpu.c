@@ -9,7 +9,7 @@ uint32_t m_opcode = 0;
 uint32_t m_next_opcode = 0;
 
 // Function to initialize the CPU state
-void m_cpu_init()
+void m_cpu_init(m_simplestation_state *m_simplestation)
 {
 	// Malloc the CPU-state struct
 	m_cpu = (m_mips_r3000a_t*) malloc(sizeof(m_mips_r3000a_t));
@@ -44,7 +44,7 @@ void m_cpu_init()
 		m_cpu->m_registers[m_regs] = 0;
 	}
 
-	m_simplestation.m_cpu_state = ON;
+	m_simplestation->m_cpu_state = ON;
 }
 
 // Function to free the CPU struct after end-of-emulation
@@ -59,12 +59,12 @@ void m_cpu_exit()
 #endif
 }
 
-void m_cpu_fde()
+void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
 	m_opcode = m_next_opcode;
 
 	/* Fetch cycle */
-	m_next_opcode = READ32_BIOS(PC);
+	m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 	
 	// Increment Program Counter by 4
 	PC += 4;
@@ -74,11 +74,11 @@ void m_cpu_fde()
 	{
 		printf(RED "[CPU] fde: Unimplemented Instruction 0x%02X (Opcode: 0x%X)\n" NORMAL, INSTRUCTION, m_opcode);
 		m_printregs();
-		m_simplestation_exit(1);
+		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
 		// Execute the instruction
-		((void (*)(void))m_psx_instrs[INSTRUCTION].m_funct)();
+		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
 	}
 }

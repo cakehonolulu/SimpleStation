@@ -1,9 +1,11 @@
 #include <simplestation.h>
-
-m_simplestation_state m_simplestation;
+#include <cpu/cpu.h>
+#include <memory/memory.h>
 
 int main(int argc, char **argv)
 {
+	m_simplestation_state m_simplestation;
+
 	// Define a char pointer that will hold the file name
 	const char *m_biosname = NULL;
 
@@ -57,39 +59,39 @@ int main(int argc, char **argv)
 			if (m_bios_load(m_biosname) == 0)
 			{
 				// Initialize the CPU Subsystem
-				m_cpu_init();
+				m_cpu_init(&m_simplestation);
 
 				// Initialize the Memory Subsystem
-				m_memory_init();
+				m_memory_init(&m_simplestation);
 
 				// Initialize the Interrupts Subsystem
-				m_interrupts_init();
+				m_interrupts_init(&m_simplestation);
 
 				while (true)
 				{
 					// Fetch, decode, execute
-					m_cpu_fde();
+					m_cpu_fde(&m_simplestation);
 				}
 			}
 		}
 	}
 	
-	return m_simplestation_exit(0);
+	return m_simplestation_exit(&m_simplestation, 0);
 }
 
-uint8_t m_simplestation_exit(uint8_t m_is_fatal)
+uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal)
 {
-	if (m_simplestation.m_memory_state)
+	if (m_simplestation->m_interrupts_state)
 	{
 		m_memory_exit();
 	}
 
-	if (m_simplestation.m_interrupts_state)
+	if (m_simplestation->m_interrupts_state)
 	{
 		// Do nothing for now
 	}
 
-	if (m_simplestation.m_cpu_state)
+	if (m_simplestation->m_cpu_state)
 	{
 		m_cpu_exit();
 	}

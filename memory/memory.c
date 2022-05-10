@@ -33,7 +33,7 @@ uint32_t m_memory_cache_control_reg = 0;
 	Description:
 	Initializes SimpleStation's Memory Subsystem.
 */
-void m_memory_init()
+void m_memory_init(m_simplestation_state *m_simplestation)
 {
 	// 2 MiB Total
 	m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
@@ -49,7 +49,7 @@ void m_memory_init()
 		printf("[MEM] init: Couldn't allocate PSX RAM Memory, exiting...");
 	}
 
-	m_simplestation.m_memory_state = ON;
+	m_simplestation->m_memory_state = ON;
 }
 
 /*
@@ -115,13 +115,13 @@ uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
+uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simplestation_state *m_simplestation)
 {
 	// PSX doesn't permit unaligned memory reads
 	if (m_memory_offset % 4 != 0)
 	{
 		printf(RED "[MEM] read: Unaligned memory read! Exiting...\n" NORMAL);
-		m_simplestation_exit(1);
+		m_simplestation_exit(m_simplestation, 1);
 	}
 
 	// Calculate the absolute memory address to read at
@@ -150,7 +150,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit(1);
+				m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -169,7 +169,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit(1);
+				m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -188,7 +188,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 			default:
 				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(1);
+				return m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if (m_address == 0xFFFE0130)
@@ -200,11 +200,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	{
 		printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit(1);
+		return m_simplestation_exit(m_simplestation, 1);
 	}
 
  	printf(RED "[MEM] read: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
- 	return m_simplestation_exit(1);
+ 	return m_simplestation_exit(m_simplestation, 1);
 }
 
 /*
@@ -219,13 +219,13 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
+uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation)
 {
 	// PSX doesn't permit unaligned memory writes
 	if (m_memory_offset % 4 != 0)
 	{
 		printf(RED "[MEM] write: Unaligned memory write! Exiting...\n" NORMAL);
-		return m_simplestation_exit(1);
+		return m_simplestation_exit(m_simplestation, 1);
 	}
 
 	// Calculate the absolute memory address to write at
@@ -253,7 +253,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(1);
+				return m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
@@ -272,7 +272,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(1);
+				return m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
@@ -286,11 +286,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_interrupts_write(m_address, m_value);
+				return m_interrupts_write(m_address, m_value, m_simplestation);
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(1);
+				return m_simplestation_exit(m_simplestation, 1);
 		}
 	}
 	else if (m_address == 0xFFFE0130)
@@ -302,9 +302,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	{
 		printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit(1);
+		return m_simplestation_exit(m_simplestation, 1);
 	}
 
  	printf(RED "[MEM] write: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
-	return m_simplestation_exit(1);
+	return m_simplestation_exit(m_simplestation, 1);
 }

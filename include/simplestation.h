@@ -1,9 +1,7 @@
 #ifndef SIMPLESTATION_H
 #define SIMPLESTATION_H
 
-#include <cpu/cpu.h>
 #include <cpu/bios.h>
-#include <memory/memory.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -29,6 +27,6 @@ typedef struct
 extern m_simplestation_state m_simplestation;
 
 /* Functions */
-uint8_t m_simplestation_exit(uint8_t m_is_fatal);
+uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal);
 
 #endif /* SIMPLESTATION_H */

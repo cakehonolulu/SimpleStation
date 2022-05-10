@@ -30,6 +30,7 @@ CFLAGS += -g
 endif
 ifdef ASAN
 CFLAGS += -fsanitize=address
+LDFLAGS += -fsanitize=address
 endif
 
 ifdef WIN32
@@ -51,7 +52,7 @@ $(BINARY): $(OBJECTS)
 	@echo " 🚧 Linking..."
 ifdef UNIX
 	@echo " \033[0;36mLD \033[0msimplestation"
-	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -fsanitize=address -o $@ $(OBJECTS)
+	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(OBJECTS)
 endif
 ifdef WIN32
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
