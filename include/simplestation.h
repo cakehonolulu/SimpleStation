@@ -54,7 +54,6 @@ typedef struct m_corewave_cw33300
 	uint32_t m_next_opcode;
 } m_mips_r3000a_t;
 
-
 #define M_R3000_COP0_REGISTERS 32
 
 typedef struct m_corewave_cw33300_cop0
@@ -83,6 +82,12 @@ typedef struct m_psx_memmory
 
 } m_psx_memory_t;
 
+typedef struct m_cpu_ints
+{	
+	uint32_t m_interrupt_stat;
+	uint32_t m_interrupt_mask;
+} m_psx_cpu_ints_t;
+
 /* Structures */
 typedef struct
 {
@@ -94,6 +99,8 @@ typedef struct
 
 	// Declare a pointer to the PSX Memory state structure
 	m_psx_memory_t *m_memory;
+
+	m_psx_cpu_ints_t *m_cpu_ints;
 
 	bool m_memory_state;
 	bool m_interrupts_state;
