@@ -19,9 +19,6 @@ uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 void m_memory_init(m_simplestation_state *m_simplestation);
 void m_memory_exit(m_simplestation_state *m_simplestation);
 
-extern int8_t *m_mem_ram;
-extern int8_t *m_mem_bios;
-
 /* Macros */
 #define READ32_BIOS(m_addr) m_memory_read(m_addr, dword)
 

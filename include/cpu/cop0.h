@@ -5,8 +5,6 @@
 #include <cpu/cpu.h>
 #include <stdint.h>
 
-extern m_simplestation_state *m_simplestation;
-
 #define COP0_REGS (m_simplestation->m_cpu_cop0->m_registers)
 #define COP0_STATUS_REGISTER COP0_REGS[12]
 

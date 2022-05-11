@@ -21,9 +21,6 @@ static const char *m_cpu_regnames[] = {
 	"ra"
 };
 
-// Defined in cpu.c
-extern m_simplestation_state *m_simplestation;
-
 // Internal defines
 #define REGS (m_simplestation->m_cpu->m_registers)
 #define INSTRUCTION ((uint32_t) (m_simplestation->m_cpu->m_opcode >> 26) & 63)
