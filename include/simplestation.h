@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef NON_C23
+#ifdef PREC23
 #include <stdbool.h>
 #endif
 
