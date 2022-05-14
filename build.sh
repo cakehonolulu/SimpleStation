@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make UNIX=1
+make UNIX=1 PREC23=1
