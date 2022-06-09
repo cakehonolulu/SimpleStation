@@ -12,3 +12,6 @@ simplestation
 
 # VSCodium Files
 .vscode/
+
+# Build Folder
+build/
