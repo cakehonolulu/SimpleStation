@@ -38,12 +38,12 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 		if (m_simplestation->m_memory->m_mem_ram)
 		{
 			// 1 KiB Total
-			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
+			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(1 * KiB);
 
 			if (m_simplestation->m_memory->m_mem_scratchpad)
 			{
 				// 0x20 Total (0x1F801020 - 0x1F801000)
-				m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
+				m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(0x20);
 
 				if (m_simplestation->m_memory->m_mem_memctl1)
 				{
