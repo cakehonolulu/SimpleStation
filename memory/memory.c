@@ -23,28 +23,57 @@ uint32_t m_memory_map[] = {
 	Description:
 	Initializes SimpleStation's Memory Subsystem.
 */
-void m_memory_init(m_simplestation_state *m_simplestation)
+uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 {
+	uint8_t m_return = 0;
+
+	// Allocate the basic memory struct
 	m_simplestation->m_memory = (m_psx_memory_t *) malloc(sizeof(m_psx_memory_t));
 
-	// 2 MiB Total
-	m_simplestation->m_memory->m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
-
-	// 1 KiB Total
-	m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
-
-	// 0x20 Total (0x1F801020 - 0x1F801000)
-	m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
-
-	m_simplestation->m_memory->m_memory_ram_config_reg = 0;
-	m_simplestation->m_memory->m_memory_cache_control_reg = 0;
-
-	if (!m_simplestation->m_memory->m_mem_ram)
+	if (m_simplestation->m_memory)
 	{
-		printf("[MEM] init: Couldn't allocate PSX RAM Memory, exiting...");
+		// 2 MiB Total
+		m_simplestation->m_memory->m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
+
+		if (m_simplestation->m_memory->m_mem_ram)
+		{
+			// 1 KiB Total
+			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(sizeof(1 * KiB));
+
+			if (m_simplestation->m_memory->m_mem_scratchpad)
+			{
+				// 0x20 Total (0x1F801020 - 0x1F801000)
+				m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(sizeof(0x20));
+
+				if (m_simplestation->m_memory->m_mem_memctl1)
+				{
+					m_simplestation->m_memory_state = ON;
+				}
+				else
+				{
+					printf("[MEM] init: Couldn't allocate PSX's MemCtl Registers, exiting...");
+					m_return = 1;
+				}
+			}
+			else
+			{
+				printf("[MEM] init: Couldn't allocate PSX's Scratchpad Memory, exiting...");
+				m_return = 1;
+			}
+		}
+		else
+		{
+			printf("[MEM] init: Couldn't allocate PSX RAM Memory, exiting...");
+			m_return = 1;
+		}
+	}
+	else
+	{
+		printf("[MEM] init: Couldn't allocate Memory Structure, exiting...");
+		m_return = 1;
 	}
 
-	m_simplestation->m_memory_state = ON;
+	return m_return;
 }
 
 /*
@@ -59,14 +88,23 @@ void m_memory_init(m_simplestation_state *m_simplestation)
 */
 void m_memory_exit(m_simplestation_state *m_simplestation)
 {
-	// Free the RAM Buffer
-	free(m_simplestation->m_memory->m_mem_ram);
+	if (m_simplestation->m_memory->m_mem_ram)
+	{
+		// Free the RAM Buffer
+		free(m_simplestation->m_memory->m_mem_ram);
+	}
 
-	// Free the Scratchpad Buffer
-	free(m_simplestation->m_memory->m_mem_scratchpad);
+	if (m_simplestation->m_memory->m_mem_scratchpad)
+	{
+		// Free the Scratchpad Buffer
+		free(m_simplestation->m_memory->m_mem_scratchpad);
+	}
 
-	// Free the Memory Control 1 Buffer
-	free(m_simplestation->m_memory->m_mem_memctl1);
+	if (m_simplestation->m_memory->m_mem_memctl1)
+	{
+		// Free the Memory Control 1 Buffer
+		free(m_simplestation->m_memory->m_mem_memctl1);
+	}
 
 	// Exit the BIOS Subsystem (Frees the BIOS Memory)
 	m_bios_exit(m_simplestation);
