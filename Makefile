@@ -3,7 +3,11 @@ ifdef USE_GCC
 CC = gcc
 else
 # Use LLVM's frontend CLANG
+ifdef CODEQL
+CC = clang-15
+else
 CC = clang
+endif
 endif
 
 # Setup the Windows Compiler (In this cross-compiling using mingw64)
@@ -39,28 +43,30 @@ else
 CFLAGS += -std=c2x
 endif
 
-ifdef WIN32
-BINARY := simplestation.exe
+ifeq ($(OS),Windows_NT)
+	BINARY := simplestation.exe
+	HOST := Windows
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S), Linux)
+		HOST := Linux
+		BINARY := simplestation
+		SOURCES := $(shell find . -name '*.c')
+		OBJECTS = $(SOURCES:.c=.o)
+    endif
 endif
 
-ifdef UNIX
-BINARY := simplestation
-endif
-
-ifdef UNIX
-SOURCES := $(shell find . -name '*.c')
-OBJECTS = $(SOURCES:.c=.o)
-endif
+.PHONY: clean all
 
 all: clean $(BINARY)
 
 $(BINARY): $(OBJECTS)
 	@echo " 🚧 Linking..."
-ifdef UNIX
+ifeq ($(HOST), Linux)
 	@echo " \033[0;36mLD \033[0msimplestation"
 	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(OBJECTS)
 endif
-ifdef WIN32
+ifeq ($(HOST), Windows)
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
 endif
 
@@ -69,6 +75,9 @@ endif
 	@echo " \033[0;35mCC\033[0m $<"
 
 clean:
-	@echo " 🧹 Cleaning..."
-	-@rm -rf $(BINARY) ||:
-	-@rm -rf $(OBJECTS) ||:
+	@echo "🧹 Cleaning..."
+
+ifeq ($(filter $(BINARY), $(MAKECMDGOALS)),)
+	$(shell find . -name '*.o' -exec rm {} \;)
+	$(shell rm -rf $(BINARY);)
+endif
