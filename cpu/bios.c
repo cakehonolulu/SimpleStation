@@ -99,5 +99,8 @@ uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_n
 // Free the BIOS Buffer
 void m_bios_exit(m_simplestation_state *m_simplestation)
 {
-	free(m_simplestation->m_memory->m_mem_bios);
+	if (m_simplestation->m_memory->m_mem_bios != NULL)
+	{
+		free(m_simplestation->m_memory->m_mem_bios);
+	}
 }
