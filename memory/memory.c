@@ -254,6 +254,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 */
 uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation)
 {
+	uint32_t m_placeholder, m_address, m_return = 0;
+
 	// PSX doesn't permit unaligned memory writes
 	if (m_memory_offset % 4 != 0)
 	{
@@ -262,13 +264,14 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 
 	// Calculate the absolute memory address to write at
-	uint32_t m_placeholder = m_memory_offset >> 29;
-	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
+	m_placeholder = m_memory_offset >> 29;
+	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
 	if (m_address == 0x1F801060)
 	{
 		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
-		return m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
+		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
+		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
@@ -282,7 +285,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+				m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+				break;
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -301,7 +305,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+				m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+				break;
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -319,7 +324,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case dword:
-				return m_interrupts_write(m_address, m_value, m_simplestation);
+				m_return = m_interrupts_write(m_address, m_value, m_simplestation);
+				break;
 
 			default:
 				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
@@ -329,7 +335,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	else if (m_address == 0xFFFE0130)
 	{
 		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg , m_value);
-		return m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
+		m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
+		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
 	}
 	else
 	{
@@ -338,6 +345,5 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		return m_simplestation_exit(m_simplestation, 1);
 	}
 
- 	printf(RED "[MEM] write: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
-	return m_simplestation_exit(m_simplestation, 1);
+	return m_return;
 }
