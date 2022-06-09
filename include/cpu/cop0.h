@@ -28,7 +28,7 @@ static const char *m_cop0_regnames[] = {
 	"cop0_28", "cop0_29", "cop0_30", "cop0_31"
 };
 
-void m_cpu_cop0_init(m_simplestation_state *m_simplestation);
+uint8_t m_cpu_cop0_init(m_simplestation_state *m_simplestation);
 void m_cpu_cop0_exit(m_simplestation_state *m_simplestation);
 
 // 0x04

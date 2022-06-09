@@ -4,54 +4,77 @@
 #include <debugger/debugger.h>
 
 // Function to initialize the CPU state
-void m_cpu_init(m_simplestation_state *m_simplestation)
+uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 {
+	// Return value
+	uint8_t m_return = 0;
+
 	// Malloc the CPU-state struct
 	m_simplestation->m_cpu = (m_mips_r3000a_t*) malloc(sizeof(m_mips_r3000a_t));
 
-	m_cpu_cop0_init(m_simplestation);
-
-	// Check for malloc completion
-	if (!m_simplestation->m_cpu)
+	// Check if it has been allocated
+	if (m_simplestation->m_cpu)
 	{
-		printf(RED "[CPU] init: Couldn't allocate CPU state struct, exiting...\n" NORMAL);
-		exit(EXIT_FAILURE);
-	}
 #ifdef DEBUG_CPU
-	else
-	{
-		printf("[CPU] init: Allocated CPU structure!\n");
-	}
+			printf("[CPU] init: Allocated CPU structure!\n");
+#endif
+		// Check if COP0 initialization succeeded
+		if (m_cpu_cop0_init(m_simplestation) == 0)
+		{
+#ifdef DEBUG_CPU
+			printf("[CPU] init: Allocated COP0 structure!\n");
 #endif
 
-	// Point Program Counter to the initial BIOS address
-	PC = 0xBFC00000;
+			// Point Program Counter to the initial BIOS address
+			PC = 0xBFC00000;
 
-	// High register to 0
-	HI = 0;
+			// High register to 0
+			HI = 0;
 
-	// Low register to 0
-	LO = 0;
+			// Low register to 0
+			LO = 0;
 
-	m_simplestation->m_cpu->m_opcode = 0;
+			// Set current opcode to 0
+			m_simplestation->m_cpu->m_opcode = 0;
 
-	m_simplestation->m_cpu->m_next_opcode = 0;
+			// Set next opcode in the pipeline to 0
+			m_simplestation->m_cpu->m_next_opcode = 0;
 
-	// Set all registers to 0
-	for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
+			// Set all registers to 0
+			for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
+			{
+				m_simplestation->m_cpu->m_registers[m_regs] = 0;
+			}
+
+			// Set the CPU state to 'ON'
+			m_simplestation->m_cpu_state = ON;
+		}
+		else
+		{
+			printf(RED "[CPU] init: Couldn't allocate CPU COP0 state struct, exiting...\n" NORMAL);
+			m_return = 1;
+		}
+	}
+	else
 	{
-		m_simplestation->m_cpu->m_registers[m_regs] = 0;
+		printf(RED "[CPU] init: Couldn't allocate CPU state struct, exiting...\n" NORMAL);
+		m_return = 1;
 	}
 
-	m_simplestation->m_cpu_state = ON;
+	return m_return;
 }
 
 // Function to free the CPU struct after end-of-emulation
 void m_cpu_exit(m_simplestation_state *m_simplestation)
 {
+	// Clear the COP0 structures
 	m_cpu_cop0_exit(m_simplestation);
 	
-	free(m_simplestation->m_cpu);
+	// Free the CPU struct if-and-only-if has been allocated
+	if (m_simplestation->m_cpu)
+	{
+		free(m_simplestation->m_cpu);
+	}
 
 #ifdef DEBUG_CPU
 	printf("[CPU] exit: Freed CPU structure!\n");

@@ -88,7 +88,7 @@ static const char *m_cpu_regnames[] = {
 #define RA (m_simplestation->m_cpu->m_registers[31])
 
 /* Function definitions */
-void m_cpu_init(m_simplestation_state *m_simplestation);
+uint8_t m_cpu_init(m_simplestation_state *m_simplestation);
 void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
 
