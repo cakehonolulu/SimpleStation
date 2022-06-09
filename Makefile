@@ -51,33 +51,45 @@ else
     ifeq ($(UNAME_S), Linux)
 		HOST := Linux
 		BINARY := simplestation
-		SOURCES := $(shell find . -name '*.c')
-		OBJECTS = $(SOURCES:.c=.o)
+		C_SOURCES := $(shell find . -name '*.c')
+		C_OBJECTS = $(C_SOURCES:.c=.o)
+		BUILD_DIR = build
+		OBJ = $(addprefix $(BUILD_DIR)/,$(addsuffix .0,$(basename $(pathsubst %,%,$(C_SOURCES)))))
+		DIR_SORT = $(sort $(dir $(C_SOURCES)))
+		DIR_LIST = $(DIR_SORT:./%=%)
+		BUILD_OBJ = $(addprefix build/, $(DIR_LIST))
     endif
 endif
 
 .PHONY: clean all
 
-all: clean $(BINARY)
+all: clean $(BUILD_OBJ) $(BINARY)
 
-$(BINARY): $(OBJECTS)
+$(BINARY): $(C_OBJECTS)
 	@echo " 🚧 Linking..."
 ifeq ($(HOST), Linux)
 	@echo " \033[0;36mLD \033[0msimplestation"
-	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(OBJECTS)
+	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(shell find . -name '*.o')
 endif
 ifeq ($(HOST), Windows)
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
 endif
 
 %.o: %.c
-	@$(CC) $(CFLAGS) $(SDLCFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(SDLCFLAGS) -c $< -o build/$@
 	@echo " \033[0;35mCC\033[0m $<"
 
-clean:
-	@echo "🧹 Cleaning..."
+$(BUILD_OBJ):
+	@echo " 🧩 Preparing build..."
 
-ifeq ($(filter $(BINARY), $(MAKECMDGOALS)),)
-	$(shell find . -name '*.o' -exec rm {} \;)
+ifeq ($(filter $(BUILD_OBJ), $(MAKECMDGOALS)),)
+	$(shell mkdir -p $(BUILD_OBJ);)
+endif
+
+clean:
+	@echo " 🧹 Cleaning..."
+
+ifneq ($(filter clean, $(MAKECMDGOALS)),)
+	$(shell rm -rf $(BUILD_DIR);)
 	$(shell rm -rf $(BINARY);)
 endif
