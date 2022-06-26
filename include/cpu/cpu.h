@@ -91,7 +91,7 @@ static const char *m_cpu_regnames[] = {
 // FIXME: This is Pre-C23 (ckd_add...)
 #if defined(__clang__)
 #define CHECK_ADD_OVERFLOW(a, b, c) \
-   __builtin_add_overflow (a, b, c)
+   __builtin_sadd_overflow (a, b, c)
 #elif defined(__GNUC__)
 #define CHECK_ADD_OVERFLOW(a, b) \
    __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
