@@ -192,7 +192,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	{
 		m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 	}
-	else if ((0x00000000 <= m_address) && (m_address < 0x00200000))
+	else if (m_address < 0x00200000)
 	{
 		m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
 	}
@@ -255,7 +255,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 	{
 		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
 	}
-	else if ((0x00000000 <= m_address) && (m_address < 0x00200000))
+	else if (m_address < 0x00200000)
 	{
 		m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
 	}
