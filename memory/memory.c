@@ -2,6 +2,7 @@
 #include <cpu/interrupts.h>
 #include <cpu/bios.h>
 #include <ui/termcolour.h>
+#include <endian.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -124,12 +125,23 @@ void m_memory_exit(m_simplestation_state *m_simplestation)
 */
 uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
 {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	/*
+		If on LE, it's safe to assume we'll read the bytes in the order we want them.
+		This reduces the function size by a large margin, and therefor, performs faster.
+	*/
+	return *(uint32_t*)(m_memory_source + (m_memory_address + 0));
+#else
+	/*
+		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
+	*/
 	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
 	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
 	uint8_t b2 = *(uint8_t*)(m_memory_source + (m_memory_address + 2));
 	uint8_t b3 = *(uint8_t*)(m_memory_source + (m_memory_address + 3));
 
 	return (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
+#endif
 }
 
 uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source)
@@ -139,95 +151,51 @@ uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_
 
 /*
 	Function:
-	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
+	m_memory_read(uint32_t m_memory_offset)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
-	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
 
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simplestation_state *m_simplestation)
+uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simplestation)
 {
+	uint32_t m_placeholder, m_address, m_return = 0;
+
 	// PSX doesn't permit unaligned memory reads
 	if (m_memory_offset % 4 != 0)
 	{
 		printf(RED "[MEM] read: Unaligned memory read! Exiting...\n" NORMAL);
-		m_simplestation_exit(m_simplestation, 1);
+		return m_simplestation_exit(m_simplestation, 1);
 	}
 
 	// Calculate the absolute memory address to read at
-	uint32_t m_placeholder = m_memory_offset >> 29;
-	uint32_t m_address = m_memory_offset & m_memory_map[m_placeholder];
+	m_placeholder = m_memory_offset >> 29;
+	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
 	// Check for a read in BIOS area
 	if (m_address == 0x1F801060)
 	{
 		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
-		return m_simplestation->m_memory->m_memory_ram_config_reg;
+		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
-		// Based on the m_size argument, select the memory size to be read
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				return m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-
-			default:
-				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
-		// Based on the m_size argument, select the memory size to be read
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				return m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-
-			default:
-				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
-		// Based on the m_size argument, select the memory size to be read
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				return m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-
-			default:
-				printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 	}
 	else if (m_address == 0xFFFE0130)
 	{
 		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg);
-		return m_simplestation->m_memory->m_memory_cache_control_reg;
+		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
 	}
 	else
 	{
@@ -236,23 +204,21 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		return m_simplestation_exit(m_simplestation, 1);
 	}
 
- 	printf(RED "[MEM] read: Abnormal path in emulator code, continuing might break things...\n" NORMAL);
- 	return m_simplestation_exit(m_simplestation, 1);
+ 	return m_return;
 }
 
 /*
 	Function:
-	m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
+	m_memory_write(uint32_t m_memory_offset, uint32_t m_value)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
 	-> m_value: Value to be written
-	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
 
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation)
+uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
 {
 	uint32_t m_placeholder, m_address, m_return = 0;
 
@@ -275,62 +241,15 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
-		// Based on the m_size argument, select the memory size to be read
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
-
-			default:
-				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
-		// Based on the m_size argument, select the memory size to be read
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-				break;
-
-			default:
-				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_interrupts_write(m_address, m_value, m_simplestation);
-				break;
-
-			default:
-				printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-				return m_simplestation_exit(m_simplestation, 1);
-		}
+		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
 	}
 	else if (m_address == 0xFFFE0130)
 	{
