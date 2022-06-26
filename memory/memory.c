@@ -177,7 +177,9 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	// Check for a read in BIOS area
 	if (m_address == 0x1F801060)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
+#endif
 		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
@@ -198,7 +200,9 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	}
 	else if (m_address == 0xFFFE0130)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg);
+#endif
 		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
 	}
 	else
@@ -239,7 +243,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 
 	if (m_address == 0x1F801060)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
+#endif
 		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
 		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
@@ -261,7 +267,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 	}
 	else if (m_address == 0xFFFE0130)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg , m_value);
+#endif
 		m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
 		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
 	}
