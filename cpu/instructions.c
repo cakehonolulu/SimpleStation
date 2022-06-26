@@ -153,15 +153,27 @@ void m_addi(m_simplestation_state *m_simplestation)
 	printf("addi $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], SIMMDT);
 #endif
 
+#ifdef __clang__
+	int m_result;
+#endif
+
 	// TODO: Pre-C23, change accordingly when it releases (ckd_add...)
+#ifndef __clang__
 	if (CHECK_ADD_OVERFLOW(REGS[REGIDX_S], SIMMDT))
+#else
+	if (CHECK_ADD_OVERFLOW(REGS[REGIDX_S], SIMMDT, &m_result))
+#endif
 	{
 		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
 		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
+#ifndef __clang__
 		REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
+#else
+		REGS[REGIDX_T] = m_result;
+#endif
 	}
 }
 
