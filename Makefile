@@ -43,6 +43,12 @@ else
 CFLAGS += -std=c2x
 endif
 
+ifdef TEST
+TESTS = Yes
+else
+TESTS = No
+endif
+
 ifeq ($(OS),Windows_NT)
 	BINARY := simplestation.exe
 	HOST := Windows
@@ -51,7 +57,11 @@ else
     ifeq ($(UNAME_S), Linux)
 		HOST := Linux
 		BINARY := simplestation
-		C_SOURCES := $(shell find . -name '*.c')
+		ifeq ($(TESTS), Yes)
+			C_SOURCES := $(shell find . -name '*.c')
+		else
+			C_SOURCES := $(shell find . -name '*.c' -not -path "./tests/*")
+		endif
 		C_OBJECTS = $(C_SOURCES:.c=.o)
 		BUILD_DIR = build
 		OBJ = $(addprefix $(BUILD_DIR)/,$(addsuffix .0,$(basename $(pathsubst %,%,$(C_SOURCES)))))
