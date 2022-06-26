@@ -147,7 +147,6 @@ void m_bne(m_simplestation_state *m_simplestation)
 	destination register is not modified and an Integer Overflow exception occurs. If it
 	does not overflow, the 32-bit result is placed into GPR rt
 */
-#include <limits.h>
 void m_addi(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
@@ -155,7 +154,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 #endif
 
 	// TODO: Pre-C23, change accordingly when it releases (ckd_add...)
-	if (m_cpu_check_add_overflow(REGS[REGIDX_S], SIMMDT))
+	if (CHECK_ADD_OVERFLOW(REGS[REGIDX_S], SIMMDT))
 	{
 		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
 		m_simplestation_exit(m_simplestation, 1);

@@ -105,13 +105,3 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
 	}
 }
-
-bool m_cpu_check_add_overflow(int32_t m_a, int32_t m_b)
-{
-	if (m_a > 0 && m_b > INT_MAX - m_a)
-	{
-		return true;
-	}
-
-	return false;
-}

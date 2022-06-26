@@ -87,10 +87,14 @@ static const char *m_cpu_regnames[] = {
 #define FP (m_simplestation->m_cpu->m_registers[30])
 #define RA (m_simplestation->m_cpu->m_registers[31])
 
+/* Macros */
+// FIXME: This is Pre-C23 (ckd_add...)
+#define CHECK_ADD_OVERFLOW(a, b) \
+   __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
+
 /* Function definitions */
 uint8_t m_cpu_init(m_simplestation_state *m_simplestation);
 void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
-bool m_cpu_check_add_overflow(int32_t m_a, int32_t m_b);
 
 #endif /* CPU_H */
