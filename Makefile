@@ -1,6 +1,14 @@
+# Setup the basic compilation flags
+# Warn all, extra and compile for c23
+CFLAGS := -Wall -Wextra -Iinclude/
+SDLCFLAGS = `sdl2-config --cflags`
+SDLLDFLAGS = `sdl2-config --libs`
+LDFLAGS := -lm
+
 ifdef USE_GCC
 # Use GNU's GCC Compiler
 CC = gcc
+CFLAGS += -DPREC23
 else
 # Use LLVM's frontend CLANG
 ifdef CODEQL
@@ -12,13 +20,6 @@ endif
 
 # Setup the Windows Compiler (In this cross-compiling using mingw64)
 MINGW64 = x86_64-w64-mingw32-gcc-10-win32
-
-# Setup the basic compilation flags
-# Warn all, extra and compile for c23
-CFLAGS := -Wall -Wextra -Iinclude/
-SDLCFLAGS = `sdl2-config --cflags`
-SDLLDFLAGS = `sdl2-config --libs`
-LDFLAGS := -lm
 
 ifdef LD_MOLD
 LDFLAGS += -fuse-ld=mold
