@@ -91,5 +91,6 @@ static const char *m_cpu_regnames[] = {
 uint8_t m_cpu_init(m_simplestation_state *m_simplestation);
 void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
+bool m_cpu_check_add_overflow(int32_t m_a, int32_t m_b);
 
 #endif /* CPU_H */

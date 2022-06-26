@@ -8,11 +8,8 @@ void m_exp(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_extended_00[(m_simplestation->m_cpu->m_opcode & 0x3F)].m_funct == NULL)
 	{
-		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F));
-		m_printregs(m_simplestation);
-		m_bios_exit(m_simplestation);
-		m_cpu_exit(m_simplestation);
-		exit(EXIT_FAILURE);
+		printf(RED "Unimplemented 0x00 Family Opcode: 0x%02X\nFull Opcode: 0x%4X\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F), m_simplestation->m_cpu->m_opcode);
+		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
@@ -26,11 +23,8 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
 	{
-		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\n" NORMAL, REGIDX_S);
-		m_printregs(m_simplestation);
-		m_bios_exit(m_simplestation);
-		m_cpu_exit(m_simplestation);
-		exit(EXIT_FAILURE);
+		printf(RED "Unimplemented Coprocessor 0 Opcode: 0x%02X\nFull Opcode: 0x%4X\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
+		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
@@ -153,23 +147,22 @@ void m_bne(m_simplestation_state *m_simplestation)
 	destination register is not modified and an Integer Overflow exception occurs. If it
 	does not overflow, the 32-bit result is placed into GPR rt
 */
+#include <limits.h>
 void m_addi(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("addi $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], SIMMDT);
 #endif
 
-	// TODO: Pre-C23, change accordingly when it releases
-	int32_t m_number;
-
-	if (__builtin_add_overflow(REGS[REGIDX_S], SIMMDT, &m_number))
+	// TODO: Pre-C23, change accordingly when it releases (ckd_add...)
+	if (m_cpu_check_add_overflow(REGS[REGIDX_S], SIMMDT))
 	{
 		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
 		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
 	{
-		REGS[REGIDX_T] = m_number;
+		REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
 	}
 }
 
