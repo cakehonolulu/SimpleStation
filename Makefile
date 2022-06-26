@@ -58,9 +58,9 @@ else
 		HOST := Linux
 		BINARY := simplestation
 		ifeq ($(TESTS), Yes)
-			C_SOURCES := $(shell find . -name '*.c')
+			C_SOURCES := $(shell find . -type f \( -iname "*.c" ! -iname "simplestation.c" \))
 		else
-			C_SOURCES := $(shell find . -name '*.c' -not -path "./tests/*")
+			C_SOURCES := $(shell find . -name '*.c' ! -path "./tests/*")
 		endif
 		C_OBJECTS = $(C_SOURCES:.c=.o)
 		BUILD_DIR = build
