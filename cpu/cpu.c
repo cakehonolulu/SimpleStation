@@ -105,3 +105,21 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
 	}
 }
+
+bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
+{
+	bool m_result = false;
+
+#ifndef __clang__
+	if (CHECK_ADD_OVERFLOW(m_first_num, m_second_num))
+#else
+	int32_t m_number;
+
+	if (CHECK_ADD_OVERFLOW(m_first_num, m_second_num, &m_number))
+#endif
+	{
+		m_result = true;
+	}
+
+	return m_result;
+}
