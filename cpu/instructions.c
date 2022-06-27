@@ -57,6 +57,26 @@ void m_sll(m_simplestation_state *m_simplestation)
 }
 
 /*
+	JR (MIPS I)
+
+	Format:
+	JR rs MIPS I
+
+	Description:
+	To branch to an instruction address in a register.
+	Jump to the effective target address in GPR rs. Execute the instruction following the
+	jump, in the branch delay slot, before jumping.
+*/
+void m_jr(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);
+#endif
+
+	PC = REGS[REGIDX_S];
+}
+
+/*
 	ADDU (MIPS I)
 	
 	Format:
