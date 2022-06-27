@@ -68,6 +68,9 @@ void m_lui(m_simplestation_state *m_simplestation);
 // 0x23
 void m_lw(m_simplestation_state *m_simplestation);
 
+// 0x28
+void m_sb(m_simplestation_state *m_simplestation);
+
 // 0x29
 void m_sh(m_simplestation_state *m_simplestation);
 

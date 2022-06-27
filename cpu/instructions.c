@@ -286,6 +286,36 @@ void m_lw(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SB (MIPS I)
+
+	Format:
+	It is recommended that a reserved hint field value either cause a default
+	prefetch action that is expected to be useful for most cases of data use, such
+	as the “load” hint, or cause the instruction to be treated as a NOP. SB rt, offset(base)
+
+	Description:
+	To store a byte to memory.
+	The least-significant 8-bit byte of GPR rt is stored in memory at the location specified
+	by the effective address. The 16-bit signed offset is added to the contents of GPR base to
+	form the effective address.
+*/
+void m_sb(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sb $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	{
+		printf(YELLOW "[CPU] sb: Ignoring word store, cache is isolated...\n" NORMAL);
+		return;
+	}
+	
+	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], byte, m_simplestation);
+}
+
+
+/*
 	SH (MIPS I)
 
 	Format:
