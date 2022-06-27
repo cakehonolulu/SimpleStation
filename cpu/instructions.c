@@ -75,6 +75,35 @@ void m_or(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SLTU (MIPS I)
+
+	Format:
+	SLTU rd, rs, rt
+
+	Description:
+	To record the result of an unsigned less-than comparison.
+	Compare the contents of GPR rs and GPR rt as unsigned integers and record the
+	Boolean result of the comparison in GPR rd. If GPR rs is less than GPR rt the result is
+	1 (true), otherwise 0 (false).
+	The arithmetic comparison does not cause an Integer Overflow exception.
+*/
+void m_sltu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sltu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	if (REGS[REGIDX_S] < REGS[REGIDX_T])
+	{
+		REGS[REGIDX_D] = 1;
+	}
+	else
+	{
+		REGS[REGIDX_D] = 0;
+	}
+}
+
+/*
 	J (MIPS I)
 
 	Format:

@@ -32,6 +32,9 @@ void m_sll(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x25
 void m_or(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x2B
+void m_sltu(m_simplestation_state *m_simplestation);
+
 // 0x02
 void m_j(m_simplestation_state *m_simplestation);
 
