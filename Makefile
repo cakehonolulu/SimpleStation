@@ -103,7 +103,7 @@ endif
 clean:
 	@echo " 🧹 Cleaning..."
 
-ifneq ($(filter clean, $(MAKECMDGOALS)),)
+ifeq ($(filter clean, $(MAKECMDGOALS)),)
 	$(shell rm -rf $(BUILD_DIR);)
 	$(shell rm -rf $(BINARY);)
 endif
