@@ -42,7 +42,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{NULL, NULL},		// 0x06
 	{NULL, NULL},		// 0x07
 	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
+	{"sh", m_sh},		// 0x29
 	{NULL, NULL},		// 0x2A
 	{"sw", m_sw},		// 0x2B
 	{NULL, NULL},		// 0x00

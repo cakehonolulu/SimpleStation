@@ -266,6 +266,33 @@ void m_lw(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SH (MIPS I)
+
+	Format:
+	SH rt, offset(base)
+
+	Description:
+	To store a halfword to memory.
+	The least-significant 16-bit halfword of register rt is stored in memory at the location
+	specified by the aligned effective address. The 16-bit signed offset is added to the
+	contents of GPR base to form the effective address.
+*/
+void m_sh(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sh $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	{
+		printf(YELLOW "[CPU] sh: Ignoring word store, cache is isolated...\n" NORMAL);
+		return;
+	}
+
+	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], m_simplestation);
+}
+
+/*
 	SW (MIPS I)
 
 	Format:
