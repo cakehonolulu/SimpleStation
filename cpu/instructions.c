@@ -55,6 +55,27 @@ void m_sll(m_simplestation_state *m_simplestation)
 }
 
 /*
+	ADDU (MIPS I)
+	
+	Format:
+	ADDU rd, rs, rt 
+
+	Description:
+	To add 32-bit integers.
+	The 32-bit word value in GPR rt is added to the 32-bit value in GPR rs and the 32-bit
+	arithmetic result is placed into GPR rd .
+	No Integer Overflow exception occurs under any circumstances.
+*/
+void m_addu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = REGS[REGIDX_S] + REGS[REGIDX_T];
+}
+
+/*
 	OR (MIPS I)
 
 	Format:

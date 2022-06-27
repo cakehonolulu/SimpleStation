@@ -29,6 +29,9 @@ void m_exp(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x00
 void m_sll(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x21
+void m_addu(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x25
 void m_or(m_simplestation_state *m_simplestation);
 
