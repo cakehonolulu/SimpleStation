@@ -155,6 +155,26 @@ void m_j(m_simplestation_state *m_simplestation)
 }
 
 /*
+	JAL (MIPS I)
+
+	Format:
+	J target
+
+	Description:
+	Branches and copies current PC to $ra ($31) for it to act as a return address (Similar to armv7 bl).
+*/
+void m_jal(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
+#endif
+
+	REGS[31] = PC;
+
+	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+}
+
+/*
 	BNE (MIPS I)
 
 	Format:

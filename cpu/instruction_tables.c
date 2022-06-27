@@ -4,7 +4,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{"exp", m_exp},		// 0x00
 	{NULL, NULL},		// 0x01
 	{"j", m_j},			// 0x02
-	{NULL, NULL},		// 0x03
+	{"jal", m_jal},		// 0x03
 	{NULL, NULL},		// 0x04
 	{"bne", m_bne},		// 0x05
 	{NULL, NULL},		// 0x06

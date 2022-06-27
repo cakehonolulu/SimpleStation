@@ -41,6 +41,9 @@ void m_sltu(m_simplestation_state *m_simplestation);
 // 0x02
 void m_j(m_simplestation_state *m_simplestation);
 
+// 0x03
+void m_jal(m_simplestation_state *m_simplestation);
+
 // 0x05
 void m_bne(m_simplestation_state *m_simplestation);
 
