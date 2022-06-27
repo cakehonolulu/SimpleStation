@@ -29,22 +29,22 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 	uint8_t m_return = 0;
 
 	// Allocate the basic memory struct
-	m_simplestation->m_memory = (m_psx_memory_t *) malloc(sizeof(m_psx_memory_t));
+	m_simplestation->m_memory = (m_psx_memory_t *) calloc(sizeof(m_psx_memory_t), sizeof(uint8_t));
 
 	if (m_simplestation->m_memory)
 	{
 		// 2 MiB Total
-		m_simplestation->m_memory->m_mem_ram = (int8_t *) malloc(sizeof(PSX_MEM));
+		m_simplestation->m_memory->m_mem_ram = (int8_t *) calloc(sizeof(PSX_MEM), sizeof(uint8_t));
 
 		if (m_simplestation->m_memory->m_mem_ram)
 		{
 			// 1 KiB Total
-			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) malloc(1 * KiB);
+			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) calloc(1 * KiB, sizeof(uint8_t));
 
 			if (m_simplestation->m_memory->m_mem_scratchpad)
 			{
 				// 0x20 Total (0x1F801020 - 0x1F801000)
-				m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) malloc(0x20);
+				m_simplestation->m_memory->m_mem_memctl1 = (int8_t *) calloc(0x20, sizeof(uint8_t));
 
 				if (m_simplestation->m_memory->m_mem_memctl1)
 				{
