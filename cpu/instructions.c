@@ -262,7 +262,7 @@ void m_lw(m_simplestation_state *m_simplestation)
 	}
 	
 	int32_t m_addr = (SIMMDT + REGS[REGIDX_S]);
-	REGS[REGIDX_T] = m_memory_read(m_addr, m_simplestation);
+	REGS[REGIDX_T] = m_memory_read(m_addr, dword, m_simplestation);
 }
 
 /*
@@ -288,8 +288,8 @@ void m_sh(m_simplestation_state *m_simplestation)
 		printf(YELLOW "[CPU] sh: Ignoring word store, cache is isolated...\n" NORMAL);
 		return;
 	}
-
-	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], m_simplestation);
+	
+	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], word, m_simplestation);
 }
 
 /*
@@ -317,7 +317,7 @@ void m_sw(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], m_simplestation);
+	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword, m_simplestation);
 }
 
 /*

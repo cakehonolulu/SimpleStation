@@ -103,7 +103,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cpu->m_opcode = m_simplestation->m_cpu->m_next_opcode;
 
 	/* Fetch cycle */
-	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), m_simplestation);
+	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 	
 	// Increment Program Counter by 4
 	PC += 4;

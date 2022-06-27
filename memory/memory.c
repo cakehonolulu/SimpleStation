@@ -151,23 +151,45 @@ uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_
 
 /*
 	Function:
-	m_memory_read(uint32_t m_memory_offset)
+	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
+	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
 
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simplestation)
+uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simplestation_state *m_simplestation)
 {
 	uint32_t m_placeholder, m_address, m_return = 0;
 
-	// PSX doesn't permit unaligned memory reads
-	if (m_memory_offset % 4 != 0)
+	// PSX doesn't permit unaligned memory writes
+	switch (m_size)
 	{
-		printf(RED "[MEM] read: Unaligned memory read! Exiting...\n" NORMAL);
-		return m_simplestation_exit(m_simplestation, 1);
+		case byte:
+			break;
+
+		case word:
+			if (m_memory_offset % 2 != 0)
+			{
+				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
+				return m_simplestation_exit(m_simplestation, 1);
+			}
+			break;
+
+		case dword:
+			if (m_memory_offset % 4 != 0)
+			{
+				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
+				return m_simplestation_exit(m_simplestation, 1);
+			}
+			break;
+
+		default:
+			printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+			return m_simplestation_exit(m_simplestation, 1);
+			break;
 	}
 
 	// Calculate the absolute memory address to read at
@@ -184,7 +206,21 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
-		m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address < 0x1F802000)
 	{
@@ -193,15 +229,57 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
-		m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
-		m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				return m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address < 0x00200000)
 	{
-		m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address == 0xFFFE0130)
 	{
@@ -222,24 +300,46 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 
 /*
 	Function:
-	m_memory_write(uint32_t m_memory_offset, uint32_t m_value)
+	m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size)
 
 	Arguments:
 	-> m_memory_offset: Offset where to look the value at
 	-> m_value: Value to be written
+	-> m_size: Size range from 0-2 for memory-block read size ([1-2-4 bytes])
 
 	Description:
 	Returns a double-word (32-bit value) located at that memory offset
 */
-uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
+uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation)
 {
 	uint32_t m_placeholder, m_address, m_return = 0;
 
 	// PSX doesn't permit unaligned memory writes
-	if (m_memory_offset % 4 != 0)
+	switch (m_size)
 	{
-		printf(RED "[MEM] write: Unaligned memory write! Exiting...\n" NORMAL);
-		return m_simplestation_exit(m_simplestation, 1);
+		case byte:
+			break;
+
+		case word:
+			if (m_memory_offset % 2 != 0)
+			{
+				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
+				return m_simplestation_exit(m_simplestation, 1);
+			}
+			break;
+
+		case dword:
+			if (m_memory_offset % 4 != 0)
+			{
+				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
+				return m_simplestation_exit(m_simplestation, 1);
+			}
+			break;
+
+		default:
+			printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+			return m_simplestation_exit(m_simplestation, 1);
+			break;
 	}
 
 	// Calculate the absolute memory address to write at
@@ -256,11 +356,39 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 	}
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
-		m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
-		m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address < 0x1F802000)
 	{
@@ -269,11 +397,39 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
-		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_interrupts_write(m_address, m_value, m_simplestation);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address < 0x00200000)
 	{
-		m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
 	}
 	else if (m_address == 0xFFFE0130)
 	{
