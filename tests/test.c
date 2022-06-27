@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 					// Initialize the Interrupts Subsystem
 					m_interrupts_init(&m_simplestation);
 					
-                    m_exec_tests();
+                    m_exec_tests(&m_simplestation);
 				}
 				else
 				{
@@ -81,13 +81,14 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	return m_is_fatal;
 }
 
-void m_exec_tests()
+void m_exec_tests(m_simplestation_state *m_simplestation)
 {
 	printf(YELLOW "[TEST] Starting the tests...\n" NORMAL);
-    m_signed_integer_overflow_test();
+    m_signed_integer_overflow_test(m_simplestation);
+	m_memory_test(m_simplestation);
 }
 
-void m_signed_integer_overflow_test()
+void m_signed_integer_overflow_test(m_simplestation_state *m_simplestation)
 {
 	size_t m_passing_tests = 0;
 	int x = 45, y = 2147483647;
@@ -153,4 +154,68 @@ void m_signed_integer_overflow_test()
 	{
 		printf(RED "[FAIL] signed_integer_overflow_test (%lu tests)\n" NORMAL, (6 - m_passing_tests));
 	}
+}
+
+void m_memory_test(m_simplestation_state *m_simplestation)
+{
+	size_t i, m_passing_tests = 0;
+
+	bool m_good = true;
+
+	for (i = 0; i < sizeof(PSX_MEM); i++)
+	{
+		if (m_simplestation->m_memory->m_mem_ram[i] != 0)
+		{
+			m_good = false;
+		}
+	}
+
+	if (m_good) m_passing_tests++;
+
+	m_good = true;
+
+	for (i = 0; i < (1 * KiB); i++)
+	{
+		if (m_simplestation->m_memory->m_mem_scratchpad[i] != 0)
+		{
+			m_good = false;
+		}
+	}
+
+	if (m_good) m_passing_tests++;
+	
+	m_good = true;
+
+	for (i = 0; i < (0x20); i++)
+	{
+		if (m_simplestation->m_memory->m_mem_memctl1[i] != 0)
+		{
+			m_good = false;
+		}
+	}
+
+	if (m_good) m_passing_tests++;
+	
+	m_good = true;
+
+    if (m_passing_tests == 3)
+	{
+		printf(GREEN "[ OK ] memory_write_test\n");
+	}
+	else
+	{
+		printf(RED "[FAIL] memory_write_test (%lu tests)\n" NORMAL, (3 - m_passing_tests));
+	}
+
+	m_memory_write_test(m_simplestation);
+}
+
+void m_memory_write_test(m_simplestation_state *m_simplestation)
+{
+	printf("Initial value: 0x%08X\n", m_memory_read(0x1FFFFC, dword, m_simplestation));
+
+	m_memory_write(0x1FFFFC, 0xFFFFFFFF , dword, m_simplestation);
+
+	printf("Value: 0x%08X\n", m_memory_read(0x1FFFFC, dword, m_simplestation));
+
 }
