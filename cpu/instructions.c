@@ -252,7 +252,7 @@ void m_addiu(m_simplestation_state *m_simplestation)
 void m_lw(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("lw $%s, %x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
+	printf("lw $%s, 0x%x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
 #endif
 
 	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
