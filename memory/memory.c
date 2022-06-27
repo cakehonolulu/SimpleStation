@@ -186,6 +186,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_simplestation_state *m_simple
 	{
 		m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 	}
+	else if (m_address < 0x1F802000)
+	{
+		// SPU Dummy Read
+		printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
+	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
 		m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
@@ -256,6 +261,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_simplestat
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
 		m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+	}
+	else if (m_address < 0x1F802000)
+	{
+		// SPU Dummy Write
+		printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
