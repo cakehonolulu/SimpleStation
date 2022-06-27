@@ -34,7 +34,7 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 	if (m_simplestation->m_memory)
 	{
 		// 2 MiB Total
-		m_simplestation->m_memory->m_mem_ram = (int8_t *) calloc(sizeof(PSX_MEM), sizeof(uint8_t));
+		m_simplestation->m_memory->m_mem_ram = (int8_t *) calloc(PSX_MEM, sizeof(uint8_t));
 
 		if (m_simplestation->m_memory->m_mem_ram)
 		{
@@ -196,8 +196,25 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	m_placeholder = m_memory_offset >> 29;
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
-	// Check for a read in BIOS area
-	if (m_address == 0x1F801060)
+	if (m_address < 0x00200000)
+	{
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
+	}
+	else if (m_address == 0x1F801060)
 	{
 #ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
@@ -261,24 +278,6 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 			case dword:
 				return m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-				break;
-
-			default:
-				__builtin_unreachable();
-		}
-	}
-	else if (m_address < 0x00200000)
-	{
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			default:
@@ -350,7 +349,25 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	m_placeholder = m_memory_offset >> 29;
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
-	if (m_address == 0x1F801060)
+	if (m_address < 0x00200000)
+	{
+		switch (m_size)
+		{
+			case byte:
+				break;
+
+			case word:
+				break;
+
+			case dword:
+				m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
+	}
+	else if (m_address == 0x1F801060)
 	{
 #ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
@@ -415,24 +432,6 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 			case dword:
 				m_return = m_interrupts_write(m_address, m_value, m_simplestation);
-				break;
-
-			default:
-				__builtin_unreachable();
-		}
-	}
-	else if (m_address < 0x00200000)
-	{
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			default:
