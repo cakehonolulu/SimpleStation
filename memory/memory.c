@@ -242,11 +242,15 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	else if (m_address < 0x1F802000)
 	{
 		// SPU Dummy Read
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
+#endif
 	}
 	else if (m_address < 0x1F804000)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);
+#endif	
 	}
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
@@ -414,11 +418,15 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	else if (m_address < 0x1F802000)
 	{
 		// SPU Dummy Write
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
+#endif
 	}
 	else if (m_address < 0x1F804000)
 	{
+#ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
+#endif
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
