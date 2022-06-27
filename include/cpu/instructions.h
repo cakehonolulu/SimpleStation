@@ -56,6 +56,9 @@ void m_addiu(m_simplestation_state *m_simplestation);
 // 0x10
 void m_cop0(m_simplestation_state *m_simplestation);
 
+// 0x0C
+void m_andi(m_simplestation_state *m_simplestation);
+
 // 0x0D
 void m_ori(m_simplestation_state *m_simplestation);
 

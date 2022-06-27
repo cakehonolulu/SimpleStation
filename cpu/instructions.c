@@ -341,6 +341,30 @@ void m_sw(m_simplestation_state *m_simplestation)
 }
 
 /*
+	ANDI (MIPS I)
+	
+	Format:
+	ANDI rt, rs, immediate
+	
+	Description:
+	To do a bitwise logical AND with a constant.
+	The 16-bit immediate is zero-extended to the left and combined with the contents of
+	GPR rs in a bitwise logical AND operation. The result is placed into GPR rt .
+*/
+void m_andi(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("andi $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
+#endif
+
+	// Check if register isn't register zero
+	if (REGIDX_T)
+	{
+		REGS[REGIDX_T] = (REGS[REGIDX_S] & IMMDT);
+	}
+}
+
+/*
 	ORI (MIPS I)
 
 	Format:
