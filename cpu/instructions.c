@@ -277,6 +277,27 @@ void m_addiu(m_simplestation_state *m_simplestation)
 }
 
 /*
+	LB (MIPS I)
+
+	Format:
+	LB rt, offset(base)
+
+	Description:
+	To load a byte from memory as a signed value.
+	The contents of the 8-bit byte at the memory location specified by the effective address
+	are fetched, sign-extended, and placed in GPR rt. The 16-bit signed offset is added to
+	the contents of GPR base to form the effective address.
+*/
+void m_lb(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lb $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+}
+
+/*
 	LW (MIPS I)
 
 	Format:

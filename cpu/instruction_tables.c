@@ -33,7 +33,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{NULL, NULL},		// 0x0D
 	{NULL, NULL},		// 0x0E
 	{NULL, NULL},		// 0x0F
-	{NULL, NULL},		// 0x20
+	{"lb", m_lb},		// 0x20
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
 	{"lw", m_lw},		// 0x23
