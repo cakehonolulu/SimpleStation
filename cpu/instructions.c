@@ -316,12 +316,6 @@ void m_lw(m_simplestation_state *m_simplestation)
 	printf("lw $%s, 0x%x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
 #endif
 
-	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
-	{
-		printf(YELLOW "[CPU] lw: Ignoring word store, cache is isolated...\n" NORMAL);
-		return;
-	}
-	
 	int32_t m_addr = (SIMMDT + REGS[REGIDX_S]);
 	REGS[REGIDX_T] = m_memory_read(m_addr, dword, m_simplestation);
 }
