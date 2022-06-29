@@ -23,4 +23,8 @@ void m_printregs(m_simplestation_state *m_simplestation)
 	printf(GREEN "LO:" WHITE " 0x%08X\n", LO);
 
 	printf(YELLOW UNDERSCORE "\nSegment Registers:\n" WHITE NORMAL);
+
+	// TODO: Segment Registers?
+
+	printf("\n");
 }
