@@ -23,6 +23,11 @@ const char *m_cpu_regnames[] = {
 // Function to initialize the CPU state
 uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 {
+#ifdef DEBUG_CPU
+	// Number of implemented instructions
+	uint8_t m_cpu_total_impl_opcodes = 0, m_cpu_impl_reg_opcodes = 0, m_cpu_impl_ext_opcodes = 0, m_cpu_impl_cop0_opcodes = 0, i;
+#endif
+
 	// Return value
 	uint8_t m_return = 0;
 
@@ -65,6 +70,40 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 
 			// Set the CPU state to 'ON'
 			m_simplestation->m_cpu_state = ON;
+
+#ifdef DEBUG_CPU
+			for (i = 0; i < 0x3F; i++)
+			{
+				if (m_psx_instrs[i].m_funct != NULL)
+				{
+					m_cpu_total_impl_opcodes++;
+					m_cpu_impl_reg_opcodes++;
+				}
+			}
+
+			for (i = 0; i < 0x3F; i++)
+			{
+				if (m_psx_extended_00[i].m_funct != NULL)
+				{
+					m_cpu_total_impl_opcodes++;
+					m_cpu_impl_ext_opcodes++;
+				}
+			}
+
+			for (i = 0; i < 0x5; i++)
+			{
+				if (m_psx_cop0[i].m_funct != NULL)
+				{
+					m_cpu_total_impl_opcodes++;
+					m_cpu_impl_cop0_opcodes++;
+				}
+			}
+
+			printf("[CPU] init: Implemented regular opcodes: %d (Out of 40), extended opcodes: %d (Out of 28), cop0 opcodes: %d (Out of 14)\n",
+					m_cpu_impl_reg_opcodes, m_cpu_impl_ext_opcodes, m_cpu_impl_cop0_opcodes);
+			printf("[CPU] init: Total implemented opcodes: %d (Out of 82)...\n", m_cpu_total_impl_opcodes);
+			printf("[CPU] init: CPU Subsystem is %d%%~ done\n", ((m_cpu_total_impl_opcodes * 82) / 100));	
+#endif
 		}
 		else
 		{
