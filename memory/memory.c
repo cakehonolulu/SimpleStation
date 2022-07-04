@@ -48,6 +48,8 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 
 				if (m_simplestation->m_memory->m_mem_memctl1)
 				{
+					m_simplestation->m_memory->m_memory_cache_control_reg = 0;
+					m_simplestation->m_memory->m_memory_ram_config_reg = 0;
 					m_simplestation->m_memory_state = ON;
 				}
 				else

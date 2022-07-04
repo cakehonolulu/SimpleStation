@@ -71,6 +71,15 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 			// Set the CPU state to 'ON'
 			m_simplestation->m_cpu_state = ON;
 
+			m_simplestation->m_cpu->write_back.reg = 0;
+			m_simplestation->m_cpu->write_back.value = 0;
+
+			m_simplestation->m_cpu->memory_load.reg = 0;
+			m_simplestation->m_cpu->memory_load.value = 0;
+
+    		m_simplestation->m_cpu->delayed_memory_load.reg = 0;
+			m_simplestation->m_cpu->delayed_memory_load.value = 0;
+
 #ifdef DEBUG_CPU
 			for (i = 0; i < 0x3F; i++)
 			{
@@ -159,6 +168,8 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		// Execute the instruction
 		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
 	}
+
+	handle_load_delay(m_simplestation);
 }
 
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
@@ -177,4 +188,30 @@ bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
 	}
 
 	return m_result;
+}
+
+void handle_load_delay(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_cpu->delayed_memory_load.reg != m_simplestation->m_cpu->memory_load.reg)
+	{
+        REGS[m_simplestation->m_cpu->memory_load.reg] = m_simplestation->m_cpu->memory_load.value;
+    }
+    m_simplestation->m_cpu->memory_load = m_simplestation->m_cpu->delayed_memory_load;
+    m_simplestation->m_cpu->delayed_memory_load.reg = 0;
+
+    REGS[m_simplestation->m_cpu->write_back.reg] = m_simplestation->m_cpu->write_back.value;
+    m_simplestation->m_cpu->write_back.reg = 0;
+    REGS[0] = 0;
+}
+
+void set_reg(uint32_t regN, uint32_t value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->write_back.reg = regN;
+    m_simplestation->m_cpu->write_back.value = value;
+}
+
+void load(uint32_t regN, uint32_t value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->delayed_memory_load.reg = regN;
+    m_simplestation->m_cpu->delayed_memory_load.value = value;
 }

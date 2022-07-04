@@ -25,6 +25,14 @@
 	5 KB L1 cache @ 33.8688MHz
 */
 
+
+typedef struct MEM_ {
+   uint32_t reg;
+   uint32_t value;
+} MEM;
+
+
+
 // Struct containing main CPU state
 typedef struct m_corewave_cw33300
 {
@@ -52,6 +60,10 @@ typedef struct m_corewave_cw33300
 	uint32_t m_opcode;
 
 	uint32_t m_next_opcode;
+
+	MEM write_back, memory_load;
+    MEM delayed_memory_load;
+
 } m_mips_r3000a_t;
 
 #define M_R3000_COP0_REGISTERS 32
