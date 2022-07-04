@@ -62,7 +62,7 @@ typedef struct m_corewave_cw33300_cop0
 
 } m_mips_r3000a_cop0_t;
 
-typedef struct m_psx_memmory
+typedef struct m_psx_memory
 {
 	// PSX RAM Memory Buffer
 	int8_t *m_mem_ram;
