@@ -53,7 +53,7 @@ void m_sll(m_simplestation_state *m_simplestation)
 	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
 #endif
 
-	set_reg(REGIDX_D, REGS[REGIDX_T] << SHIFT, m_simplestation);
+	m_cpu_register_set(REGIDX_D, REGS[REGIDX_T] << SHIFT, m_simplestation);
 }
 
 /*
@@ -94,7 +94,7 @@ void m_addu(m_simplestation_state *m_simplestation)
 	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	set_reg(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
+	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
 }
 
 /*
@@ -138,11 +138,11 @@ void m_sltu(m_simplestation_state *m_simplestation)
 
 	if (REGS[REGIDX_S] < REGS[REGIDX_T])
 	{
-		set_reg(REGIDX_D, 1, m_simplestation);
+		m_cpu_register_set(REGIDX_D, 1, m_simplestation);
 	}
 	else
 	{
-		set_reg(REGIDX_D, 0, m_simplestation);
+		m_cpu_register_set(REGIDX_D, 0, m_simplestation);
 	}
 }
 
@@ -189,7 +189,7 @@ void m_jal(m_simplestation_state *m_simplestation)
 	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	set_reg(31, PC, m_simplestation);
+	m_cpu_register_set(31, PC, m_simplestation);
 
 	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
@@ -252,7 +252,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		set_reg(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
 	}
 }
 
@@ -273,7 +273,7 @@ void m_addiu(m_simplestation_state *m_simplestation)
 	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
-	set_reg(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+	m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
 }
 
 /*
@@ -296,7 +296,7 @@ void m_lb(m_simplestation_state *m_simplestation)
 
 
 	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
-	load(REGIDX_T, value, m_simplestation);
+	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
 	
 }
 
@@ -321,7 +321,7 @@ void m_lw(m_simplestation_state *m_simplestation)
 
 	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), dword, m_simplestation);
 
-	load(REGIDX_T, value, m_simplestation);
+	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
 }
 
 /*
@@ -429,7 +429,7 @@ void m_andi(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		set_reg(REGIDX_T, REGS[REGIDX_S] & SIMMDT, m_simplestation);
+		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] & SIMMDT, m_simplestation);
 	}
 }
 
@@ -453,7 +453,7 @@ void m_ori(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		set_reg(REGIDX_T, REGS[REGIDX_S] | IMMDT, m_simplestation);
+		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] | IMMDT, m_simplestation);
 	}
 }
 
@@ -478,6 +478,6 @@ void m_lui(m_simplestation_state *m_simplestation)
 	if (REGIDX_T)
 	{
 		// Bit shift by 16 the immediate value and place it at the register pointed by the index
-		set_reg(REGIDX_T, (IMMDT << 16), m_simplestation);
+		m_cpu_register_set(REGIDX_T, (IMMDT << 16), m_simplestation);
 	}
 }
