@@ -453,8 +453,7 @@ void m_ori(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		// FIXME
-		REGS[REGIDX_T] = (REGS[REGIDX_S] | IMMDT);
+		set_reg(REGIDX_T, REGS[REGIDX_S] | IMMDT, m_simplestation);
 	}
 }
 
