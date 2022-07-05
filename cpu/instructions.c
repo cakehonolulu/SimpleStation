@@ -195,6 +195,38 @@ void m_jal(m_simplestation_state *m_simplestation)
 }
 
 /*
+	BEQ (MIPS I)
+
+	Format:
+	BEQ rs, rt, offset
+
+	Description:
+	To compare GPRs then do a PC-relative conditional branch.
+	An 18-bit signed offset (the 16-bit offset field shifted left 2 bits) is added to the address
+	of the instruction following the branch (not the branch itself), in the branch delay slot,
+	to form a PC-relative effective target address.
+	If the contents of GPR rs and GPR rt are equal, branch to the effective target address
+	after the instruction in the delay slot is executed.
+*/
+void m_beq(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("beq $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], (SIMMDT) << 2);
+#endif
+	
+	/*
+		According to simias, we only need the 16-bit sign-extended immediate,
+		but MIPS Reference Manual specifies that we need to bit-shift it to the
+		left by 2 times to get a 18-bit relative address
+	*/
+	if (REGS[REGIDX_S] == REGS[REGIDX_T])
+	{
+		PC += ((SIMMDT) << 2);
+		PC -= 4;
+	}
+}
+
+/*
 	BNE (MIPS I)
 
 	Format:
