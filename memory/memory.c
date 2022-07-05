@@ -208,6 +208,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	m_placeholder = m_memory_offset >> 29;
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
+	// PSX RAM
 	if (m_address < 0x00200000)
 	{
 		switch (m_size)
@@ -227,13 +228,15 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				__builtin_unreachable();
 		}
 	}
-	else if (m_address == 0x1F801060)
+	// PSX Expansion 1
+	else if ((0x1F000000 <= m_address) && (m_address < 0x1F400000))
 	{
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
+		printf(YELLOW "[MEM] read: Detected 'Expansion 1' memory read! No Expansion Pack detected, ignoring...\n" NORMAL);
 #endif
-		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+		m_return = 0xFF;
 	}
+	// PSX Scratchpad
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
 		switch (m_size)
@@ -253,19 +256,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				__builtin_unreachable();
 		}
 	}
-	else if (m_address < 0x1F802000)
-	{
-		// SPU Dummy Read
-#ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
-#endif
-	}
-	else if (m_address < 0x1F804000)
-	{
-#ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);
-#endif	
-	}
+	// PSX Memory Control
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
 		switch (m_size)
@@ -285,6 +276,30 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				__builtin_unreachable();
 		}
 	}
+	// PSX RAM Register
+	else if (m_address == 0x1F801060)
+	{
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
+#endif
+		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+	}
+	// PSX SPU
+	else if (m_address < 0x1F802000)
+	{
+		// SPU Dummy Read
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
+#endif
+	}
+	// PSX Expansion 2
+	else if ((0x1F802000 <= m_address) && (m_address < 0x1F804000))
+	{
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);
+#endif	
+	}
+	// PSX BIOS Space
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
 		switch (m_size)
@@ -304,6 +319,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				__builtin_unreachable();
 		}
 	}
+	// PSX Cache Control Register
 	else if (m_address == 0xFFFE0130)
 	{
 #ifdef DEBUG_MEMORY
@@ -369,6 +385,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	m_placeholder = m_memory_offset >> 29;
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
+	// PSX RAM
 	if (m_address < 0x00200000)
 	{
 		switch (m_size)
@@ -388,14 +405,14 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				__builtin_unreachable();
 		}
 	}
-	else if (m_address == 0x1F801060)
+	// PSX Expansion 1
+	else if ((0x1F000000 <= m_address) && (m_address < 0x1F400000))
 	{
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
+		printf(YELLOW "[MEM] write: Detected 'Expansion 1' memory write! Ignoring...\n" NORMAL);
 #endif
-		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
-		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
+	// PSX Scratchpad
 	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
 	{
 		switch (m_size)
@@ -415,6 +432,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				__builtin_unreachable();
 		}
 	}
+	// PSX Memory Control
 	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
 	{
 		switch (m_size)
@@ -434,6 +452,16 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				__builtin_unreachable();
 		}
 	}
+	// PSX's RAM Register
+	else if (m_address == 0x1F801060)
+	{
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
+#endif
+		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
+		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+	}
+	// PSX SPU
 	else if (m_address < 0x1F802000)
 	{
 		// SPU Dummy Write
@@ -441,16 +469,19 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
 #endif
 	}
-	else if (m_address < 0x1F804000)
+	// PSX Expansion 2
+	else if ((0x1F802000 <= m_address) && (m_address < 0x1F804000))
 	{
 #ifdef DEBUG_MEMORY
 		printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
 #endif
 	}
+	// PSX Interrupts
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
 		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
 	}
+	// PSX Cache Control Register
 	else if (m_address == 0xFFFE0130)
 	{
 #ifdef DEBUG_MEMORY
