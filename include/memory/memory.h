@@ -15,6 +15,8 @@ typedef enum {byte, word, dword} m_memory_size;
 
 /* Function definitions */
 uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simplestation_state *m_simplestation);
+uint8_t m_memory_read_byte(uint32_t m_memory_address, int8_t *m_memory_source);
+uint8_t m_memory_write_byte(uint32_t m_memory_address, uint8_t m_value, int8_t *m_memory_source);
 uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_size m_size, m_simplestation_state *m_simplestation);
 uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source);
 uint8_t m_memory_init(m_simplestation_state *m_simplestation);

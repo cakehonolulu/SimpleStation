@@ -113,6 +113,16 @@ void m_memory_exit(m_simplestation_state *m_simplestation)
 	m_bios_exit(m_simplestation);
 }
 
+uint8_t m_memory_read_byte(uint32_t m_memory_address, int8_t *m_memory_source)
+{
+	return *(uint8_t*)(m_memory_source + (m_memory_address + 0));
+}
+
+uint8_t m_memory_write_byte(uint32_t m_memory_address, uint8_t m_value, int8_t *m_memory_source)
+{
+	return *(uint8_t *) (m_memory_address + m_memory_source) = m_value;
+}
+
 /*
 	Function:
 	m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
