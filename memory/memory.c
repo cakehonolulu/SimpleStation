@@ -213,6 +213,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_read_byte(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			case word:
@@ -238,6 +239,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_read_byte(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 				break;
 
 			case word:
@@ -269,6 +271,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_read_byte(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
 				break;
 
 			case word:
@@ -287,6 +290,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_read_byte(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 				break;
 
 			case word:
@@ -370,6 +374,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_write_byte(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			case word:
@@ -396,6 +401,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_write_byte(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
 				break;
 
 			case word:
@@ -414,6 +420,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		switch (m_size)
 		{
 			case byte:
+				m_return = m_memory_write_byte(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
 				break;
 
 			case word:
@@ -442,21 +449,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
 	{
-		switch (m_size)
-		{
-			case byte:
-				break;
-
-			case word:
-				break;
-
-			case dword:
-				m_return = m_interrupts_write(m_address, m_value, m_simplestation);
-				break;
-
-			default:
-				__builtin_unreachable();
-		}
+		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
 	}
 	else if (m_address == 0xFFFE0130)
 	{
