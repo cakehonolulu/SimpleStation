@@ -8,7 +8,7 @@ void m_exp(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_extended_00[(m_simplestation->m_cpu->m_opcode & 0x3F)].m_funct == NULL)
 	{
-		printf(RED "[CPU] fde->exp: Unimplemented '0x00 Family' Opcode: 0x%02X (Full Opcode: 0x%4X)\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F), m_simplestation->m_cpu->m_opcode);
+		printf(RED "[CPU] fde->exp: Unimplemented '0x00 Family' Opcode: 0x%02X (Full Opcode: 0x%8X)\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F), m_simplestation->m_cpu->m_opcode);
 		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
@@ -24,7 +24,7 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
 	{
-		printf(RED "[CPU] fde->cop0: Unimplemented 'Coprocessor 0' Opcode: 0x%02X (Full Opcode: 0x%4X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
+		printf(RED "[CPU] fde->cop0: Unimplemented 'Coprocessor 0' Opcode: 0x%02X (Full Opcode: 0x%8X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
 		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
