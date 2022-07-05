@@ -186,7 +186,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			if (m_memory_offset % 2 != 0)
 			{
 				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
-				return m_simplestation_exit(m_simplestation, 1);
+				m_return = m_simplestation_exit(m_simplestation, 1);
 			}
 			break;
 
@@ -194,13 +194,13 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			if (m_memory_offset % 4 != 0)
 			{
 				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
-				return m_simplestation_exit(m_simplestation, 1);
+				m_return = m_simplestation_exit(m_simplestation, 1);
 			}
 			break;
 
 		default:
 			printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-			return m_simplestation_exit(m_simplestation, 1);
+			m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 
@@ -244,7 +244,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+				m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 				break;
 
 			default:
@@ -275,7 +275,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+				m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
 				break;
 
 			default:
@@ -293,7 +293,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case dword:
-				return m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+				m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 				break;
 
 			default:
@@ -311,7 +311,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	{
 		printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit(m_simplestation, 1);
+		m_return = m_simplestation_exit(m_simplestation, 1);
 	}
 
  	return m_return;
@@ -343,7 +343,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			if (m_memory_offset % 2 != 0)
 			{
 				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
-				return m_simplestation_exit(m_simplestation, 1);
+				m_return = m_simplestation_exit(m_simplestation, 1);
 			}
 			break;
 
@@ -351,13 +351,13 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			if (m_memory_offset % 4 != 0)
 			{
 				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
-				return m_simplestation_exit(m_simplestation, 1);
+				m_return = m_simplestation_exit(m_simplestation, 1);
 			}
 			break;
 
 		default:
 			printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
-			return m_simplestation_exit(m_simplestation, 1);
+			m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 
@@ -470,7 +470,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	{
 		printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		return m_simplestation_exit(m_simplestation, 1);
+		m_return = m_simplestation_exit(m_simplestation, 1);
 	}
 
 	return m_return;
