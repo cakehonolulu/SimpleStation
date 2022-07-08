@@ -77,6 +77,36 @@ void m_jr(m_simplestation_state *m_simplestation)
 }
 
 /*
+ 	ADD (MIPS I)
+
+	Format:
+	ADD rd, rs, rt
+	
+	Description:
+	To add 32-bit integers. If overflow occurs, then trap.
+	The 32-bit word value in GPR rt is added to the 32-bit value in GPR rs to produce a
+	32-bit result. If the addition results in 32-bit 2’s complement arithmetic overflow then
+	the destination register is not modified and an Integer Overflow exception occurs. If it
+	does not overflow, the 32-bit result is placed into GPR rd .
+*/
+void m_add(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("add $%s, $%s, %d\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	if (m_cpu_check_signed_addition(REGS[REGIDX_S], REGS[REGIDX_T]))
+	{
+		printf(RED "[CPU] add: Integer overflow! Panicking...\n");
+		m_simplestation_exit(m_simplestation, 1);
+	}
+	else
+	{
+		m_cpu_register_set(REGIDX_D, REGS[REGIDX_S] + REGS[REGIDX_T], m_simplestation);
+	}
+}
+
+/*
 	ADDU (MIPS I)
 	
 	Format:
