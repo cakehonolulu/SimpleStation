@@ -284,6 +284,14 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #endif
 		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 	}
+	// PSX Interrupt Stat Register
+	else if (m_address == 0x1F801074)
+	{
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: Interrupt Mask Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask);
+#endif
+		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+	}
 	// PSX SPU
 	else if (m_address < 0x1F802000)
 	{
@@ -460,6 +468,15 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #endif
 		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
 		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+	}
+	// PSX Interrupt Stat Register
+	else if (m_address == 0x1F801074)
+	{
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] write: Interrupt Mask Register (Current Value: 0x%0X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask, m_value);
+#endif
+		m_simplestation->m_cpu_ints->m_interrupt_mask = m_value;
+		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
 	}
 	// PSX SPU
 	else if (m_address < 0x1F802000)
