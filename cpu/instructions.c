@@ -92,7 +92,7 @@ void m_jr(m_simplestation_state *m_simplestation)
 void m_add(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("add $%s, $%s, %d\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+	printf("add $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
 	if (m_cpu_check_signed_addition(REGS[REGIDX_S], REGS[REGIDX_T]))
