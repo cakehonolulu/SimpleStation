@@ -134,7 +134,7 @@ void m_or(m_simplestation_state *m_simplestation)
 	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
+	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
 }
 
 /*
