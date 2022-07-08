@@ -98,6 +98,26 @@ void m_addu(m_simplestation_state *m_simplestation)
 }
 
 /*
+	AND (MIPS I)
+	
+	Format:
+	AND rd, rs, rt 
+
+	Description:
+	To do a bitwise logical AND.
+	The contents of GPR rs are combined with the contents of GPR rt in a bitwise logical
+	AND operation. The result is placed into GPR rd 
+*/
+void m_and(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("and $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] & REGS[REGIDX_T]), m_simplestation);
+}
+
+/*
 	OR (MIPS I)
 
 	Format:

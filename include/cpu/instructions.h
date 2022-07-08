@@ -35,6 +35,9 @@ void m_jr(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x21
 void m_addu(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x24
+void m_and(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x25
 void m_or(m_simplestation_state *m_simplestation);
 
