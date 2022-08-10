@@ -100,6 +100,11 @@ ifeq ($(filter $(BUILD_OBJ), $(MAKECMDGOALS)),)
 	$(shell mkdir -p $(BUILD_OBJ);)
 endif
 
+codechecker:
+	CodeChecker log --build "make" --output ./compile_commands.json
+	CodeChecker analyze ./compile_commands.json --enable sensitive --output ./reports
+	CodeChecker parse --export html --output ./reports_html ./reports
+
 clean:
 	@echo " 🧹 Cleaning..."
 ifneq ($(filter clean, $(MAKECMDGOALS)),)
