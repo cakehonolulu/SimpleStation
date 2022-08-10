@@ -86,7 +86,15 @@ uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_n
 		}
 
 		// Close the file handle
-		fclose(m_bios);
+		if (!fclose(m_bios))
+		{
+			printf("BIOS File closed succesfully");
+		}
+		else
+		{
+			printf("BIOS File couldn't be closed, fatal error!");
+			m_simplestation_exit(m_simplestation, 1);
+		}
 	}
 	else
 	{
