@@ -34,12 +34,12 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 	if (m_simplestation->m_memory)
 	{
 		// 2 MiB Total
-		m_simplestation->m_memory->m_mem_ram = (int8_t *) calloc(PSX_MEM, sizeof(int8_t));
+		m_simplestation->m_memory->m_mem_ram = (int8_t *) calloc((size_t) PSX_MEM, sizeof(int8_t));
 
 		if (m_simplestation->m_memory->m_mem_ram)
 		{
 			// 1 KiB Total
-			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) calloc(1 * KiB, sizeof(int8_t));
+			m_simplestation->m_memory->m_mem_scratchpad = (int8_t *) calloc((size_t) (1 * KiB), sizeof(int8_t));
 
 			if (m_simplestation->m_memory->m_mem_scratchpad)
 			{
