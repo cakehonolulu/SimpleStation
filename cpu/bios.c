@@ -11,7 +11,7 @@ uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_n
 	uint8_t m_status = 1;
 
 	// BIOS Filesizem_simplestation
-	int32_t m_bios_size;
+	int64_t m_bios_size;
 
 	// Open the BIOS in Binary Mode and Read-Only
 	m_bios = fopen(m_bios_name, "rb");
