@@ -293,7 +293,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
 	}
 	// PSX SPU
-	else if (m_address < 0x1F802000)
+	else if ((0x1F801C00 <= m_address) && (m_address < 0x1F802000))
 	{
 		// SPU Dummy Read
 #ifdef DEBUG_MEMORY
@@ -479,7 +479,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
 	}
 	// PSX SPU
-	else if (m_address < 0x1F802000)
+	else if ((0x1F801C00 <= m_address) && (m_address < 0x1F802000))
 	{
 		// SPU Dummy Write
 #ifdef DEBUG_MEMORY
