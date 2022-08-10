@@ -88,11 +88,11 @@ uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_n
 		// Close the file handle
 		if (!fclose(m_bios))
 		{
-			printf("BIOS File closed succesfully");
+			printf("BIOS File Handle closed succesfully!\n");
 		}
 		else
 		{
-			printf("BIOS File couldn't be closed, fatal error!");
+			printf("BIOS File Handle couldn't be closed, fatal error!\n");
 			m_simplestation_exit(m_simplestation, 1);
 		}
 	}
