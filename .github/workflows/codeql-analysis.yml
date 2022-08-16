@@ -28,8 +28,6 @@ jobs:
       should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_TOKEN }}
       - name: print latest_commit
         run: echo ${{ github.sha }}
 
@@ -112,7 +110,7 @@ jobs:
           LABEL: 'Build'
           STATUS: ${{ steps.date.build_status.BUILD_STATUS }}
           COLOR: purple
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
               
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
