@@ -8,7 +8,7 @@
 
 
 
-[![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
+[![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
 
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
