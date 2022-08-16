@@ -9,12 +9,13 @@
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
 * LLE Interpreter Emulator
-* Upstream compiler support (CLANG-15 & GCC-12)
+* Upstream compiler support (clang-16 & gcc-12)
 
 ## 🖥️ Specs
 #### Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
-- [ ] 8 out of 126 instructions implemented
+- [ ] 25 out of 79 instructions implemented (19%~)
     - MIPS R3000 Coprocessor 0 _in-the-works_
+      - 2 out of 11 instructions implemented
     - Instructions pipelining
 #### MIPS R3000 Disassembler
 * Currently works on PSX's BIOS
