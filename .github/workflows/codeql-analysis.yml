@@ -98,9 +98,11 @@ jobs:
        if test -f "simplestation"; then
            echo "Build succeeded!"
            echo '::set-output name=BUILD_STATUS::passing'
+           echo '::set-output name=BUILD_STATUS_COLOUR::green'
        else
            echo "Build failed!"
            echo '::set-output name=BUILD_STATUS::failing'
+           echo '::set-output name=BUILD_STATUS_COLOUR::red'
        fi
        
     - name: Build badge
@@ -109,7 +111,7 @@ jobs:
           NAME: build
           LABEL: 'Build'
           STATUS: ${{ steps.build_status.outputs.BUILD_STATUS }}
-          COLOR: purple
+          COLOR: ${{ steps.build_status.outputs.BUILD_STATUS_COLOUR }}
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
               
     - name: Perform CodeQL Analysis
