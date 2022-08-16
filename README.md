@@ -4,7 +4,11 @@
 
 <h2 align="center">A simple, multiplatform, Sony Playstation 1 (PSX) emulator written in C23</h2>
 
-[![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml)
+
+
+
+
+[![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/codeql-analysis.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
 
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
