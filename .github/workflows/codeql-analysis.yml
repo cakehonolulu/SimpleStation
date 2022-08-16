@@ -108,7 +108,7 @@ jobs:
       with:
           NAME: build
           LABEL: 'Build'
-          STATUS: ${{ steps.date.build_status.BUILD_STATUS }}
+          STATUS: ${{ steps.build_status.BUILD_STATUS }}
           COLOR: purple
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
               
