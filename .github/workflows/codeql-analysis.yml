@@ -96,13 +96,15 @@ jobs:
        echo "Run, Build Application using script"º
        make CODEQL=1
        if test -f "simplestation"; then
+           echo "Build succeeded!"
            echo '::set-output name=BUILD_STATUS::passing'
        else
-          echo '::set-output name=BUILD_STATUS::failing'
+           echo "Build failed!"
+           echo '::set-output name=BUILD_STATUS::failing'
        fi
        
     - name: Build badge
-      uses: RubbaBoy/BYOB@v1.3.0
+      uses: RubbaBoy/BYOB@v1.2.1
       with:
           NAME: build
           LABEL: 'Build'
