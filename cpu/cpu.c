@@ -108,10 +108,10 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 				}
 			}
 
-			printf("[CPU] init: Implemented regular opcodes: %d (Out of 40), extended opcodes: %d (Out of 28), cop0 opcodes: %d (Out of 14)\n",
+			printf("[CPU] init: Implemented regular opcodes: %d (Out of 40), extended opcodes: %d (Out of 28), cop0 opcodes: %d (Out of 11)\n",
 					m_cpu_impl_reg_opcodes, m_cpu_impl_ext_opcodes, m_cpu_impl_cop0_opcodes);
-			printf("[CPU] init: Total implemented opcodes: %d (Out of 82)...\n", m_cpu_total_impl_opcodes);
-			printf("[CPU] init: CPU Subsystem is %d%%~ done\n", ((m_cpu_total_impl_opcodes * 82) / 100));	
+			printf("[CPU] init: Total implemented opcodes: %d (Out of 79)...\n", m_cpu_total_impl_opcodes);
+			printf("[CPU] init: CPU Subsystem is %d%%~ done\n", ((m_cpu_total_impl_opcodes * 79) / 100));	
 #endif
 		}
 		else
