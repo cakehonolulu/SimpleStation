@@ -124,7 +124,7 @@ void m_addu(m_simplestation_state *m_simplestation)
 	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] + REGS[REGIDX_T]);
 }
 
 /*
@@ -186,14 +186,9 @@ void m_sltu(m_simplestation_state *m_simplestation)
 	printf("sltu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	if (REGS[REGIDX_S] < REGS[REGIDX_T])
-	{
-		REGS[REGIDX_D] = 1;
-	}
-	else
-	{
-		REGS[REGIDX_D] = 0;
-	}
+	bool m_test = REGS[REGIDX_S] < REGS[REGIDX_T];
+
+	REGS[REGIDX_D] = (uint32_t) m_test;
 }
 
 /*
@@ -332,7 +327,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
+		REGS[REGIDX_T] = ((uint32_t) ( ((int32_t) REGS[REGIDX_S]) + ( (int32_t) SIMMDT)));
 	}
 }
 
@@ -374,10 +369,8 @@ void m_lb(m_simplestation_state *m_simplestation)
 	printf("lb $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-
-	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
-	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
-	
+	uint8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
 }
 
 /*
@@ -401,7 +394,7 @@ void m_lw(m_simplestation_state *m_simplestation)
 
 	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), dword, m_simplestation);
 
-	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, value, m_simplestation);
 }
 
 /*
@@ -506,11 +499,7 @@ void m_andi(m_simplestation_state *m_simplestation)
 	printf("andi $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
 #endif
 
-	// Check if register isn't register zero
-	if (REGIDX_T)
-	{
-		REGS[REGIDX_T] = (REGS[REGIDX_S] & SIMMDT);
-	}
+	REGS[REGIDX_T] = (REGS[REGIDX_S] & IMMDT);
 }
 
 /*

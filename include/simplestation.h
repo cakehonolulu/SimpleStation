@@ -25,10 +25,14 @@
 	5 KB L1 cache @ 33.8688MHz
 */
 
+// Different types of memory granularity
+typedef enum {byte, word, dword} m_memory_size;
+
 // Delay Slot Helper Structure
 typedef struct m_mips_r3000a_delay_slot {
    uint8_t m_register;
    uint32_t m_value;
+   m_memory_size m_size;
 } m_mips_r3000a_delay_slot_t;
 
 // Struct containing main CPU state

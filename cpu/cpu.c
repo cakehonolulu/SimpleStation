@@ -204,12 +204,28 @@ void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)
 	
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = byte;
 
     REGS[0] = 0;
 }
 
-void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
+void m_cpu_load_delay_enqueue_byte(uint8_t m_register, uint8_t m_value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = byte;
+}
+
+void m_cpu_load_delay_enqueue_word(uint8_t m_register, uint16_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = word;
+}
+
+void m_cpu_load_delay_enqueue_dword(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = dword;
 }
