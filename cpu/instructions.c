@@ -178,6 +178,25 @@ void m_addu(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SUBU (MIPS I)
+	Format:
+	SUBU rd, rs, rt
+	Description:
+	To subtract 32-bit integers.
+	The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs and the
+	32-bit arithmetic result is placed into GPR rd.
+	No integer overflow exception occurs under any circumstances.
+*/
+void m_subu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("subu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_S] - REGS[REGIDX_T]);
+}
+
+/*
 	AND (MIPS I)
 	
 	Format:
