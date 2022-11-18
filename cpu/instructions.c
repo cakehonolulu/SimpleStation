@@ -36,6 +36,58 @@ void m_cop0(m_simplestation_state *m_simplestation)
 }
 
 /*
+	BXX
+	Branch instructions
+*/
+void m_bxx(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	if ((INSTRUCTION >> 16) & 1)
+	{
+		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		{
+			printf("bgezal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+		else
+		{
+			printf("bgez $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+	}
+	else
+	{
+		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		{
+			printf("bltzal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+		else
+		{
+			printf("bltz $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+	}
+#endif
+
+	bool m_bgez = (INSTRUCTION >> 16) & 1;
+	bool m_link = ((INSTRUCTION >> 17) & 0xF) == 8;
+
+	int32_t v = REGS[REGIDX_S];
+
+	uint32_t m_test = (v < 0);
+
+	m_test ^= m_bgez;
+
+	if (m_link)
+	{
+		uint32_t m_ra = PC + 4;
+		REGS[31] = m_ra;
+	}
+
+	if (m_test)
+	{
+		m_cpu_branch(SIMMDT, m_simplestation);
+	}
+}
+
+/*
 	SLL (MIPS I)
 
 	Format:
