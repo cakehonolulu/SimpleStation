@@ -302,6 +302,32 @@ void m_bne(m_simplestation_state *m_simplestation)
 }
 
 /*
+	BLEZ (MIPS I)
+	Format:
+	BLEZ rs, offset
+	Description:
+	To test a GPR then do a PC-relative conditional branch.ç
+	An 18-bit signed offset (the 16-bit offset field shifted left 2 bits) is added to the address
+	of the instruction following the branch (not the branch itself), in the branch delay slot,
+	to form a PC-relative effective target address.
+	If the contents of GPR rs are less than or equal to zero (sign bit is 1 or value is zero),
+	branch to the effective target address after the instruction in the delay slot is executed.
+*/
+void m_blez(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("blez $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT);
+#endif
+
+	int32_t m_val = REGS[REGIDX_S];
+
+	if (m_val <= 0)
+	{
+		m_cpu_branch(SIMMDT, m_simplestation);
+	}
+}
+
+/*
 	BGTZ (MIPS I)
 	Format:
 	BGTZ rs, offset
@@ -323,8 +349,7 @@ void m_bgtz(m_simplestation_state *m_simplestation)
 
 	if (m_val > 0)
 	{
-		PC += ((SIMMDT) << 2);
-		PC -= 4;
+		m_cpu_branch(SIMMDT, m_simplestation);
 	}
 }
 
