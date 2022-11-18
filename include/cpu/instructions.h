@@ -32,6 +32,9 @@ void m_exp(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x00
 void m_sll(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x03
+void m_sra(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x08
 void m_jr(m_simplestation_state *m_simplestation);
 

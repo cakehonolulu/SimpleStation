@@ -125,6 +125,24 @@ void m_sll(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SRA (MIPS I)
+	Format:
+	SRA rd, rt, sa
+	Description:
+	The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the
+	sign-bit (bit 31) in the emptied bits; the word result is placed in GPR rd. The bit shift
+	count is specified by sa. If rd is a 64-bit register, the result word is sign-extended.
+*/
+void m_sra(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sra $%s, $%s, %d\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+#endif
+
+	REGS[REGIDX_D] = ((uint32_t) (((int32_t) (REGS[REGIDX_T])) >> SHIFT));
+}
+
+/*
 	JR (MIPS I)
 
 	Format:
