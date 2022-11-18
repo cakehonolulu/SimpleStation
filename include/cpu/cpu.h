@@ -39,6 +39,7 @@ extern const char *m_cpu_regnames[];
 
 // Register defines
 #define PC (m_simplestation->m_cpu->m_pc)
+#define NXT_PC (m_simplestation->m_cpu->m_pc_nxt)
 #define HI (m_simplestation->m_cpu->m_hi)
 #define LO (m_simplestation->m_cpu->m_lo)
 
@@ -92,5 +93,6 @@ void m_cpu_exit(m_simplestation_state *m_simplestation);
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num);
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation);
 void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
+void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation);
 
 #endif /* CPU_H */

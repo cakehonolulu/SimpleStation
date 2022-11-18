@@ -48,7 +48,8 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 #endif
 
 			// Point Program Counter to the initial BIOS address
-			PC = 0xBFC00000;
+			PC = 0;
+			NXT_PC = 0xBFC00000;
 
 			// High register to 0
 			HI = 0;
@@ -150,11 +151,13 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cpu->m_opcode = m_simplestation->m_cpu->m_next_opcode;
 
+	PC = NXT_PC;
+
 	/* Fetch cycle */
 	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 	
 	// Increment Program Counter by 4
-	PC += 4;
+	NXT_PC += 4;
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
@@ -188,6 +191,14 @@ bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
 	}
 
 	return m_result;
+}
+
+void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
+{
+	m_offset <<= 2;
+
+	NXT_PC += m_offset;
+	NXT_PC -= 4;
 }
 
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)

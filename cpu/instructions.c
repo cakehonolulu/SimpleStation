@@ -73,7 +73,7 @@ void m_jr(m_simplestation_state *m_simplestation)
 	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);
 #endif
 
-	PC = REGS[REGIDX_S];
+	NXT_PC = REGS[REGIDX_S];
 }
 
 /*
@@ -221,7 +221,7 @@ void m_j(m_simplestation_state *m_simplestation)
 		According to simias, the immediate value is shifted 2 times to the right,
 		but psx spx wiki specifies the immediate jump value is multiplied by 4
 	*/
-	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
 
 /*
@@ -239,9 +239,9 @@ void m_jal(m_simplestation_state *m_simplestation)
 	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	REGS[31] = PC;
+	REGS[31] = PC + 4;
 
-	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
 
 /*
@@ -271,8 +271,7 @@ void m_beq(m_simplestation_state *m_simplestation)
 	*/
 	if (REGS[REGIDX_S] == REGS[REGIDX_T])
 	{
-		PC += ((SIMMDT) << 2);
-		PC -= 4;
+		m_cpu_branch(SIMMDT, m_simplestation);
 	}
 }
 
@@ -303,8 +302,7 @@ void m_bne(m_simplestation_state *m_simplestation)
 	*/
 	if (REGS[REGIDX_S] != REGS[REGIDX_T])
 	{
-		PC += ((SIMMDT) << 2);
-		PC -= 4;
+		m_cpu_branch(SIMMDT, m_simplestation);
 	}
 }
 

@@ -36,6 +36,9 @@ typedef struct m_corewave_cw33300
 {
 	// Program Counter Register
 	uint32_t m_pc;
+	
+	// Following Program Counter (abs(4) byte-offsetted)
+	uint32_t m_pc_nxt;
 
 	/*
 		High 32 bits of multiplication result
