@@ -538,6 +538,26 @@ void m_lw(m_simplestation_state *m_simplestation)
 }
 
 /*
+	LBU (MIPS I)
+	Format:
+	LBU rt, offset(base)
+	Description:
+	The contents of the 8-bit byte at the memory location specified by the effective address
+	are fetched, zero-extended, and placed in GPR rt. The 16-bit signed offset is added to
+	the contents of GPR base to form the effective address.
+*/
+void m_lbu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lbu $%s, %04X($%s)\n", m_cpu_regnames[REGIDX_T], (uint16_t) (SIMMDT & 0x0000FFFF), m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+
+	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
+}
+
+/*
 	SB (MIPS I)
 
 	Format:

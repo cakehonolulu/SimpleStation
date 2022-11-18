@@ -98,6 +98,9 @@ void m_lb(m_simplestation_state *m_simplestation);
 // 0x23
 void m_lw(m_simplestation_state *m_simplestation);
 
+// 0x24
+void m_lbu(m_simplestation_state *m_simplestation);
+
 // 0x28
 void m_sb(m_simplestation_state *m_simplestation);
 
