@@ -59,6 +59,9 @@ void m_beq(m_simplestation_state *m_simplestation);
 // 0x05
 void m_bne(m_simplestation_state *m_simplestation);
 
+// 0x07
+void m_bgtz(m_simplestation_state *m_simplestation);
+
 // 0x08
 void m_addi(m_simplestation_state *m_simplestation);
 
