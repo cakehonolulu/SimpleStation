@@ -456,6 +456,25 @@ void m_addiu(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SLTI (MIPS I)
+	Format:
+	SLTI rt, rs, immediate
+	Description:
+	Compare the contents of GPR rs and the 16-bit signed immediate as signed integers and
+	record the Boolean result of the comparison in GPR rt. If GPR rs is less than immediate
+	the result is 1 (true), otherwise 0 (false).
+	The arithmetic comparison does not cause an Integer Overflow exception.
+*/
+void m_slti(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("slti $%s, $%s, %d\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
+#endif
+
+	REGS[REGIDX_T] = ((int32_t) REGIDX_S) < ((int32_t) SIMMDT);
+}
+
+/*
 	LB (MIPS I)
 
 	Format:

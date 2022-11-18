@@ -74,6 +74,9 @@ void m_addi(m_simplestation_state *m_simplestation);
 // 0x09
 void m_addiu(m_simplestation_state *m_simplestation);
 
+// 0x0A
+void m_slti(m_simplestation_state *m_simplestation);
+
 // 0x10
 void m_cop0(m_simplestation_state *m_simplestation);
 
