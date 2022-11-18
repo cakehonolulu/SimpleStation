@@ -53,7 +53,7 @@ void m_sll(m_simplestation_state *m_simplestation)
 	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
 #endif
 
-	m_cpu_register_set(REGIDX_D, REGS[REGIDX_T] << SHIFT, m_simplestation);
+	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
 }
 
 /*
@@ -102,7 +102,7 @@ void m_add(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		m_cpu_register_set(REGIDX_D, REGS[REGIDX_S] + REGS[REGIDX_T], m_simplestation);
+		REGS[REGIDX_D] = REGS[REGIDX_S] + REGS[REGIDX_T];
 	}
 }
 
@@ -124,7 +124,7 @@ void m_addu(m_simplestation_state *m_simplestation)
 	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
 }
 
 /*
@@ -144,7 +144,7 @@ void m_and(m_simplestation_state *m_simplestation)
 	printf("and $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] & REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] & REGS[REGIDX_T]);
 }
 
 /*
@@ -164,7 +164,7 @@ void m_or(m_simplestation_state *m_simplestation)
 	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
 }
 
 /*
@@ -188,11 +188,11 @@ void m_sltu(m_simplestation_state *m_simplestation)
 
 	if (REGS[REGIDX_S] < REGS[REGIDX_T])
 	{
-		m_cpu_register_set(REGIDX_D, 1, m_simplestation);
+		REGS[REGIDX_D] = 1;
 	}
 	else
 	{
-		m_cpu_register_set(REGIDX_D, 0, m_simplestation);
+		REGS[REGIDX_D] = 0;
 	}
 }
 
@@ -239,7 +239,7 @@ void m_jal(m_simplestation_state *m_simplestation)
 	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	m_cpu_register_set(31, PC, m_simplestation);
+	REGS[31] = PC;
 
 	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
@@ -334,7 +334,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+		REGS[REGIDX_T] = REGS[REGIDX_S] + SIMMDT;
 	}
 }
 
@@ -355,7 +355,7 @@ void m_addiu(m_simplestation_state *m_simplestation)
 	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
-	m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+	REGS[REGIDX_T] = (REGS[REGIDX_S] + SIMMDT);
 }
 
 /*
@@ -511,7 +511,7 @@ void m_andi(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] & SIMMDT, m_simplestation);
+		REGS[REGIDX_T] = (REGS[REGIDX_S] & SIMMDT);
 	}
 }
 
@@ -535,7 +535,7 @@ void m_ori(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] | IMMDT, m_simplestation);
+		REGS[REGIDX_T] = (REGS[REGIDX_S] | IMMDT);
 	}
 }
 
@@ -560,6 +560,6 @@ void m_lui(m_simplestation_state *m_simplestation)
 	if (REGIDX_T)
 	{
 		// Bit shift by 16 the immediate value and place it at the register pointed by the index
-		m_cpu_register_set(REGIDX_T, (IMMDT << 16), m_simplestation);
+		REGS[REGIDX_T] = (IMMDT << 16);
 	}
 }

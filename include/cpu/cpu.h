@@ -91,7 +91,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num);
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation);
-void m_cpu_register_set(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
 void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
 
 #endif /* CPU_H */

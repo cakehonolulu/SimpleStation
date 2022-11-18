@@ -205,12 +205,6 @@ void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)
     REGS[0] = 0;
 }
 
-void m_cpu_register_set(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = m_register;
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_value = m_value;
-}
-
 void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
