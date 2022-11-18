@@ -127,6 +127,35 @@ void m_jr(m_simplestation_state *m_simplestation)
 }
 
 /*
+	JALR (MIPS I)
+	Format(s):
+	JALR rs (rd = 31 implied)
+	JALR rd, rs
+	Description:
+	Place the return address link in GPR rd. The return link is the address of the second
+	instruction following the branch, where execution would continue after a procedure
+	call.
+	Jump to the effective target address in GPR rs. Execute the instruction following the
+	jump, in the branch delay slot, before jumping.
+*/
+void m_jalr(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	if (REGIDX_D == 31)
+	{
+		printf("jalr $%s\n", m_cpu_regnames[REGIDX_S]);
+	}
+	else
+	{
+		printf("jalr $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S]);
+	}
+#endif
+
+	REGS[REGIDX_D] = PC + 4;
+	NXT_PC = REGS[REGIDX_S];
+}
+
+/*
  	ADD (MIPS I)
 
 	Format:
