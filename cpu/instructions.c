@@ -475,7 +475,7 @@ void m_sh(m_simplestation_state *m_simplestation)
 void m_sw(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
 	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
@@ -486,7 +486,7 @@ void m_sw(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], dword, m_simplestation);
+	m_memory_write((uint32_t) (REGS[REGIDX_S] + IMMDT), REGS[REGIDX_T], dword, m_simplestation);
 }
 
 /*
