@@ -316,7 +316,7 @@ void m_bne(m_simplestation_state *m_simplestation)
 void m_blez(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("blez $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT);
+	printf("blez $%s, %d\n", m_cpu_regnames[REGIDX_S], (SIMMDT) << 2);
 #endif
 
 	int32_t m_val = REGS[REGIDX_S];
@@ -342,7 +342,7 @@ void m_blez(m_simplestation_state *m_simplestation)
 void m_bgtz(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("bgtz $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT);
+	printf("bgtz $%s, %d\n", m_cpu_regnames[REGIDX_S], (SIMMDT) << 2);
 #endif
 
 	int32_t m_val = REGS[REGIDX_S];
