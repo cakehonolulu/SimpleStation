@@ -102,7 +102,7 @@ void m_add(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		REGS[REGIDX_D] = REGS[REGIDX_S] + REGS[REGIDX_T];
+		REGS[REGIDX_D] = ((int32_t) (((int32_t) REGS[REGIDX_S]) + ((int32_t) REGS[REGIDX_T])));
 	}
 }
 
