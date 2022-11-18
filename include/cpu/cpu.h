@@ -76,6 +76,9 @@ extern const char *m_cpu_regnames[];
 #define FP (m_simplestation->m_cpu->m_registers[30])
 #define RA (m_simplestation->m_cpu->m_registers[31])
 
+#define COP0_EPC (m_simplestation->m_cpu_cop0->m_registers[13])
+#define COP0_CAUSE (m_simplestation->m_cpu_cop0->m_registers[14])
+
 /* Macros */
 // FIXME: This is Pre-C23 (ckd_add...)
 #if defined(__clang__)
