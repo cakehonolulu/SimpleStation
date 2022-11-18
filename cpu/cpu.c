@@ -48,7 +48,8 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 #endif
 
 			// Point Program Counter to the initial BIOS address
-			PC = 0xBFC00000;
+			PC = 0;
+			NXT_PC = 0xBFC00000;
 
 			// High register to 0
 			HI = 0;
@@ -68,17 +69,11 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 				m_simplestation->m_cpu->m_registers[m_regs] = 0;
 			}
 
-			// Set the CPU state to 'ON'
-			m_simplestation->m_cpu_state = ON;
-
-			m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = 0;
-			m_simplestation->m_cpu->m_cpu_memory_write_back.m_value = 0;
-
-			m_simplestation->m_cpu->m_cpu_memory_load.m_register = 0;
-			m_simplestation->m_cpu->m_cpu_memory_load.m_value = 0;
-
     		m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 			m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
+
+			// Set the CPU state to 'ON'
+			m_simplestation->m_cpu_state = ON;
 
 #ifdef DEBUG_CPU
 			for (i = 0; i < 0x3F; i++)
@@ -150,11 +145,13 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cpu->m_opcode = m_simplestation->m_cpu->m_next_opcode;
 
+	PC = NXT_PC;
+
 	/* Fetch cycle */
 	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 	
 	// Increment Program Counter by 4
-	PC += 4;
+	NXT_PC += 4;
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
@@ -190,29 +187,45 @@ bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
 	return m_result;
 }
 
+void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
+{
+	m_offset <<= 2;
+
+	NXT_PC += m_offset;
+	NXT_PC -= 4;
+}
+
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register != m_simplestation->m_cpu->m_cpu_memory_load.m_register)
+    if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register != 0)
 	{
-        REGS[m_simplestation->m_cpu->m_cpu_memory_load.m_register] = m_simplestation->m_cpu->m_cpu_memory_load.m_value;
+        REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
     }
 	
-    m_simplestation->m_cpu->m_cpu_memory_load = m_simplestation->m_cpu->m_cpu_delayed_memory_load;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = byte;
 
-    REGS[m_simplestation->m_cpu->m_cpu_memory_write_back.m_register] = m_simplestation->m_cpu->m_cpu_memory_write_back.m_value;
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = 0;
     REGS[0] = 0;
 }
 
-void m_cpu_register_set(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = m_register;
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_value = m_value;
-}
-
-void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
+void m_cpu_load_delay_enqueue_byte(uint8_t m_register, uint8_t m_value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = byte;
+}
+
+void m_cpu_load_delay_enqueue_word(uint8_t m_register, uint16_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = word;
+}
+
+void m_cpu_load_delay_enqueue_dword(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = m_register;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = m_value;
+	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = dword;
 }

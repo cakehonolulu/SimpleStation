@@ -39,6 +39,7 @@ extern const char *m_cpu_regnames[];
 
 // Register defines
 #define PC (m_simplestation->m_cpu->m_pc)
+#define NXT_PC (m_simplestation->m_cpu->m_pc_nxt)
 #define HI (m_simplestation->m_cpu->m_hi)
 #define LO (m_simplestation->m_cpu->m_lo)
 
@@ -75,6 +76,10 @@ extern const char *m_cpu_regnames[];
 #define FP (m_simplestation->m_cpu->m_registers[30])
 #define RA (m_simplestation->m_cpu->m_registers[31])
 
+#define COP0_SR (m_simplestation->m_cpu_cop0->m_registers[12])
+#define COP0_EPC (m_simplestation->m_cpu_cop0->m_registers[13])
+#define COP0_CAUSE (m_simplestation->m_cpu_cop0->m_registers[14])
+
 /* Macros */
 // FIXME: This is Pre-C23 (ckd_add...)
 #if defined(__clang__)
@@ -91,7 +96,11 @@ void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num);
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation);
-void m_cpu_register_set(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
-void m_cpu_load_delay_enqueue(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
+
+void m_cpu_load_delay_enqueue_byte(uint8_t m_register, uint8_t m_value, m_simplestation_state *m_simplestation);
+void m_cpu_load_delay_enqueue_word(uint8_t m_register, uint16_t m_value, m_simplestation_state *m_simplestation);
+void m_cpu_load_delay_enqueue_dword(uint8_t m_register, uint32_t m_value, m_simplestation_state *m_simplestation);
+
+void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation);
 
 #endif /* CPU_H */

@@ -67,14 +67,13 @@ void m_mfc0(m_simplestation_state *m_simplestation)
 
     if (REGIDX_D == 3 || (REGIDX_D >= 5 && REGIDX_D <= 9) || (REGIDX_D >= 11 && REGIDX_D <= 15))
 	{
-        m_cpu_load_delay_enqueue(REGIDX_T, COP0_REGS[REGIDX_D], m_simplestation);
+		if (REGIDX_D == 13)
+		{
+			printf(YELLOW "[COP0] mfc0: Read from 'Cause' register!\n" NORMAL);
+		}
+
+        m_cpu_load_delay_enqueue_dword(REGIDX_T, COP0_REGS[REGIDX_D], m_simplestation);
     }
-	else
-	if (REGIDX_D == 13)
-	{
-		printf(RED "[COP0] mfc0: Unhandled read from 'Cause' register...\n");
-		m_simplestation_exit(m_simplestation, 1);
-	}
     else
 	{
 		printf(RED "[COP0] mfc0: Unhandled read from COP0...\n");

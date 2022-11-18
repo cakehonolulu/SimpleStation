@@ -2,16 +2,16 @@
 
 const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{"exp", m_exp},		// 0x00
-	{NULL, NULL},		// 0x01
+	{"bxx", m_bxx},		// 0x01
 	{"j", m_j},			// 0x02
 	{"jal", m_jal},		// 0x03
 	{"beq", m_beq},		// 0x04
 	{"bne", m_bne},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
+	{"blez", m_blez},	// 0x06
+	{"bgtz", m_bgtz},	// 0x07
 	{"addi", m_addi},	// 0x08
 	{"addiu", m_addiu},	// 0x09
-	{NULL, NULL},		// 0x00
+	{"slti", m_slti},	// 0x00
 	{NULL, NULL},		// 0x0B
 	{"andi", m_andi},	// 0x0C
 	{"ori", m_ori},		// 0x0D
@@ -37,7 +37,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
 	{"lw", m_lw},		// 0x23
-	{NULL, NULL},		// 0x04
+	{"lbu", m_lbu},		// 0x24
 	{NULL, NULL},		// 0x05
 	{NULL, NULL},		// 0x06
 	{NULL, NULL},		// 0x07
@@ -70,16 +70,16 @@ const struct m_corewave_cw33300_extended_00_instrs m_psx_extended_00[0x3F] = {
 	{"sll", m_sll},		// 0x00
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
+	{"sra", m_sra},		// 0x03
 	{NULL, NULL},		// 0x04
 	{NULL, NULL},		// 0x05
 	{NULL, NULL},		// 0x06
 	{NULL, NULL},		// 0x07
 	{"jr", m_jr},		// 0x08
-	{NULL, NULL},		// 0x09
+	{"jalr", m_jalr},	// 0x09
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0B
-	{NULL, NULL},		// 0x00
+	{"syscall", m_syscall},	// 0x00
 	{NULL, NULL},		// 0x0D
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0F
@@ -102,7 +102,7 @@ const struct m_corewave_cw33300_extended_00_instrs m_psx_extended_00[0x3F] = {
 	{"add", m_add},		// 0x20
 	{"addu", m_addu},	// 0x21
 	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
+	{"subu", m_subu},	// 0x23
 	{"and", m_and},		// 0x24
 	{"or", m_or},		// 0x05
 	{NULL, NULL},		// 0x06

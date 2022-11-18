@@ -9,7 +9,6 @@ void m_exp(m_simplestation_state *m_simplestation)
 	if (m_psx_extended_00[(m_simplestation->m_cpu->m_opcode & 0x3F)].m_funct == NULL)
 	{
 		printf(RED "[CPU] fde->exp: Unimplemented '0x00 Family' Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, (m_simplestation->m_cpu->m_opcode & 0x3F), (uint32_t) m_simplestation->m_cpu->m_opcode);
-		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
@@ -25,7 +24,6 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	if (m_psx_cop0[REGIDX_S].m_funct == NULL)
 	{
 		printf(RED "[CPU] fde->cop0: Unimplemented 'Coprocessor 0' Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
-		m_printregs(m_simplestation);
 		m_simplestation_exit(m_simplestation, 1);
 	}
 	else
@@ -33,6 +31,76 @@ void m_cop0(m_simplestation_state *m_simplestation)
 		// Execute the instruction
 		((void (*)(void))m_psx_cop0[REGIDX_S].m_funct)();
 	}
+}
+
+/*
+	BXX
+	Branch instructions
+*/
+void m_bxx(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	if ((INSTRUCTION >> 16) & 1)
+	{
+		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		{
+			printf("bgezal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+		else
+		{
+			printf("bgez $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+	}
+	else
+	{
+		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		{
+			printf("bltzal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+		else
+		{
+			printf("bltz $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
+		}
+	}
+#endif
+
+	bool m_bgez = (INSTRUCTION >> 16) & 1;
+	bool m_link = ((INSTRUCTION >> 17) & 0xF) == 8;
+
+	int32_t v = REGS[REGIDX_S];
+
+	uint32_t m_test = (v < 0);
+
+	m_test ^= m_bgez;
+
+	if (m_link)
+	{
+		uint32_t m_ra = PC + 4;
+		REGS[31] = m_ra;
+	}
+
+	if (m_test)
+	{
+		m_cpu_branch(SIMMDT, m_simplestation);
+	}
+}
+
+// Exception handler
+void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation)
+{
+	// BEV bit in COP0's SR register decides where
+	uint32_t m_dst = (((COP0_SR & (1 << 2)) != 0) ? 0xBFC00180 : 0x8000080);
+
+	uint8_t m_mode = COP0_SR & 0x3F;
+	COP0_SR &= ~0x3F;
+
+	COP0_SR |= ((m_mode << 2) & 0x3F);
+
+	COP0_CAUSE = (((uint32_t) m_exception) << 2);
+
+	COP0_EPC = PC;
+
+	NXT_PC = m_dst;
 }
 
 /*
@@ -53,7 +121,25 @@ void m_sll(m_simplestation_state *m_simplestation)
 	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
 #endif
 
-	m_cpu_register_set(REGIDX_D, REGS[REGIDX_T] << SHIFT, m_simplestation);
+	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
+}
+
+/*
+	SRA (MIPS I)
+	Format:
+	SRA rd, rt, sa
+	Description:
+	The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the
+	sign-bit (bit 31) in the emptied bits; the word result is placed in GPR rd. The bit shift
+	count is specified by sa. If rd is a 64-bit register, the result word is sign-extended.
+*/
+void m_sra(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sra $%s, $%s, %d\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+#endif
+
+	REGS[REGIDX_D] = ((uint32_t) (((int32_t) (REGS[REGIDX_T])) >> SHIFT));
 }
 
 /*
@@ -73,7 +159,43 @@ void m_jr(m_simplestation_state *m_simplestation)
 	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);
 #endif
 
-	PC = REGS[REGIDX_S];
+	NXT_PC = REGS[REGIDX_S];
+}
+
+/*
+	JALR (MIPS I)
+	Format(s):
+	JALR rs (rd = 31 implied)
+	JALR rd, rs
+	Description:
+	Place the return address link in GPR rd. The return link is the address of the second
+	instruction following the branch, where execution would continue after a procedure
+	call.
+	Jump to the effective target address in GPR rs. Execute the instruction following the
+	jump, in the branch delay slot, before jumping.
+*/
+void m_jalr(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	if (REGIDX_D == 31)
+	{
+		printf("jalr $%s\n", m_cpu_regnames[REGIDX_S]);
+	}
+	else
+	{
+		printf("jalr $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S]);
+	}
+#endif
+
+	REGS[REGIDX_D] = PC + 4;
+	NXT_PC = REGS[REGIDX_S];
+}
+
+void m_syscall(m_simplestation_state *m_simplestation)
+{
+	m_exc_types m_exc = syscall;
+
+	m_exception(m_exc, m_simplestation);
 }
 
 /*
@@ -102,7 +224,7 @@ void m_add(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		m_cpu_register_set(REGIDX_D, REGS[REGIDX_S] + REGS[REGIDX_T], m_simplestation);
+		REGS[REGIDX_D] = ((int32_t) (((int32_t) REGS[REGIDX_S]) + ((int32_t) REGS[REGIDX_T])));
 	}
 }
 
@@ -124,7 +246,26 @@ void m_addu(m_simplestation_state *m_simplestation)
 	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] + REGS[REGIDX_T]);
+}
+
+/*
+	SUBU (MIPS I)
+	Format:
+	SUBU rd, rs, rt
+	Description:
+	To subtract 32-bit integers.
+	The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs and the
+	32-bit arithmetic result is placed into GPR rd.
+	No integer overflow exception occurs under any circumstances.
+*/
+void m_subu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("subu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_S] - REGS[REGIDX_T]);
 }
 
 /*
@@ -144,7 +285,7 @@ void m_and(m_simplestation_state *m_simplestation)
 	printf("and $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] & REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] & REGS[REGIDX_T]);
 }
 
 /*
@@ -164,7 +305,7 @@ void m_or(m_simplestation_state *m_simplestation)
 	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	m_cpu_register_set(REGIDX_D, (REGS[REGIDX_S] | REGS[REGIDX_T]), m_simplestation);
+	REGS[REGIDX_D] = (REGS[REGIDX_S] | REGS[REGIDX_T]);
 }
 
 /*
@@ -186,14 +327,9 @@ void m_sltu(m_simplestation_state *m_simplestation)
 	printf("sltu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	if (REGS[REGIDX_S] < REGS[REGIDX_T])
-	{
-		m_cpu_register_set(REGIDX_D, 1, m_simplestation);
-	}
-	else
-	{
-		m_cpu_register_set(REGIDX_D, 0, m_simplestation);
-	}
+	bool m_test = REGS[REGIDX_S] < REGS[REGIDX_T];
+
+	REGS[REGIDX_D] = (uint32_t) m_test;
 }
 
 /*
@@ -221,7 +357,7 @@ void m_j(m_simplestation_state *m_simplestation)
 		According to simias, the immediate value is shifted 2 times to the right,
 		but psx spx wiki specifies the immediate jump value is multiplied by 4
 	*/
-	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
 
 /*
@@ -239,9 +375,9 @@ void m_jal(m_simplestation_state *m_simplestation)
 	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	m_cpu_register_set(31, PC, m_simplestation);
+	REGS[31] = PC + 4;
 
-	PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
 }
 
 /*
@@ -271,8 +407,7 @@ void m_beq(m_simplestation_state *m_simplestation)
 	*/
 	if (REGS[REGIDX_S] == REGS[REGIDX_T])
 	{
-		PC += ((SIMMDT) << 2);
-		PC -= 4;
+		m_cpu_branch(SIMMDT, m_simplestation);
 	}
 }
 
@@ -303,8 +438,59 @@ void m_bne(m_simplestation_state *m_simplestation)
 	*/
 	if (REGS[REGIDX_S] != REGS[REGIDX_T])
 	{
-		PC += ((SIMMDT) << 2);
-		PC -= 4;
+		m_cpu_branch(SIMMDT, m_simplestation);
+	}
+}
+
+/*
+	BLEZ (MIPS I)
+	Format:
+	BLEZ rs, offset
+	Description:
+	To test a GPR then do a PC-relative conditional branch.ç
+	An 18-bit signed offset (the 16-bit offset field shifted left 2 bits) is added to the address
+	of the instruction following the branch (not the branch itself), in the branch delay slot,
+	to form a PC-relative effective target address.
+	If the contents of GPR rs are less than or equal to zero (sign bit is 1 or value is zero),
+	branch to the effective target address after the instruction in the delay slot is executed.
+*/
+void m_blez(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("blez $%s, %d\n", m_cpu_regnames[REGIDX_S], (SIMMDT) << 2);
+#endif
+
+	int32_t m_val = REGS[REGIDX_S];
+
+	if (m_val <= 0)
+	{
+		m_cpu_branch(SIMMDT, m_simplestation);
+	}
+}
+
+/*
+	BGTZ (MIPS I)
+	Format:
+	BGTZ rs, offset
+	Description:
+	To test a GPR then do a PC-relative conditional branch.
+	An 18-bit signed offset (the 16-bit offset field shifted left 2 bits) is added to the address
+	of the instruction following the branch (not the branch itself), in the branch delay slot,
+	to form a PC-relative effective target address.
+	If the contents of GPR rs are greater than zero (sign bit is 0 but value not zero), branch
+	to the effective target address after the instruction in the delay slot is executed.
+*/
+void m_bgtz(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("bgtz $%s, %d\n", m_cpu_regnames[REGIDX_S], (SIMMDT) << 2);
+#endif
+
+	int32_t m_val = REGS[REGIDX_S];
+
+	if (m_val > 0)
+	{
+		m_cpu_branch(SIMMDT, m_simplestation);
 	}
 }
 
@@ -334,7 +520,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+		REGS[REGIDX_T] = ((uint32_t) ( ((int32_t) REGS[REGIDX_S]) + ( (int32_t) SIMMDT)));
 	}
 }
 
@@ -355,7 +541,26 @@ void m_addiu(m_simplestation_state *m_simplestation)
 	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
-	m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] + SIMMDT, m_simplestation);
+	REGS[REGIDX_T] = (REGS[REGIDX_S] + SIMMDT);
+}
+
+/*
+	SLTI (MIPS I)
+	Format:
+	SLTI rt, rs, immediate
+	Description:
+	Compare the contents of GPR rs and the 16-bit signed immediate as signed integers and
+	record the Boolean result of the comparison in GPR rt. If GPR rs is less than immediate
+	the result is 1 (true), otherwise 0 (false).
+	The arithmetic comparison does not cause an Integer Overflow exception.
+*/
+void m_slti(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("slti $%s, $%s, %d\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
+#endif
+
+	REGS[REGIDX_T] = ((int32_t) REGIDX_S) < ((int32_t) SIMMDT);
 }
 
 /*
@@ -376,10 +581,8 @@ void m_lb(m_simplestation_state *m_simplestation)
 	printf("lb $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-
-	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
-	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
-	
+	uint8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
 }
 
 /*
@@ -403,7 +606,27 @@ void m_lw(m_simplestation_state *m_simplestation)
 
 	uint32_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), dword, m_simplestation);
 
-	m_cpu_load_delay_enqueue(REGIDX_T, value, m_simplestation);
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, value, m_simplestation);
+}
+
+/*
+	LBU (MIPS I)
+	Format:
+	LBU rt, offset(base)
+	Description:
+	The contents of the 8-bit byte at the memory location specified by the effective address
+	are fetched, zero-extended, and placed in GPR rt. The 16-bit signed offset is added to
+	the contents of GPR base to form the effective address.
+*/
+void m_lbu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lbu $%s, %04X($%s)\n", m_cpu_regnames[REGIDX_T], (uint16_t) (SIMMDT & 0x0000FFFF), m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+
+	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
 }
 
 /*
@@ -488,7 +711,7 @@ void m_sw(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-	m_memory_write(REGS[REGIDX_S] + SIMMDT, REGS[REGIDX_T], dword, m_simplestation);
+	m_memory_write((REGS[REGIDX_S] + SIMMDT), REGS[REGIDX_T], dword, m_simplestation);
 }
 
 /*
@@ -508,11 +731,7 @@ void m_andi(m_simplestation_state *m_simplestation)
 	printf("andi $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
 #endif
 
-	// Check if register isn't register zero
-	if (REGIDX_T)
-	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] & SIMMDT, m_simplestation);
-	}
+	REGS[REGIDX_T] = (REGS[REGIDX_S] & IMMDT);
 }
 
 /*
@@ -535,7 +754,7 @@ void m_ori(m_simplestation_state *m_simplestation)
 	// Check if register isn't register zero
 	if (REGIDX_T)
 	{
-		m_cpu_register_set(REGIDX_T, REGS[REGIDX_S] | IMMDT, m_simplestation);
+		REGS[REGIDX_T] = (REGS[REGIDX_S] | IMMDT);
 	}
 }
 
@@ -560,6 +779,6 @@ void m_lui(m_simplestation_state *m_simplestation)
 	if (REGIDX_T)
 	{
 		// Bit shift by 16 the immediate value and place it at the register pointed by the index
-		m_cpu_register_set(REGIDX_T, (IMMDT << 16), m_simplestation);
+		REGS[REGIDX_T] = (IMMDT << 16);
 	}
 }

@@ -25,10 +25,14 @@
 	5 KB L1 cache @ 33.8688MHz
 */
 
+// Different types of memory granularity
+typedef enum {byte, word, dword} m_memory_size;
+
 // Delay Slot Helper Structure
 typedef struct m_mips_r3000a_delay_slot {
    uint8_t m_register;
    uint32_t m_value;
+   m_memory_size m_size;
 } m_mips_r3000a_delay_slot_t;
 
 // Struct containing main CPU state
@@ -36,6 +40,9 @@ typedef struct m_corewave_cw33300
 {
 	// Program Counter Register
 	uint32_t m_pc;
+
+	// Following Program Counter (abs(4) byte-offsetted)
+	uint32_t m_pc_nxt;
 
 	/*
 		High 32 bits of multiplication result
@@ -59,7 +66,6 @@ typedef struct m_corewave_cw33300
 
 	uint32_t m_next_opcode;
 
-	m_mips_r3000a_delay_slot_t m_cpu_memory_write_back, m_cpu_memory_load;
     m_mips_r3000a_delay_slot_t m_cpu_delayed_memory_load;
 
 } m_mips_r3000a_t;
@@ -118,7 +124,13 @@ typedef struct
 
 } m_simplestation_state;
 
+// Exception types
+typedef enum {
+	syscall = 0x8
+} m_exc_types;
+
 /* Functions */
 uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal);
+extern void m_printregs(m_simplestation_state *m_simplestation);
 
 #endif /* SIMPLESTATION_H */

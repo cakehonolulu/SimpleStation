@@ -10,9 +10,6 @@
 // BIOS Size on Sony's PSX (512 KiB) 
 #define PSX_MEM_BIOS (MiB / 2)
 
-// Different types of memory granularity
-typedef enum {byte, word, dword} m_memory_size;
-
 /* Function definitions */
 uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simplestation_state *m_simplestation);
 uint8_t m_memory_read_byte(uint32_t m_memory_address, int8_t *m_memory_source);
