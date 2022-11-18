@@ -124,6 +124,11 @@ typedef struct
 
 } m_simplestation_state;
 
+// Exception types
+typedef enum {
+	syscall = 0x8
+} m_exc_types;
+
 /* Functions */
 uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal);
 extern void m_printregs(m_simplestation_state *m_simplestation);

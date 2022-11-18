@@ -85,6 +85,24 @@ void m_bxx(m_simplestation_state *m_simplestation)
 	}
 }
 
+// Exception handler
+void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation)
+{
+	// BEV bit in COP0's SR register decides where
+	uint32_t m_dst = (((COP0_SR & (1 << 2)) != 0) ? 0xBFC00180 : 0x8000080);
+
+	uint8_t m_mode = COP0_SR & 0x3F;
+	COP0_SR &= ~0x3F;
+
+	COP0_SR |= ((m_mode << 2) & 0x3F);
+
+	COP0_CAUSE = (((uint32_t) m_exception) << 2);
+
+	COP0_EPC = PC;
+
+	NXT_PC = m_dst;
+}
+
 /*
 	SLL (MIPS I)
 
@@ -153,6 +171,13 @@ void m_jalr(m_simplestation_state *m_simplestation)
 
 	REGS[REGIDX_D] = PC + 4;
 	NXT_PC = REGS[REGIDX_S];
+}
+
+void m_syscall(m_simplestation_state *m_simplestation)
+{
+	m_exc_types m_exc = syscall;
+
+	m_exception(m_exc, m_simplestation);
 }
 
 /*
