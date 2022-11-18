@@ -69,17 +69,11 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 				m_simplestation->m_cpu->m_registers[m_regs] = 0;
 			}
 
-			// Set the CPU state to 'ON'
-			m_simplestation->m_cpu_state = ON;
-
-			m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = 0;
-			m_simplestation->m_cpu->m_cpu_memory_write_back.m_value = 0;
-
-			m_simplestation->m_cpu->m_cpu_memory_load.m_register = 0;
-			m_simplestation->m_cpu->m_cpu_memory_load.m_value = 0;
-
     		m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 			m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
+
+			// Set the CPU state to 'ON'
+			m_simplestation->m_cpu_state = ON;
 
 #ifdef DEBUG_CPU
 			for (i = 0; i < 0x3F; i++)
@@ -203,16 +197,14 @@ void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
 
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register != m_simplestation->m_cpu->m_cpu_memory_load.m_register)
+    if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register != 0)
 	{
-        REGS[m_simplestation->m_cpu->m_cpu_memory_load.m_register] = m_simplestation->m_cpu->m_cpu_memory_load.m_value;
+        REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
     }
 	
-    m_simplestation->m_cpu->m_cpu_memory_load = m_simplestation->m_cpu->m_cpu_delayed_memory_load;
+    m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 
-    REGS[m_simplestation->m_cpu->m_cpu_memory_write_back.m_register] = m_simplestation->m_cpu->m_cpu_memory_write_back.m_value;
-    m_simplestation->m_cpu->m_cpu_memory_write_back.m_register = 0;
     REGS[0] = 0;
 }
 

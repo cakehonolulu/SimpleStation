@@ -36,7 +36,7 @@ typedef struct m_corewave_cw33300
 {
 	// Program Counter Register
 	uint32_t m_pc;
-	
+
 	// Following Program Counter (abs(4) byte-offsetted)
 	uint32_t m_pc_nxt;
 
@@ -62,7 +62,6 @@ typedef struct m_corewave_cw33300
 
 	uint32_t m_next_opcode;
 
-	m_mips_r3000a_delay_slot_t m_cpu_memory_write_back, m_cpu_memory_load;
     m_mips_r3000a_delay_slot_t m_cpu_delayed_memory_load;
 
 } m_mips_r3000a_t;
