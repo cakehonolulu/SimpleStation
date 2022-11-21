@@ -214,6 +214,28 @@ void m_syscall(m_simplestation_state *m_simplestation)
 }
 
 /*
+	MFLO (MIPS I)
+
+	Format:
+	MFLO rd
+
+	Description:
+	The contents of special register LO are loaded into GPR rd.
+	Restrictions:
+	The two instructions that follow an MFLO instruction must not be instructions that
+	modify the LO register: DDIV, DDIVU, DIV, DIVU, DMULT, DMULTU, MTLO, MULT,
+	MULTU. If this restriction is violated, the result of the MFLO is undefined.
+*/
+void m_mflo(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("mflo $%s\n", m_cpu_regnames[REGIDX_D]);
+#endif
+
+	REGS[REGIDX_D] = LO;
+}
+
+/*
 	DIV (MIPS I)
 
 	Format:
