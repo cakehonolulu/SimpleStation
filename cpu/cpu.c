@@ -158,6 +158,10 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		m_simplestation_exit(m_simplestation, 1);
 	}
 
+#ifdef DEBUG_INSTRUCTIONS
+	printf("\nPC: 0x%08X\n", PC - 4);
+#endif
+
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
