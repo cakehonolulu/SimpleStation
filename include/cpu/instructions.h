@@ -53,6 +53,9 @@ void m_mflo(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x1A
 void m_div(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x1B
+void m_divu(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x20
 void m_add(m_simplestation_state *m_simplestation);
 

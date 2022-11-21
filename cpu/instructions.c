@@ -299,6 +299,36 @@ void m_div(m_simplestation_state *m_simplestation)
 }
 
 /*
+	DIVU (MIPS I)
+
+	Format:
+	DIVU rs, rt
+
+	Description:
+	The 32-bit word value in GPR rs is divided by the 32-bit value in GPR rt, treating both
+	operands as unsigned values. The 32-bit quotient is placed into special register LO and
+	the 32-bit remainder is placed into special register HI.
+	No arithmetic exception occurs under any circumstances.
+*/
+void m_divu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("divu $%s, $%s\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	if (REGS[REGIDX_T] == 0)
+	{
+		HI = REGS[REGIDX_S];
+		LO = 0xFFFFFFFF;
+	}
+	else
+	{
+		HI = REGS[REGIDX_S] % REGS[REGIDX_T];
+		LO = REGS[REGIDX_S] / REGS[REGIDX_T];
+	}
+}
+
+/*
  	ADD (MIPS I)
 
 	Format:
