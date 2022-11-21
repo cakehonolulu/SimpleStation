@@ -12,7 +12,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{"addi", m_addi},	// 0x08
 	{"addiu", m_addiu},	// 0x09
 	{"slti", m_slti},	// 0x00
-	{NULL, NULL},		// 0x0B
+	{"sltiu", m_sltiu},	// 0x0B
 	{"andi", m_andi},	// 0x0C
 	{"ori", m_ori},		// 0x0D
 	{NULL, NULL},		// 0x00

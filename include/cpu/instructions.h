@@ -101,6 +101,9 @@ void m_addiu(m_simplestation_state *m_simplestation);
 // 0x0A
 void m_slti(m_simplestation_state *m_simplestation);
 
+// 0x0B
+void m_sltiu(m_simplestation_state *m_simplestation);
+
 // 0x10
 void m_cop0(m_simplestation_state *m_simplestation);
 

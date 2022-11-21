@@ -646,8 +646,10 @@ void m_addiu(m_simplestation_state *m_simplestation)
 
 /*
 	SLTI (MIPS I)
+
 	Format:
 	SLTI rt, rs, immediate
+
 	Description:
 	Compare the contents of GPR rs and the 16-bit signed immediate as signed integers and
 	record the Boolean result of the comparison in GPR rt. If GPR rs is less than immediate
@@ -661,6 +663,31 @@ void m_slti(m_simplestation_state *m_simplestation)
 #endif
 
 	REGS[REGIDX_T] = ((int32_t) REGIDX_S) < ((int32_t) SIMMDT);
+}
+
+/*
+	SLTIU (MIPS I)
+
+	Format:
+	SLTIU rt, rs, immediate
+
+	Description:
+	Compare the contents of GPR rs and the sign-extended 16-bit immediate as unsigned
+	integers and record the Boolean result of the comparison in GPR rt. If GPR rs is less
+	than immediate the result is 1 (true), otherwise 0 (false).
+	Because the 16-bit immediate is sign-extended before comparison, the instruction is able
+	to represent the smallest or largest unsigned numbers. The representable values are at
+	the minimum [0, 32767] or maximum [max_unsigned-32767, max_unsigned] end of
+	the unsigned range.
+	The arithmetic comparison does not cause an Integer Overflow exception.
+*/
+void m_sltiu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sltiu $%s, $%s, %d\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
+#endif
+
+	REGS[REGIDX_T] = ((uint32_t) ((uint32_t) REGIDX_S) < ((uint32_t) SIMMDT));
 }
 
 /*
