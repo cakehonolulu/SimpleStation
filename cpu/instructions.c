@@ -164,9 +164,11 @@ void m_jr(m_simplestation_state *m_simplestation)
 
 /*
 	JALR (MIPS I)
+
 	Format(s):
 	JALR rs (rd = 31 implied)
 	JALR rd, rs
+	
 	Description:
 	Place the return address link in GPR rd. The return link is the address of the second
 	instruction following the branch, where execution would continue after a procedure
@@ -191,6 +193,19 @@ void m_jalr(m_simplestation_state *m_simplestation)
 	NXT_PC = REGS[REGIDX_S];
 }
 
+/*
+	SYSCALL (MIPS I)
+
+	Format(s):
+	SYSCALL
+	
+	Description:
+	A system call exception occurs, immediately and unconditionally transferring control
+	to the exception handler.
+	The code field is available for use as software parameters, but is retrieved by the
+	exception handler only by loading the contents of the memory word containing the
+	instruction.
+*/
 void m_syscall(m_simplestation_state *m_simplestation)
 {
 	m_exc_types m_exc = syscall;
