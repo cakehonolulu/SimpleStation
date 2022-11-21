@@ -196,7 +196,7 @@ void m_jalr(m_simplestation_state *m_simplestation)
 /*
 	SYSCALL (MIPS I)
 
-	Format(s):
+	Format:
 	SYSCALL
 	
 	Description:
@@ -211,6 +211,49 @@ void m_syscall(m_simplestation_state *m_simplestation)
 	m_exc_types m_exc = syscall;
 
 	m_exception(m_exc, m_simplestation);
+}
+
+/*
+	DIV (MIPS I)
+
+	Format:
+	DIV rs, rt
+
+	Description:
+	The 32-bit word value in GPR rs is divided by the 32-bit value in GPR rt, treating both
+	operands as signed values. The 32-bit quotient is placed into special register LO and
+	the 32-bit remainder is placed into special register HI.
+	No arithmetic exception occurs under any circumstances.
+*/
+void m_div(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("div $%s, $%s\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	if ((int32_t) (REGS[REGIDX_T]) == 0)
+	{
+		HI = (uint32_t) (REGS[REGIDX_S]);
+
+		if ((int32_t) (REGS[REGIDX_S]) >= 0)
+		{
+			LO = 0xFFFFFFFF;
+		}
+		else
+		{
+			LO = 1;
+		}
+	}
+	else if (((uint32_t) (REGS[REGIDX_S]) == 0x80000000) && ((int32_t) (REGS[REGIDX_T]) == -1))
+	{
+		HI = 0;
+		LO = 0x80000000;
+	}
+	else
+	{
+		HI = ((uint32_t) (((int32_t) REGS[REGIDX_S]) % ((int32_t) REGS[REGIDX_T])));
+		LO = ((uint32_t) (((int32_t) REGS[REGIDX_S]) / ((int32_t) REGS[REGIDX_T])));
+	}
 }
 
 /*

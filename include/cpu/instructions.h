@@ -44,6 +44,9 @@ void m_jalr(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x0C
 void m_syscall(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x1A
+void m_div(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x20
 void m_add(m_simplestation_state *m_simplestation);
 
