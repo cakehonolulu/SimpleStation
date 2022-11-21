@@ -48,6 +48,19 @@ int main(int argc, char **argv)
 					printf("You must specify a filename to load the BIOS from!\n");
 				}
 			}
+			else if (!strcmp(argv[m_args], "-break"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					m_simplestation.m_breakpoint = strtol(argv[m_args + 1], NULL, 16);
+					printf("Breakpoint set: 0x%08X\n", m_simplestation.m_breakpoint);
+					m_args++;
+				}
+				else
+				{
+					printf("You must specify breakpoint!\n");
+				}
+			}
 			else
 			{
 				printf("Unknown argument: %s\n", argv[m_args]);

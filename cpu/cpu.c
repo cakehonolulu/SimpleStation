@@ -153,6 +153,11 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	// Increment Program Counter by 4
 	NXT_PC += 4;
 
+	if ((PC - 4) == m_simplestation->m_breakpoint)
+	{
+		m_simplestation_exit(m_simplestation, 1);
+	}
+
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{

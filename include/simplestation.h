@@ -122,6 +122,8 @@ typedef struct
 	bool m_interrupts_state;
 	bool m_cpu_state;
 
+	uint32_t m_breakpoint;
+
 } m_simplestation_state;
 
 // Exception types
