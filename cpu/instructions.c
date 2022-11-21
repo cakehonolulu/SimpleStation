@@ -687,7 +687,7 @@ void m_sltiu(m_simplestation_state *m_simplestation)
 	printf("sltiu $%s, $%s, %d\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
-	REGS[REGIDX_T] = ((uint32_t) ((uint32_t) REGIDX_S) < ((uint32_t) SIMMDT));
+	REGS[REGIDX_T] = ((uint32_t) ((uint32_t) REGS[REGIDX_S]) < ((uint32_t) SIMMDT));
 }
 
 /*
