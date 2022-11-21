@@ -125,6 +125,26 @@ void m_sll(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SRL (MIPS I)
+
+	Format:
+	SRL rd, rt, sa
+
+	Description:
+	The contents of the low-order 32-bit word of GPR rt are shifted right, inserting zeros
+	into the emptied bits; the word result is placed in GPR rd. The bit shift count is
+	specified by sa. If rd is a 64-bit register, the result word is sign-extended.
+*/
+void m_srl(m_simplestation_state *m_simplestation)
+{
+	#ifdef DEBUG_INSTRUCTIONS
+	printf("srl $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+#endif
+
+	REGS[REGIDX_D] = REGS[REGIDX_T] >> SHIFT;
+}
+
+/*
 	SRA (MIPS I)
 	Format:
 	SRA rd, rt, sa
