@@ -22,9 +22,9 @@ void m_printregs(m_simplestation_state *m_simplestation)
 	printf(GREEN "HI:" WHITE " 0x%08X\n", HI);
 	printf(GREEN "LO:" WHITE " 0x%08X\n", LO);
 
-	printf(YELLOW UNDERSCORE "\nSegment Registers:\n" WHITE NORMAL);
-
-	// TODO: Segment Registers?
-
+	printf(YELLOW UNDERSCORE "\nCOP0:\n" WHITE NORMAL);
+	printf(YELLOW "SR    : " WHITE " 0x%08X\n", COP0_SR);
+	printf(YELLOW "EPC   : " WHITE " 0x%08X\n", COP0_EPC);
+	printf(YELLOW "CAUSE : " WHITE " 0x%08X\n", COP0_CAUSE);
 	printf("\n");
 }
