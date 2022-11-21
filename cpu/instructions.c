@@ -457,6 +457,29 @@ void m_or(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SLT (MIPS I)
+
+	Format:
+	SLT rd, rs, rt
+	
+	Description:
+	Compare the contents of GPR rs and GPR rt as signed integers and record the Boolean
+	result of the comparison in GPR rd. If GPR rs is less than GPR rt the result is 1 (true),
+	otherwise 0 (false).
+	The arithmetic comparison does not cause an Integer Overflow exception.
+*/
+void m_slt(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("slt $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	bool m_test = (((int32_t) REGS[REGIDX_S]) < ((int32_t) REGS[REGIDX_T]));
+
+	REGS[REGIDX_D] = ((uint32_t) m_test);
+}
+
+/*
 	SLTU (MIPS I)
 
 	Format:
