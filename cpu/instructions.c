@@ -234,6 +234,24 @@ void m_syscall(m_simplestation_state *m_simplestation)
 }
 
 /*
+	MFHI (MIPS I)
+
+	Format:
+	MFHI rd
+
+	Description:
+	The contents of special register HI are loaded into GPR rd.
+*/
+void m_mfhi(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("mfhi $%s\n", m_cpu_regnames[REGIDX_D]);
+#endif
+
+	REGS[REGIDX_D] = HI;
+}
+
+/*
 	MFLO (MIPS I)
 
 	Format:

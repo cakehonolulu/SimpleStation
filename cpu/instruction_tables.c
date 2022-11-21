@@ -83,7 +83,7 @@ const struct m_corewave_cw33300_extended_00_instrs m_psx_extended_00[0x3F] = {
 	{NULL, NULL},		// 0x0D
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0F
-	{NULL, NULL},		// 0x10
+	{"mfhi", m_mfhi},	// 0x10
 	{NULL, NULL},		// 0x11
 	{"mflo", m_mflo},	// 0x12
 	{NULL, NULL},		// 0x03
