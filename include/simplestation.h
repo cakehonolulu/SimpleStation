@@ -124,7 +124,9 @@ typedef struct
 
 	uint32_t m_breakpoint;
 	uint32_t m_wp;
-	
+
+	bool m_debugger;
+
 	bool m_cond;
 
 } m_simplestation_state;

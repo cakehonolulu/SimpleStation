@@ -178,7 +178,15 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 
 	if ((PC - 4) == m_simplestation->m_breakpoint)
 	{
-		m_simplestation_exit(m_simplestation, 1);
+		if (m_simplestation->m_debugger)
+		{
+			m_debugger(m_simplestation);
+			m_simplestation_exit(m_simplestation, 1);
+		}
+		else
+		{
+			m_simplestation_exit(m_simplestation, 1);
+		}
 	}
 
 
