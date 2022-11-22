@@ -300,6 +300,14 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #endif
 		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
 	}
+	// PSX DMA Registers
+	else if ((0x1F801080 <= m_address) && (m_address < 0x1F801100))
+	{
+		// DMA Registers Dummy Read
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: Dummy DMA Registers memory read! Ignoring...\n" NORMAL);
+#endif
+	}
 	// PSX Timer Registers
 	else if ((0x1F801100 <= m_address) && (m_address < 0x1F801130))
 	{
@@ -502,6 +510,14 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #endif
 		m_simplestation->m_cpu_ints->m_interrupt_mask = m_value;
 		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+	}
+	// PSX DMA Registers
+	else if ((0x1F801080 <= m_address) && (m_address < 0x1F801100))
+	{
+		// DMA Registers Dummy Write
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] write: Dummy DMA Registers memory write! Ignoring...\n" NORMAL);
+#endif
 	}
 	// PSX Timer Registers
 	else if ((0x1F801100 <= m_address) && (m_address < 0x1F801130))
