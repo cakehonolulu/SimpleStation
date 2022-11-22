@@ -40,9 +40,9 @@ void m_cop0(m_simplestation_state *m_simplestation)
 void m_bxx(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	if ((INSTRUCTION >> 16) & 1)
+	if ((m_simplestation->m_cpu->m_opcode >> 16) & 1)
 	{
-		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		if (((m_simplestation->m_cpu->m_opcode >> 17) & 0xF) == 8)
 		{
 			printf("bgezal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
 		}
@@ -53,7 +53,7 @@ void m_bxx(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		if (((INSTRUCTION >> 17) & 0xF) == 8)
+		if (((m_simplestation->m_cpu->m_opcode >> 17) & 0xF) == 8)
 		{
 			printf("bltzal $%s, %d\n", m_cpu_regnames[REGIDX_S], SIMMDT << 2);
 		}
@@ -64,8 +64,8 @@ void m_bxx(m_simplestation_state *m_simplestation)
 	}
 #endif
 
-	bool m_bgez = (INSTRUCTION >> 16) & 1;
-	bool m_link = ((INSTRUCTION >> 17) & 0xF) == 8;
+	bool m_bgez = (m_simplestation->m_cpu->m_opcode >> 16) & 1;
+	bool m_link = ((m_simplestation->m_cpu->m_opcode >> 17) & 0xF) == 8;
 
 	int32_t v = REGS[REGIDX_S];
 
