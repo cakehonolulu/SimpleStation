@@ -853,7 +853,7 @@ void m_sb(m_simplestation_state *m_simplestation)
 	printf("sb $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	if ((COP0_SR & 0x10000) != 0)
 	{
 		printf(YELLOW "[CPU] sb: Ignoring word store, cache is isolated...\n" NORMAL);
 		return;
@@ -881,7 +881,7 @@ void m_sh(m_simplestation_state *m_simplestation)
 	printf("sh $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	if ((COP0_SR & 0x10000) != 0)
 	{
 		printf(YELLOW "[CPU] sh: Ignoring word store, cache is isolated...\n" NORMAL);
 		return;
@@ -907,7 +907,7 @@ void m_sw(m_simplestation_state *m_simplestation)
 	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	if ((COP0_STATUS_REGISTER & 0x10000) != 0)
+	if ((COP0_SR & 0x10000) != 0)
 	{
 #ifdef DEBUG_INSTRUCTIONS
 		printf(YELLOW "[CPU] sw: Ignoring word store, cache is isolated...\n" NORMAL);

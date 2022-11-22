@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #define COP0_REGS (m_simplestation->m_cpu_cop0->m_registers)
-#define COP0_STATUS_REGISTER COP0_REGS[12]
 
 // Register names
 extern const char *m_cop0_regnames[];
