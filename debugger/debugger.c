@@ -16,7 +16,7 @@ void m_printregs(m_simplestation_state *m_simplestation)
 	}
 
 	printf(BLUE UNDERSCORE "\nControl-Flow Registers:\n" WHITE NORMAL);
-	printf(BLUE "PC:" WHITE " 0x%08X\n", PC - 4);
+	printf(BLUE "PC:" WHITE " 0x%08X\n", PC);
 
 	printf(GREEN UNDERSCORE "\nArithmetic Registers:\n" WHITE NORMAL);
 	printf(GREEN "HI:" WHITE " 0x%08X\n", HI);
