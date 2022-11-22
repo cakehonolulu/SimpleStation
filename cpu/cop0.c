@@ -61,10 +61,6 @@ void m_cpu_cop0_exit(m_simplestation_state *m_simplestation)
 
 void m_mfc0(m_simplestation_state *m_simplestation)
 {
-#ifdef DEBUG_INSTRUCTIONS
-	printf("mfc0 $%d, $%s\n", REGIDX_T, m_cop0_regnames[REGIDX_D]);
-#endif
-
     if (REGIDX_D == 3 || (REGIDX_D >= 5 && REGIDX_D <= 9) || (REGIDX_D >= 11 && REGIDX_D <= 15))
 	{
 		if (REGIDX_D == 13)
@@ -83,9 +79,5 @@ void m_mfc0(m_simplestation_state *m_simplestation)
 
 void m_mtc0(m_simplestation_state *m_simplestation)
 {
-#ifdef DEBUG_INSTRUCTIONS
-	printf("mtc0 $%s, $%s\n", m_cpu_regnames[REGIDX_T], m_cop0_regnames[REGIDX_D]);
-#endif
-
 	COP0_REGS[REGIDX_D] = REGS[REGIDX_T];
 }

@@ -1,9 +1,9 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
+#include <simplestation.h>
 #include <cpu/cpu.h>
 #include <memory/memory.h>
-#include <cpu/instructions.h>
 #include <ui/termcolour.h>
 #include <stdint.h>
 #include <stdio.h>
