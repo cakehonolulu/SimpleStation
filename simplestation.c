@@ -24,6 +24,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{
+		m_simplestation.m_breakpoint = 0;
+		
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
 			if (!strcmp(argv[m_args], "-bios"))
