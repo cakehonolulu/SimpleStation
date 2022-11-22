@@ -1,5 +1,5 @@
 
-#include <cpu/opcodes.h>
+#include <cpu/instructions_debug.h>
 
 void p_exp(m_simplestation_state *m_simplestation)
 {

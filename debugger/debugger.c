@@ -1,6 +1,6 @@
 #include <debugger/debugger.h>
 #include <cpu/instructions.h>
-#include <cpu/opcodes.h>
+#include <cpu/instructions_debug.h>
 
 void m_printregs(m_simplestation_state *m_simplestation)
 {

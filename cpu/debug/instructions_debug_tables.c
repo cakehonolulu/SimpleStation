@@ -1,4 +1,4 @@
-#include <cpu/opcodes.h>
+#include <cpu/instructions_debug.h>
 
 const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
 	{"exp", p_exp},		// 0x00
