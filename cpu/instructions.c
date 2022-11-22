@@ -709,7 +709,7 @@ void m_addi(m_simplestation_state *m_simplestation)
 void m_addiu(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("addiu $%x, $%s, 0x%X\n", REGIDX_T, m_cpu_regnames[REGIDX_S], SIMMDT);
+	printf("addiu $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
 	REGS[REGIDX_T] = (REGS[REGIDX_S] + SIMMDT);
