@@ -33,7 +33,7 @@ void p_cop0(m_simplestation_state *m_simplestation)
 
 void p_mfc0(m_simplestation_state *m_simplestation)
 {
-	printf("mfc0 $%d, $%s\n", REGIDX_T, m_cop0_regnames[REGIDX_D]);
+	printf("mfc0 $%s, $%s\n", m_cpu_regnames[REGIDX_T], m_cop0_regnames[REGIDX_D]);
 }
 
 void p_mtc0(m_simplestation_state *m_simplestation)
