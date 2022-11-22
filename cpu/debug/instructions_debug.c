@@ -69,7 +69,14 @@ void p_bxx(m_simplestation_state *m_simplestation)
 
 void p_sll(m_simplestation_state *m_simplestation)
 {
-	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+	if (m_simplestation->m_cpu->m_opcode == 0)
+	{
+		printf("nop\n");
+	}
+	else
+	{
+		printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+	}
 }
 
 void p_srl(m_simplestation_state *m_simplestation)
