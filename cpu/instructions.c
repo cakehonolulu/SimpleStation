@@ -89,7 +89,7 @@ void m_bxx(m_simplestation_state *m_simplestation)
 void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation)
 {
 	// BEV bit in COP0's SR register decides where
-	uint32_t m_dst = (((COP0_SR & (1 << 2)) != 0) ? 0xBFC00180 : 0x8000080);
+	uint32_t m_dst = (((COP0_SR & (1 << 2)) != 0) ? 0xBFC00180 : 0x80000800);
 
 	uint8_t m_mode = COP0_SR & 0x3F;
 	COP0_SR &= ~0x3F;
@@ -101,7 +101,8 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 	COP0_EPC = PC;
 
 	NXT_PC = m_dst;
-	m_simplestation->m_cpu->m_branch = true;
+
+	m_simplestation->m_cpu->m_branch = false;
 }
 
 /*
