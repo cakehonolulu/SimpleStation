@@ -71,6 +71,9 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
     		m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 			m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
 
+			m_simplestation->m_cpu->m_branch = false;
+			m_simplestation->m_cpu->m_pre_ds_pc = 0;
+
 			m_simplestation->m_cond = false;
 
 			// Set the CPU state to 'ON'
@@ -175,6 +178,11 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	// Increment Program Counter by 4
 	NXT_PC += 4;
 
+	if (m_simplestation->m_cpu->m_branch)
+	{
+		m_simplestation->m_cpu->m_branch = false;
+	}
+
 	if ((PC - 4) == m_simplestation->m_breakpoint)
 	{
 		if (m_simplestation->m_debugger)
@@ -187,7 +195,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 			m_simplestation_exit(m_simplestation, 1);
 		}
 	}
-
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
@@ -228,6 +235,7 @@ void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
 
 	NXT_PC += m_offset;
 	NXT_PC -= 4;
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)

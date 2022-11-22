@@ -101,6 +101,7 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 	COP0_EPC = PC;
 
 	NXT_PC = m_dst;
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
@@ -180,6 +181,7 @@ void m_jr(m_simplestation_state *m_simplestation)
 #endif
 
 	NXT_PC = REGS[REGIDX_S];
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
@@ -211,6 +213,7 @@ void m_jalr(m_simplestation_state *m_simplestation)
 
 	REGS[REGIDX_D] = PC + 4;
 	NXT_PC = REGS[REGIDX_S];
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
@@ -529,6 +532,7 @@ void m_j(m_simplestation_state *m_simplestation)
 		but psx spx wiki specifies the immediate jump value is multiplied by 4
 	*/
 	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
@@ -549,6 +553,7 @@ void m_jal(m_simplestation_state *m_simplestation)
 	REGS[31] = PC + 4;
 
 	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
