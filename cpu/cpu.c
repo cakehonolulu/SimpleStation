@@ -72,6 +72,8 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
     		m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 			m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
 
+			m_simplestation->m_cond = false;
+
 			// Set the CPU state to 'ON'
 			m_simplestation->m_cpu_state = ON;
 
@@ -148,13 +150,23 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 #ifdef DEBUG_INSTRUCTIONS
 	if (NXT_PC > (PC + 4))
 	{
-		printf("\n" GREEN "[DS]" NORMAL " PC: 0x%08X\n", PC);
+		printf("\n" GREEN "[DS]" NORMAL " PC: 0x%08X\nOpcode: 0x%08X\n", PC, m_simplestation->m_cpu->m_opcode);
 	}
 	else
 	{
-		printf("\nPC: 0x%08X\n", PC);
+		printf("\nPC: 0x%08X\nOpcode: 0x%08X\n", PC, m_simplestation->m_cpu->m_opcode);
 	}
 #endif
+
+	if ((PC - 4) == m_simplestation->m_wp)
+	{
+		m_simplestation->m_cond = true;
+	}
+
+	if (m_simplestation->m_cond)
+	{
+		m_printregs(m_simplestation);
+	}
 
 	PC = NXT_PC;
 

@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 	else
 	{
 		m_simplestation.m_breakpoint = 0;
-		
+
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
 			if (!strcmp(argv[m_args], "-bios"))
@@ -48,6 +48,19 @@ int main(int argc, char **argv)
 				else
 				{
 					printf("You must specify a filename to load the BIOS from!\n");
+				}
+			}
+			else if (!strcmp(argv[m_args], "-prfrom"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					m_simplestation.m_wp = strtol(argv[m_args + 1], NULL, 16);
+					printf("Printing registers from PC: 0x%08X\n", m_simplestation.m_breakpoint);
+					m_args++;
+				}
+				else
+				{
+					printf("You must specify an address to start printing registers from!\n");
 				}
 			}
 			else if (!strcmp(argv[m_args], "-break"))

@@ -123,6 +123,9 @@ typedef struct
 	bool m_cpu_state;
 
 	uint32_t m_breakpoint;
+	uint32_t m_wp;
+	
+	bool m_cond;
 
 } m_simplestation_state;
 
