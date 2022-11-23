@@ -38,6 +38,9 @@ void m_srl(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x03
 void m_sra(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x04
+void m_sllv(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x08
 void m_jr(m_simplestation_state *m_simplestation);
 

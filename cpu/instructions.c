@@ -161,8 +161,10 @@ void m_srl(m_simplestation_state *m_simplestation)
 
 /*
 	SRA (MIPS I)
+
 	Format:
 	SRA rd, rt, sa
+
 	Description:
 	The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the
 	sign-bit (bit 31) in the emptied bits; the word result is placed in GPR rd. The bit shift
@@ -175,6 +177,27 @@ void m_sra(m_simplestation_state *m_simplestation)
 #endif
 
 	REGS[REGIDX_D] = ((uint32_t) (((int32_t) (REGS[REGIDX_T])) >> SHIFT));
+}
+
+/*
+	SLLV (MIPS I)
+
+	Format:
+	SLLV rd, rt, rs
+
+	Description:
+	The contents of the low-order 32-bit word of GPR rt are shifted left, inserting zeroes
+	into the emptied bits; the result word is placed in GPR rd . The bit shift count is
+	specified by the low-order five bits of GPR rs. If rd is a 64-bit register, the result word
+	is sign-extended.
+*/
+void m_sllv(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sllv $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_T] << (REGS[REGIDX_S] & 0x1F));
 }
 
 /*

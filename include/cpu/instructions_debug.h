@@ -45,6 +45,9 @@ void p_srl(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x03
 void p_sra(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x04
+void p_sllv(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x08
 void p_jr(m_simplestation_state *m_simplestation);
 
