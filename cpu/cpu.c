@@ -143,29 +143,23 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 #ifdef DEBUG_INSTRUCTIONS
 	if (NXT_PC > (PC + 4))
 	{
-		printf("\n" GREEN "[DS]" NORMAL " PC: 0x%08X\nOpcode: 0x%08X\n", PC, m_simplestation->m_cpu->m_opcode);
+		printf("\n" GREEN "[DS]" NORMAL " PC: 0x%08X\n", PC);
 	}
 	else
 	{
-		printf("\nPC: 0x%08X\nOpcode: 0x%08X\n", PC, m_simplestation->m_cpu->m_opcode);
+		printf("\nPC: 0x%08X\n", PC);
 	}
 #endif
-
-	if ((PC - 4) == m_simplestation->m_wp)
-	{
-		m_simplestation->m_cond = true;
-	}
-
-	if (m_simplestation->m_cond)
-	{
-		m_printregs(m_simplestation);
-	}
 
 	PC = NXT_PC;
 
 	/* Fetch cycle */
 	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
-	
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("Opcode: 0x%08X\nNext Opcode: 0x%08X\n", m_simplestation->m_cpu->m_opcode, m_simplestation->m_cpu->m_next_opcode);
+#endif
+
 	// Increment Program Counter by 4
 	NXT_PC += 4;
 
@@ -187,6 +181,8 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		}
 	}
 
+	REGS[0] = 0;
+
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
@@ -198,6 +194,8 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		// Execute the instruction
 		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
 	}
+
+	REGS[0] = 0;
 
 	m_cpu_delay_slot_handler(m_simplestation);
 }
