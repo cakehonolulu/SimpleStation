@@ -248,6 +248,11 @@ void p_lbu(m_simplestation_state *m_simplestation)
 	printf("lbu $%s, %04X($%s)\n", m_cpu_regnames[REGIDX_T], (uint16_t) (SIMMDT & 0x0000FFFF), m_cpu_regnames[REGIDX_S]);
 }
 
+void p_lhu(m_simplestation_state *m_simplestation)
+{
+	printf("lhu $%s, %04X($%s)\n", m_cpu_regnames[REGIDX_T], (uint16_t) (SIMMDT & 0x0000FFFF), m_cpu_regnames[REGIDX_S]);
+}
+
 void p_sb(m_simplestation_state *m_simplestation)
 {
 	printf("sb $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
