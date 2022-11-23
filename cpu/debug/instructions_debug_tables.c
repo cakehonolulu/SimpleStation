@@ -84,7 +84,7 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0F
 	{"mfhi", p_mfhi},	// 0x10
-	{NULL, NULL},		// 0x11
+	{"mthi", p_mthi},	// 0x11
 	{"mflo", p_mflo},	// 0x12
 	{"mtlo", p_mtlo},	// 0x13
 	{NULL, NULL},		// 0x04

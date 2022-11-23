@@ -256,6 +256,24 @@ void m_mfhi(m_simplestation_state *m_simplestation)
 }
 
 /*
+	MTHI (MIPS I)
+
+	Format:
+	MTHI rs
+
+	Description:
+	The contents of GPR rs are loaded into special register HI.
+*/
+void m_mthi(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("mthi $%s\n", m_cpu_regnames[REGIDX_S]);
+#endif
+
+	HI = REGS[REGIDX_S];
+}
+
+/*
 	MFLO (MIPS I)
 
 	Format:

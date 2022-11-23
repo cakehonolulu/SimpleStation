@@ -55,6 +55,9 @@ void p_syscall(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x10
 void p_mfhi(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x11
+void p_mthi(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x12
 void p_mflo(m_simplestation_state *m_simplestation);
 

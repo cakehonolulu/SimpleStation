@@ -117,6 +117,11 @@ void p_mfhi(m_simplestation_state *m_simplestation)
 	printf("mfhi $%s\n", m_cpu_regnames[REGIDX_D]);
 }
 
+void p_mthi(m_simplestation_state *m_simplestation)
+{
+	printf("mthi $%s\n", m_cpu_regnames[REGIDX_S]);
+}
+
 void p_mflo(m_simplestation_state *m_simplestation)
 {
 	printf("mflo $%s\n", m_cpu_regnames[REGIDX_D]);

@@ -50,10 +50,13 @@ void m_syscall(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x10
 void m_mfhi(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x11
+void m_mthi(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x12
 void m_mflo(m_simplestation_state *m_simplestation);
 
-// 0x00 > 0x13
+// 0x00 -> 0x13
 void m_mtlo(m_simplestation_state *m_simplestation);
 
 // 0x00 -> 0x1A
