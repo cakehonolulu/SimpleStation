@@ -132,10 +132,22 @@ const struct m_corewave_cw33300_extended_00_instrs m_psx_extended_00[0x3F] = {
 	{NULL, NULL}		// 0x00
 };
 
-const struct m_corewave_cw33300_cop0_instrs m_psx_cop0[0x5] = {
+const struct m_corewave_cw33300_cop0_instrs m_psx_cop0[0x11] = {
 	{"mfc0", m_mfc0},	// 0x00
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
 	{NULL, NULL},		// 0x03
-	{"mtc0", m_mtc0}	// 0x04
+	{"mtc0", m_mtc0},	// 0x04
+	{NULL, NULL},		// 0x05
+	{NULL, NULL},		// 0x06
+	{NULL, NULL},		// 0x07
+	{NULL, NULL},		// 0x08
+	{NULL, NULL},		// 0x09
+	{NULL, NULL},		// 0x0A
+	{NULL, NULL},		// 0x0B
+	{NULL, NULL},		// 0x0C
+	{NULL, NULL},		// 0x0D
+	{NULL, NULL},		// 0x0E
+	{NULL, NULL},		// 0x0F
+	{NULL, NULL}		// 0x10
 };

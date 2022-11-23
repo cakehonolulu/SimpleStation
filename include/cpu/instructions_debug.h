@@ -19,7 +19,7 @@ extern struct m_opc_ext_names {
 extern struct m_opc_cop0_names {
 	const char *m_instr;
 	void *m_funct;
-} const m_psx_cop0_opcodes[0x5];
+} const m_psx_cop0_opcodes[0x11];
 
 /* Instructions */
 

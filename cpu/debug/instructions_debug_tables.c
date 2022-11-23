@@ -132,10 +132,22 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{NULL, NULL}		// 0x00
 };
 
-const struct m_opc_cop0_names m_psx_cop0_opcodes[0x5] = {
+const struct m_opc_cop0_names m_psx_cop0_opcodes[0x11] = {
 	{"mfc0", p_mfc0},	// 0x00
 	{NULL, NULL},		// 0x01
 	{NULL, NULL},		// 0x02
 	{NULL, NULL},		// 0x03
-	{"mtc0", p_mtc0}	// 0x04
+	{"mtc0", p_mtc0},	// 0x04
+	{NULL, NULL},		// 0x05
+	{NULL, NULL},		// 0x06
+	{NULL, NULL},		// 0x07
+	{NULL, NULL},		// 0x08
+	{NULL, NULL},		// 0x09
+	{NULL, NULL},		// 0x0A
+	{NULL, NULL},		// 0x0B
+	{NULL, NULL},		// 0x0C
+	{NULL, NULL},		// 0x0D
+	{NULL, NULL},		// 0x0E
+	{NULL, NULL},		// 0x0F
+	{NULL, NULL}		// 0x10
 };
