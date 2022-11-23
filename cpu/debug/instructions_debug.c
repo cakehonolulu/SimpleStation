@@ -27,7 +27,7 @@ void p_cop0(m_simplestation_state *m_simplestation)
 	else
 	{
 		// Execute the instruction
-		((void (*)(void))m_psx_cop0_opcodes[REGIDX_S].m_funct)();
+		((void (*)(m_simplestation_state *m_simplestation))m_psx_cop0_opcodes[REGIDX_S].m_funct)(m_simplestation);
 	}
 }
 
