@@ -788,7 +788,7 @@ void m_slti(m_simplestation_state *m_simplestation)
 	printf("slti $%s, $%s, %d\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], SIMMDT);
 #endif
 
-	REGS[REGIDX_T] = ((int32_t) REGIDX_S) < ((int32_t) SIMMDT);
+	REGS[REGIDX_T] = ((int32_t) REGS[REGIDX_S]) < ((int32_t) SIMMDT);
 }
 
 /*
