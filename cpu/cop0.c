@@ -86,6 +86,23 @@ void m_mtc0(m_simplestation_state *m_simplestation)
 	COP0_REGS[REGIDX_D] = REGS[REGIDX_T];
 }
 
+/*
+    RFE (MIPS)
+
+	Format:
+    RFE
+
+	Description:
+	This instuction is not implemented on R4000 processors; use ERET instead.
+	RFE restores the previous interrupt mask and Kernel/User-mode bits (IEp and KUp)
+	of the Status register (SR) into the corresponding current status bits (IEc and KUc) and
+	restores the old status bits (IEo and KUo) into the corresponding previous status bits
+	(IEp and KUp). The old status bits remain unchanged.
+	The architecture does not specify the operation of memory references associated with
+	load/store instructions immediately prior to an RFE instruction. Normally, the RFE
+	instruction follows in the delay slot of a JR (jump register)instruction to restore the PC.
+	R2000/R3000/R6000
+*/
 void m_rfe(m_simplestation_state *m_simplestation)
 {
 	if ((m_simplestation->m_cpu->m_opcode & 0x3F) != 0b010000)

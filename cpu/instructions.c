@@ -103,6 +103,12 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 	/* FIXME: Next 2 lines are suboptimal */
 	NXT_PC = m_dst;
 	m_simplestation->m_cpu->m_next_opcode = m_memory_read((NXT_PC), dword, m_simplestation);
+
+	if (m_simplestation->m_cpu->m_branch)
+	{
+		COP0_EPC -= 4;
+		COP0_CAUSE |= (1 << 31);
+	}
 }
 
 /*
