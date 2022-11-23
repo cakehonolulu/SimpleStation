@@ -219,6 +219,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case word:
+				m_return = m_memory_read_word(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			case dword:
@@ -247,6 +248,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case word:
+				m_return = m_memory_read_word(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
 				break;
 
 			case dword:
@@ -267,6 +269,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case word:
+				m_return = m_memory_read_word(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
 				break;
 
 			case dword:
@@ -342,6 +345,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				break;
 
 			case word:
+				m_return = m_memory_read_word(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
 				break;
 
 			case dword:
@@ -428,6 +432,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case word:
+				m_return = m_memory_write_word(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
 				break;
 
 			case dword:
@@ -455,6 +460,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case word:
+				m_return = m_memory_write_word(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
 				break;
 
 			case dword:
@@ -475,6 +481,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				break;
 
 			case word:
+				m_return = m_memory_write_word(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
 				break;
 
 			case dword:
