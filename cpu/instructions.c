@@ -278,6 +278,24 @@ void m_mflo(m_simplestation_state *m_simplestation)
 }
 
 /*
+	MTLO (MIPS I)
+
+	Format:
+	MTLO rs
+
+	Description:
+	The contents of GPR rs are loaded into special register LO.
+*/
+void m_mtlo(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("mtlo $%s\n", m_cpu_regnames[REGIDX_S]);
+#endif
+
+	LO = REGS[REGIDX_S];
+}
+
+/*
 	DIV (MIPS I)
 
 	Format:
