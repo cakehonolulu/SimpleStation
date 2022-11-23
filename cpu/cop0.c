@@ -63,10 +63,14 @@ void m_mfc0(m_simplestation_state *m_simplestation)
 {
     if (REGIDX_D == 3 || (REGIDX_D >= 5 && REGIDX_D <= 9) || (REGIDX_D >= 11 && REGIDX_D <= 15))
 	{
+
+#ifdef DEBUG_CPU_COP0
 		if (REGIDX_D == 13)
 		{
-			printf(YELLOW "[COP0] mfc0: Read from 'Cause' register!\n" NORMAL);
+
+			printf(YELLOW "[COP0] mfc0: Read from 'Cause' register!\n" WHITE NORMAL);
 		}
+#endif
 
         m_cpu_load_delay_enqueue_dword(REGIDX_T, COP0_REGS[REGIDX_D], m_simplestation);
     }
