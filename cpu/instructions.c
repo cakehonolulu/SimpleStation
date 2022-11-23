@@ -420,8 +420,8 @@ void m_add(m_simplestation_state *m_simplestation)
 
 	if (m_cpu_check_signed_addition(REGS[REGIDX_S], REGS[REGIDX_T]))
 	{
-		printf(RED "[CPU] add: Integer overflow! Panicking...\n");
-		m_simplestation_exit(m_simplestation, 1);
+		m_exc_types m_exc = overflow;
+		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{
@@ -741,8 +741,8 @@ void m_addi(m_simplestation_state *m_simplestation)
 
 	if (m_cpu_check_signed_addition(REGS[REGIDX_S], SIMMDT))
 	{
-		printf(RED "[CPU] addi: Integer overflow! Panicking...\n");
-		m_simplestation_exit(m_simplestation, 1);
+		m_exc_types m_exc = overflow;
+		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{

@@ -153,6 +153,13 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 
 	PC = NXT_PC;
 
+	if ((PC % 4) != 0)
+	{
+		m_exc_types m_exc = load_error;
+		m_exception(m_exc, m_simplestation);
+		return;
+	}
+
 	/* Fetch cycle */
 	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
 

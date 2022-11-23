@@ -1,4 +1,5 @@
 #include <memory/memory.h>
+#include <cpu/instructions.h>
 #include <cpu/interrupts.h>
 #include <cpu/bios.h>
 #include <ui/termcolour.h>
@@ -176,6 +177,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 {
 	uint32_t m_placeholder, m_address, m_return = 0;
 
+	m_exc_types m_exc = load_error;
+
 	// PSX doesn't permit unaligned memory writes
 	switch (m_size)
 	{
@@ -185,16 +188,14 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		case word:
 			if (m_memory_offset % 2 != 0)
 			{
-				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
-				m_return = m_simplestation_exit(m_simplestation, 1);
+				m_exception(m_exc, m_simplestation);
 			}
 			break;
 
 		case dword:
 			if (m_memory_offset % 4 != 0)
 			{
-				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
-				m_return = m_simplestation_exit(m_simplestation, 1);
+				m_exception(m_exc, m_simplestation);
 			}
 			break;
 
@@ -385,6 +386,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 {
 	uint32_t m_placeholder, m_address, m_return = 0;
 
+	m_exc_types m_exc = store_error;
+
 	// PSX doesn't permit unaligned memory writes
 	switch (m_size)
 	{
@@ -394,16 +397,14 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		case word:
 			if (m_memory_offset % 2 != 0)
 			{
-				printf(RED "[MEM] write: Unaligned word memory write! Exiting...\n" NORMAL);
-				m_return = m_simplestation_exit(m_simplestation, 1);
+				m_exception(m_exc, m_simplestation);
 			}
 			break;
 
 		case dword:
 			if (m_memory_offset % 4 != 0)
 			{
-				printf(RED "[MEM] write: Unaligned dword memory write! Exiting...\n" NORMAL);
-				m_return = m_simplestation_exit(m_simplestation, 1);
+				m_exception(m_exc, m_simplestation);
 			}
 			break;
 

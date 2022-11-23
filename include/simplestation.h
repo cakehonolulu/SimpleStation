@@ -136,7 +136,10 @@ typedef struct
 
 // Exception types
 typedef enum {
-	syscall = 0x8
+	load_error = 0x4,
+	store_error = 0x5,
+	syscall = 0x8,
+	overflow = 0xC
 } m_exc_types;
 
 /* Functions */
