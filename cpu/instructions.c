@@ -120,7 +120,14 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 void m_sll(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+	if (m_simplestation->m_cpu->m_opcode == 0)
+	{
+		printf("nop\n");
+	}
+	else
+	{
+		printf("sll $%s, $%s, %x\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], SHIFT);
+	}
 #endif
 
 	REGS[REGIDX_D] = REGS[REGIDX_T] << SHIFT;
