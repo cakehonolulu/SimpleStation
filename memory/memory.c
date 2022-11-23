@@ -124,6 +124,30 @@ uint8_t m_memory_write_byte(uint32_t m_memory_address, uint8_t m_value, int8_t *
 	return *(uint8_t *) (m_memory_address + m_memory_source) = m_value;
 }
 
+uint16_t m_memory_read_word(uint32_t m_memory_address, int8_t *m_memory_source)
+{
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	/*
+		If on LE, it's safe to assume we'll read the bytes in the order we want them.
+		This reduces the function size by a large margin, and therefor, performs faster.
+	*/
+	return *(uint16_t*)(m_memory_source + (m_memory_address + 0));
+#else
+	/*
+		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
+	*/
+	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
+	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
+
+	return (b0 | (b1 << 8));
+#endif
+}
+
+uint16_t m_memory_write_word(uint32_t m_memory_address, uint16_t m_value, int8_t *m_memory_source)
+{
+	return *(uint16_t *) (m_memory_address + m_memory_source) = m_value;
+}
+
 /*
 	Function:
 	m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
