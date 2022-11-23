@@ -149,5 +149,5 @@ const struct m_opc_cop0_names m_psx_cop0_opcodes[0x11] = {
 	{NULL, NULL},		// 0x0D
 	{NULL, NULL},		// 0x0E
 	{NULL, NULL},		// 0x0F
-	{NULL, NULL}		// 0x10
+	{"rfe", p_rfe}		// 0x10
 };

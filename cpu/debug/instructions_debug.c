@@ -41,6 +41,12 @@ void p_mtc0(m_simplestation_state *m_simplestation)
 	printf("mtc0 $%s, $%s\n", m_cpu_regnames[REGIDX_T], m_cop0_regnames[REGIDX_D]);
 }
 
+void p_rfe(m_simplestation_state *m_simplestation)
+{
+	(void) (m_simplestation);
+	printf("rfe\n");
+}
+
 void p_bxx(m_simplestation_state *m_simplestation)
 {
 	if ((m_simplestation->m_cpu->m_opcode >> 16) & 1)

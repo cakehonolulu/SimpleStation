@@ -85,3 +85,15 @@ void m_mtc0(m_simplestation_state *m_simplestation)
 {
 	COP0_REGS[REGIDX_D] = REGS[REGIDX_T];
 }
+
+void m_rfe(m_simplestation_state *m_simplestation)
+{
+	if ((m_simplestation->m_cpu->m_opcode & 0x3F) != 0b010000)
+	{
+		printf(RED "[COP0] rfe: Invalid COP0 instruction...! (0x%08X)\n", m_simplestation->m_cpu->m_opcode);
+	}
+
+	uint8_t m_mode = (COP0_SR & 0x3F);
+	COP0_SR &= !0x3F;
+	COP0_SR |= m_mode >> 2;
+}

@@ -21,4 +21,7 @@ void m_mfc0(m_simplestation_state *m_simplestation);
 // 0x04
 void m_mtc0(m_simplestation_state *m_simplestation);
 
+// 0x10
+void m_rfe(m_simplestation_state *m_simplestation);
+
 #endif /* COP0_H */

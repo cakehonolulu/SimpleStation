@@ -28,6 +28,8 @@ void p_mfc0(m_simplestation_state *m_simplestation);
 
 void p_mtc0(m_simplestation_state *m_simplestation);
 
+void p_rfe(m_simplestation_state *m_simplestation);
+
 // Exception handler
 void p_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation);
 
