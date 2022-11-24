@@ -75,6 +75,9 @@ void p_mflo(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x13
 void p_mtlo(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x19
+void p_multu(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x1A
 void p_div(m_simplestation_state *m_simplestation);
 

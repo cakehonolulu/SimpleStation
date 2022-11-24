@@ -392,6 +392,30 @@ void m_mtlo(m_simplestation_state *m_simplestation)
 }
 
 /*
+	MULTU (MIPS I)
+
+	Format:
+	MULTU rs, rt
+
+	Description:
+	The 32-bit word value in GPR rt is multiplied by the 32-bit value in GPR rs, treating
+	both operands as unsigned values, to produce a 64-bit result. The low-order 32-bit
+	word of the result is placed into special register LO, and the high-order 32-bit word is
+	placed into special register HI.
+	No arithmetic exception occurs under any circumstances.
+*/
+void m_multu(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("multu $%s, $%s\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	uint64_t m_res = ((((uint64_t) REGS[REGIDX_S])) * ((uint64_t) (REGS[REGIDX_T])));
+	HI = ((uint32_t) (m_res >> 32));
+	LO = ((uint32_t) (m_res));
+}
+
+/*
 	DIV (MIPS I)
 
 	Format:

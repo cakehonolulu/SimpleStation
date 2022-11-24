@@ -92,7 +92,7 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{NULL, NULL},		// 0x06
 	{NULL, NULL},		// 0x07
 	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
+	{"multu", p_multu},	// 0x19
 	{"div", p_div},		// 0x1A
 	{"divu", p_divu},	// 0x1B
 	{NULL, NULL},		// 0x0C
