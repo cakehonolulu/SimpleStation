@@ -110,7 +110,12 @@ void m_rfe(m_simplestation_state *m_simplestation)
 		printf(RED "[COP0] rfe: Invalid COP0 instruction...! (0x%08X)\n", m_simplestation->m_cpu->m_opcode);
 	}
 
-	uint8_t m_mode = (COP0_SR & 0x3F);
-	COP0_SR &= !0x3F;
-	COP0_SR |= m_mode >> 2;
+	int32_t m_mode = COP0_SR;
+	int32_t m_stack = ((m_mode >> 2) & 0xF);
+
+	m_mode &= 0xFFFFFFF0;
+
+	m_mode |= m_stack;
+
+	COP0_SR = m_mode;
 }
