@@ -34,7 +34,7 @@ const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
 	{NULL, NULL},		// 0x0E
 	{NULL, NULL},		// 0x0F
 	{"lb", p_lb},		// 0x20
-	{NULL, NULL},		// 0x01
+	{"lh", p_lh},		// 0x21
 	{NULL, NULL},		// 0x02
 	{"lw", p_lw},		// 0x23
 	{"lbu", p_lbu},		// 0x24

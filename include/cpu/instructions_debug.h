@@ -144,6 +144,9 @@ void p_lui(m_simplestation_state *m_simplestation);
 // 0x20
 void p_lb(m_simplestation_state *m_simplestation);
 
+// 0x21
+void p_lh(m_simplestation_state *m_simplestation);
+
 // 0x23
 void p_lw(m_simplestation_state *m_simplestation);
 

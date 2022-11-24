@@ -243,6 +243,11 @@ void p_lb(m_simplestation_state *m_simplestation)
 	printf("lb $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 }
 
+void p_lh(m_simplestation_state *m_simplestation)
+{
+	printf("lh $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+}
+
 void p_lw(m_simplestation_state *m_simplestation)
 {
 	printf("lw $%s, 0x%x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);

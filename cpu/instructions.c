@@ -861,6 +861,17 @@ void m_lb(m_simplestation_state *m_simplestation)
 	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
 }
 
+void m_lh(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lh $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint16_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), word, m_simplestation);
+	m_cpu_load_delay_enqueue_word(REGIDX_T, value, m_simplestation);
+}
+
+
 /*
 	LW (MIPS I)
 
