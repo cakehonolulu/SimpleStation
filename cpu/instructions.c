@@ -533,6 +533,25 @@ void m_or(m_simplestation_state *m_simplestation)
 }
 
 /*
+	NOR (MIPS I)
+
+	Format:
+	NOR rd, rs, rt
+
+	Description:
+	The contents of GPR rs are combined with the contents of GPR rt in a bitwise logical
+	NOR operation. The result is placed into GPR rd.
+*/
+void m_nor(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("nor $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = !(REGS[REGIDX_S] | REGS[REGIDX_T]);
+}
+
+/*
 	SLT (MIPS I)
 
 	Format:

@@ -106,7 +106,7 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{"and", p_and},		// 0x24
 	{"or", p_or},		// 0x05
 	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
+	{"nor", p_nor},		// 0x27
 	{NULL, NULL},		// 0x08
 	{NULL, NULL},		// 0x09
 	{"slt", p_slt},		// 0x2A
