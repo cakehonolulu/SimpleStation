@@ -100,6 +100,11 @@ void p_sllv(m_simplestation_state *m_simplestation)
 	printf("sllv $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
 }
 
+void p_srav(m_simplestation_state *m_simplestation)
+{
+	printf("srav $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
+}
+
 void p_jr(m_simplestation_state *m_simplestation)
 {
 	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);

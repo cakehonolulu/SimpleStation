@@ -222,6 +222,27 @@ void m_jr(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SRAV (MIPS I)
+
+	Format:
+	SRAV rd, rt, rs
+
+	Description:
+	The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the
+	sign-bit (bit 31) in the emptied bits; the word result is placed in GPR rd. The bit shift
+	count is specified by the low-order five bits of GPR rs. If rd is a 64-bit register, the result
+	word is sign-extended.
+*/
+void m_srav(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("srav $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
+#endif
+
+	REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F)));
+}
+
+/*
 	JALR (MIPS I)
 
 	Format(s):
