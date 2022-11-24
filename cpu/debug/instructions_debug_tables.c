@@ -73,8 +73,8 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{"sra", p_sra},		// 0x03
 	{"sllv", p_sllv},	// 0x04
 	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{"srav", p_srav},		// 0x07
+	{"srlv", p_srlv},	// 0x06
+	{"srav", p_srav},	// 0x07
 	{"jr", p_jr},		// 0x08
 	{"jalr", p_jalr},	// 0x09
 	{NULL, NULL},		// 0x00

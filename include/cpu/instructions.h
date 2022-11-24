@@ -41,6 +41,9 @@ void m_sra(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x04
 void m_sllv(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x06
+void m_srlv(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x07
 void m_srav(m_simplestation_state *m_simplestation);
 

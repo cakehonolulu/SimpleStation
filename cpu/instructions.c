@@ -201,24 +201,24 @@ void m_sllv(m_simplestation_state *m_simplestation)
 }
 
 /*
-	JR (MIPS I)
+	SRLV (MIPS I)
 
 	Format:
-	JR rs MIPS I
+	SRLV rd, rt, rs
 
 	Description:
-	To branch to an instruction address in a register.
-	Jump to the effective target address in GPR rs. Execute the instruction following the
-	jump, in the branch delay slot, before jumping.
+	The contents of the low-order 32-bit word of GPR rt are shifted right, inserting zeros
+	into the emptied bits; the word result is placed in GPR rd. The bit shift count is
+	specified by the low-order five bits of GPR rs. If rd is a 64-bit register, the result word
+	is sign-extended.
 */
-void m_jr(m_simplestation_state *m_simplestation)
+void m_srlv(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
-	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);
+	printf("srlv $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
 #endif
 
-	NXT_PC = REGS[REGIDX_S];
-	m_simplestation->m_cpu->m_branch = true;
+	REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F)));
 }
 
 /*
@@ -239,7 +239,28 @@ void m_srav(m_simplestation_state *m_simplestation)
 	printf("srav $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
 #endif
 
-	REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F)));
+	REGS[REGIDX_D] = ((REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F));
+}
+
+/*
+	JR (MIPS I)
+
+	Format:
+	JR rs MIPS I
+
+	Description:
+	To branch to an instruction address in a register.
+	Jump to the effective target address in GPR rs. Execute the instruction following the
+	jump, in the branch delay slot, before jumping.
+*/
+void m_jr(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("jr $%s\n", m_cpu_regnames[REGIDX_S]);
+#endif
+
+	NXT_PC = REGS[REGIDX_S];
+	m_simplestation->m_cpu->m_branch = true;
 }
 
 /*
