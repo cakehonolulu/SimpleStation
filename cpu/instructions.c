@@ -861,14 +861,27 @@ void m_lb(m_simplestation_state *m_simplestation)
 	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
 }
 
+/*
+	LH (MIPS I)
+
+	Format:
+	LH rt, offset(base)
+
+	Description:
+	The contents of the 16-bit halfword at the memory location specified by the aligned
+	effective address are fetched, sign-extended, and placed in GPR rt. The 16-bit signed
+	offset is added to the contents of GPR base to form the effective address.
+*/
 void m_lh(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
 	printf("lh $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	uint16_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), word, m_simplestation);
-	m_cpu_load_delay_enqueue_word(REGIDX_T, value, m_simplestation);
+	int16_t value = ((int16_t) (m_memory_read((REGS[REGIDX_S] + SIMMDT), word, m_simplestation)));
+
+	// Make the value fit the entire register (We use _dword not _word)
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, ((uint32_t) value), m_simplestation);
 }
 
 
