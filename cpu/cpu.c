@@ -211,8 +211,9 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 	{
-		printf(RED "[CPU] fde: Illegal Opcode 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
-		m_simplestation_exit(m_simplestation, 1);
+		printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
+		m_exc_types m_exc = illegal;
+		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{
