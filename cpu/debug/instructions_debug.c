@@ -189,6 +189,11 @@ void p_addu(m_simplestation_state *m_simplestation)
 	printf("addu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 }
 
+void p_sub(m_simplestation_state *m_simplestation)
+{
+	printf("sub $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+}
+
 void p_subu(m_simplestation_state *m_simplestation)
 {
 	printf("subu $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);

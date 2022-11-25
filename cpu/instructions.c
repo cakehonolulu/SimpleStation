@@ -593,8 +593,39 @@ void m_addu(m_simplestation_state *m_simplestation)
 
 /*
 	SUBU (MIPS I)
+
 	Format:
 	SUBU rd, rs, rt
+
+	Description:
+	The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs to
+	produce a 32-bit result. If the subtraction results in 32-bit 2’s complement arithmetic
+	overflow then the destination register is not modified and an Integer Overflow
+	exception occurs. If it does not overflow, the 32-bit result is placed into GPR rd.
+*/
+void m_sub(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("sub $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	if (m_cpu_check_signed_subtraction((int32_t) REGS[REGIDX_S], (int32_t) REGS[REGIDX_T]))
+	{
+		m_exc_types m_exc = overflow;
+		m_exception(m_exc, m_simplestation);
+	}
+	else
+	{
+		REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_S]) - ((int32_t) REGS[REGIDX_T])));
+	}
+}
+
+/*
+	SUBU (MIPS I)
+	
+	Format:
+	SUBU rd, rs, rt
+
 	Description:
 	To subtract 32-bit integers.
 	The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs and the

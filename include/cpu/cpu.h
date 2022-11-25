@@ -90,11 +90,20 @@ extern const char *m_cpu_regnames[];
    __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
 #endif
 
+#if defined(__clang__)
+#define CHECK_SUB_OVERFLOW(a, b, c) \
+   __builtin_ssub_overflow (a, b, c)
+#elif defined(__GNUC__)
+#define CHECK_SUB_OVERFLOW(a, b) \
+   __builtin_sub_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
+#endif
+
 /* Function definitions */
 uint8_t m_cpu_init(m_simplestation_state *m_simplestation);
 void m_cpu_fde(m_simplestation_state *m_simplestation);
 void m_cpu_exit(m_simplestation_state *m_simplestation);
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num);
+bool m_cpu_check_signed_subtraction(int32_t m_first_num, int32_t m_second_num);
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation);
 
 void m_cpu_load_delay_enqueue_byte(uint8_t m_register, uint8_t m_value, m_simplestation_state *m_simplestation);

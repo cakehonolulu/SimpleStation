@@ -89,6 +89,9 @@ void m_add(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x21
 void m_addu(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x22
+void m_sub(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x23
 void m_subu(m_simplestation_state *m_simplestation);
 

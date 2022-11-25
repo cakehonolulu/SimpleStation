@@ -243,6 +243,24 @@ bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num)
 	return m_result;
 }
 
+bool m_cpu_check_signed_subtraction(int32_t m_first_num, int32_t m_second_num)
+{
+	bool m_result = false;
+
+#ifndef __clang__
+	if (CHECK_SUB_OVERFLOW(m_first_num, m_second_num))
+#else
+	int32_t m_number;
+
+	if (CHECK_SUB_OVERFLOW(m_first_num, m_second_num, &m_number))
+#endif
+	{
+		m_result = true;
+	}
+
+	return m_result;
+}
+
 void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
 {
 	m_offset <<= 2;
