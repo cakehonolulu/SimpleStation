@@ -349,20 +349,34 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	{
 		// PSX GPU Dummy Read
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: GPU Registers memory read! Returning 0...\n" NORMAL);
+		printf(YELLOW "[MEM] read: GPU Registers read!\n" NORMAL);
 #endif
 		switch (m_size)
 		{
 			case byte:
-				m_return = 0;
+				printf(RED "[MEM] read: Unhandled GPU Registers Byte Read..\n" NORMAL);
+				m_simplestation_exit(m_simplestation, 1);
 				break;
 
 			case word:
-				m_return = 0;
+				printf(RED "[MEM] read: Unhandled GPU Registers Word Read..\n" NORMAL);
+				m_simplestation_exit(m_simplestation, 1);
 				break;
 
 			case dword:
-				m_return = 0;
+				switch(m_address)
+				{
+					case 0x1F801810:
+						m_return = 0;
+						break;
+					
+					case 0x1F801814:
+						m_return = 0x10000000;
+						break;
+
+					default:
+						__builtin_unreachable();
+				}
 				break;
 
 			default:
