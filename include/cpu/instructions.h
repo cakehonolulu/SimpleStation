@@ -56,6 +56,9 @@ void m_jalr(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x0C
 void m_syscall(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x0C
+void m_break(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x10
 void m_mfhi(m_simplestation_state *m_simplestation);
 

@@ -310,7 +310,35 @@ void m_jalr(m_simplestation_state *m_simplestation)
 */
 void m_syscall(m_simplestation_state *m_simplestation)
 {
+#ifdef DEBUG_INSTRUCTIONS
+	printf("syscall\n");
+#endif
+
 	m_exc_types m_exc = syscall;
+
+	m_exception(m_exc, m_simplestation);
+}
+
+/*
+	BREAK (MIPS I)
+
+	Format:
+	BREAK
+
+	Description:
+	A breakpoint exception occurs, immediately and unconditionally transferring control
+	to the exception handler.
+	The code field is available for use as software parameters, but is retrieved by the
+	exception handler only by loading the contents of the memory word containing the
+	instruction.
+*/
+void m_break(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("break\n");
+#endif
+
+	m_exc_types m_exc = breakpoint;
 
 	m_exception(m_exc, m_simplestation);
 }

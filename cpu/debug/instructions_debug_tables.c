@@ -80,7 +80,7 @@ const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0B
 	{"syscall", p_syscall},	// 0x00
-	{NULL, NULL},		// 0x0D
+	{"break", p_break},	// 0x0D
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x0F
 	{"mfhi", p_mfhi},	// 0x10

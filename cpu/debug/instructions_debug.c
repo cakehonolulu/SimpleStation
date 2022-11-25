@@ -133,6 +133,12 @@ void p_syscall(m_simplestation_state *m_simplestation)
     printf("syscall\n");
 }
 
+void p_break(m_simplestation_state *m_simplestation)
+{
+    (void) (m_simplestation);
+    printf("break\n");
+}
+
 void p_mfhi(m_simplestation_state *m_simplestation)
 {
 	printf("mfhi $%s\n", m_cpu_regnames[REGIDX_D]);
