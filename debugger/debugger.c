@@ -59,7 +59,7 @@ void m_debugger(m_simplestation_state *m_simplestation)
 
 		if (m_psx_instrs_opcodes[INSTRUCTION].m_funct == NULL)
 		{
-			printf(RED "\n[CPU] fde: Unimplemented Instruction 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
+			printf(RED "\n[CPU] fde: Illegal Opcode 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
 			m_simplestation_exit(m_simplestation, 1);
 		}
 		else
@@ -80,7 +80,7 @@ void m_debugger(m_simplestation_state *m_simplestation)
 		// Check if the instruction is implemented
 		if (m_psx_instrs[INSTRUCTION].m_funct == NULL)
 		{
-			printf(RED "\n[CPU] fde: Unimplemented Instruction 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
+			printf(RED "\n[CPU] fde: Illegal Opcode 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
 			m_simplestation_exit(m_simplestation, 1);
 		}
 		else
