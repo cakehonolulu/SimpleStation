@@ -139,7 +139,8 @@ typedef enum {
 	load_error = 0x4,
 	store_error = 0x5,
 	syscall = 0x8,
-	breakpoint = 0x9, 
+	breakpoint = 0x9,
+	coprocessor = 0xB,
 	overflow = 0xC
 } m_exc_types;
 

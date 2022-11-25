@@ -33,6 +33,28 @@ void m_cop0(m_simplestation_state *m_simplestation)
 	}
 }
 
+void m_cop1(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("cop2\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+
+	m_exception(m_exc, m_simplestation);
+}
+
+void m_cop3(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("cop3\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+
+	m_exception(m_exc, m_simplestation);
+}
+
 /*
 	BXX
 	Branch instructions

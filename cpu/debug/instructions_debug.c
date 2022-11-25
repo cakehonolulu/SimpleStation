@@ -31,6 +31,18 @@ void p_cop0(m_simplestation_state *m_simplestation)
 	}
 }
 
+void p_cop1(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("cop1\n");
+}
+
+void p_cop3(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("cop3\n");
+}
+
 void p_mfc0(m_simplestation_state *m_simplestation)
 {
 	printf("mfc0 $%s, $%s\n", m_cpu_regnames[REGIDX_T], m_cop0_regnames[REGIDX_D]);

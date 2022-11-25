@@ -18,9 +18,9 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{"xori", m_xori},	// 0x00
 	{"lui", m_lui},		// 0x0F
 	{"cop0", m_cop0},	// 0x10
-	{NULL, NULL},		// 0x11
+	{"cop1", m_cop1},	// 0x11
 	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
+	{"cop3", m_cop3},	// 0x03
 	{NULL, NULL},		// 0x04
 	{NULL, NULL},		// 0x05
 	{NULL, NULL},		// 0x06
