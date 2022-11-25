@@ -599,6 +599,25 @@ void m_or(m_simplestation_state *m_simplestation)
 }
 
 /*
+	XOR (MIPS I)
+
+	Format:
+	XOR rd, rs, rt
+
+	Description:
+	Combine the contents of GPR rs and GPR rt in a bitwise logical exclusive OR operation
+	and place the result into GPR rd.
+*/
+void m_xor(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("xor $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+#endif
+
+	REGS[REGIDX_D] = (REGS[REGIDX_S] ^ REGS[REGIDX_T]);
+}
+
+/*
 	NOR (MIPS I)
 
 	Format:

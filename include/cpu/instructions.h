@@ -92,6 +92,9 @@ void m_and(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x25
 void m_or(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x26
+void m_xor(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x27
 void m_nor(m_simplestation_state *m_simplestation);
 

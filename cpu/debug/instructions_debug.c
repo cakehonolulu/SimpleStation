@@ -193,6 +193,11 @@ void p_or(m_simplestation_state *m_simplestation)
 	printf("or $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 }
 
+void p_xor(m_simplestation_state *m_simplestation)
+{
+	printf("xor $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+}
+
 void p_nor(m_simplestation_state *m_simplestation)
 {
 	printf("nor $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);

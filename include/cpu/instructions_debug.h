@@ -99,6 +99,9 @@ void p_and(m_simplestation_state *m_simplestation);
 // 0x00 -> 0x25
 void p_or(m_simplestation_state *m_simplestation);
 
+// 0x00 -> 0x26
+void p_xor(m_simplestation_state *m_simplestation);
+
 // 0x00 -> 0x27
 void p_nor(m_simplestation_state *m_simplestation);
 
