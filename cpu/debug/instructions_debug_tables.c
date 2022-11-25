@@ -49,18 +49,18 @@ const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
 	{NULL, NULL},		// 0x00
 	{"swr", p_swr},		// 0x0E
 	{NULL, NULL},		// 0x00
+	{"lwc0", p_lwc0},	// 0x00
+	{"lwc1", p_lwc1},	// 0x00
+	{"lwc2", p_lwc2},	// 0x00
+	{"lwc3", p_lwc3},	// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
+	{"swc0", p_swc0},	// 0x38
+	{"swc1", p_swc1},	// 0x00
+	{"swc2", p_swc2},	// 0x00
+	{"swc3", p_swc3},	// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL},		// 0x00
 	{NULL, NULL}		// 0x00

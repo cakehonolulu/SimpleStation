@@ -1377,6 +1377,91 @@ void m_swr(m_simplestation_state *m_simplestation)
 	}
 }
 
+void m_lwc0(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwc0\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+
+}
+
+void m_lwc1(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwc1\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+}
+
+void m_lwc2(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwc2\n");
+#endif
+
+	printf(RED "[CPU] lwc2: Unhandled instr.\n" NORMAL);
+	m_simplestation_exit(m_simplestation, 1);
+}
+
+void m_lwc3(m_simplestation_state *m_simplestation)
+{
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwc3\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+}
+
+void m_swc0(m_simplestation_state *m_simplestation)
+{
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("swc0\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+}
+
+void m_swc1(m_simplestation_state *m_simplestation)
+{
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("swc1\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+}
+
+void m_swc2(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("swc2\n");
+#endif
+
+	printf(RED "[CPU] swc2: Unhandled instr.\n" NORMAL);
+	m_simplestation_exit(m_simplestation, 1);
+}
+
+void m_swc3(m_simplestation_state *m_simplestation)
+{
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("swc3\n");
+#endif
+
+	m_exc_types m_exc = coprocessor;
+	m_exception(m_exc, m_simplestation);
+}
+
 /*
 	ANDI (MIPS I)
 	

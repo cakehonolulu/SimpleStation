@@ -347,6 +347,54 @@ void p_swr(m_simplestation_state *m_simplestation)
 	printf("swr $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 }
 
+void p_lwc0(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("lwc0\n");
+}
+
+void p_lwc1(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("lwc1\n");
+}
+
+void p_lwc2(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("lwc2\n");
+}
+
+void p_lwc3(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("lwc3\n");
+}
+
+void p_swc0(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("swc0\n");
+}
+
+void p_swc1(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("swc1\n");
+}
+
+void p_swc2(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("swc2\n");
+}
+
+void p_swc3(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("swc3\n");
+}
+
 void p_andi(m_simplestation_state *m_simplestation)
 {
 	printf("andi $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);

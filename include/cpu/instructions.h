@@ -200,4 +200,20 @@ void m_sw(m_simplestation_state *m_simplestation);
 // 0x2E
 void m_swr(m_simplestation_state *m_simplestation);
 
+void m_lwc0(m_simplestation_state *m_simplestation);
+
+void m_lwc1(m_simplestation_state *m_simplestation);
+
+void m_lwc2(m_simplestation_state *m_simplestation);
+
+void m_lwc3(m_simplestation_state *m_simplestation);
+
+void m_swc0(m_simplestation_state *m_simplestation);
+
+void m_swc1(m_simplestation_state *m_simplestation);
+
+void m_swc2(m_simplestation_state *m_simplestation);
+
+void m_swc3(m_simplestation_state *m_simplestation);
+
 #endif /* INSTRUCTIONS_H */

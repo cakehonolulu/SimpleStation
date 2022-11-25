@@ -207,4 +207,20 @@ void p_sw(m_simplestation_state *m_simplestation);
 // 0x2E
 void p_swr(m_simplestation_state *m_simplestation);
 
+void p_lwc0(m_simplestation_state *m_simplestation);
+
+void p_lwc1(m_simplestation_state *m_simplestation);
+
+void p_lwc2(m_simplestation_state *m_simplestation);
+
+void p_lwc3(m_simplestation_state *m_simplestation);
+
+void p_swc0(m_simplestation_state *m_simplestation);
+
+void p_swc1(m_simplestation_state *m_simplestation);
+
+void p_swc2(m_simplestation_state *m_simplestation);
+
+void p_swc3(m_simplestation_state *m_simplestation);
+
 #endif /* OPCODES_H */
