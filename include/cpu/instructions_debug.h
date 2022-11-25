@@ -198,6 +198,9 @@ void p_sb(m_simplestation_state *m_simplestation);
 // 0x29
 void p_sh(m_simplestation_state *m_simplestation);
 
+// 0x2A
+void p_swl(m_simplestation_state *m_simplestation);
+
 // 0x2B
 void p_sw(m_simplestation_state *m_simplestation);
 

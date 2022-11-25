@@ -332,6 +332,11 @@ void p_sh(m_simplestation_state *m_simplestation)
 	printf("sh $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 }
 
+void p_swl(m_simplestation_state *m_simplestation)
+{
+	printf("swl $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+}
+
 void p_sw(m_simplestation_state *m_simplestation)
 {
 	printf("sw $%s, 0x%X($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);

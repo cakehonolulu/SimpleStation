@@ -1230,6 +1230,66 @@ void m_sh(m_simplestation_state *m_simplestation)
 }
 
 /*
+	SWL (MIPS I)
+
+	Format:
+	SWL rt, offset(base)
+
+	Description:
+	The 16-bit signed offset is added to the contents of GPR base to form an effective address
+	(EffAddr). EffAddr is the address of the most-significant of four consecutive bytes
+	forming a word in memory (W) starting at an arbitrary byte boundary. A part of W, the
+	most-significant one to four bytes, is in the aligned word containing EffAddr. The same
+	number of the most-significant (left) bytes from the word in GPR rt are stored into
+	these bytes of W.
+	If GPR rt is a 64-bit register, the source word is the low word of the register.
+	Figures A-2 illustrates this operation for big-endian byte ordering for 32-bit and 64-bit
+	registers. The four consecutive bytes in 2..5 form an unaligned word starting at
+	location 2. A part of W, two bytes, is contained in the aligned word containing the
+	most-significant byte at 2. First, SWL stores the most-significant two bytes of the low-
+	word from the source register into these two bytes in memory. Next, the
+	complementary SWR stores the remainder of the unaligned word.
+
+	The bytes stored from the source register to memory depend on both the offset of the
+	effective address within an aligned word, i.e. the low two bits of the address
+	(vAddr1..0), and the current byte ordering mode of the processor (big- or little-endian).
+	The table below shows the bytes stored for every combination of offset and byte
+	ordering
+*/
+void m_swl(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("swl $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint32_t m_aligned_addr = ((REGS[REGIDX_S] + SIMMDT) & !3);
+
+	uint32_t m_val = m_memory_read(m_aligned_addr, dword, m_simplestation);
+
+	switch ((REGS[REGIDX_S] + SIMMDT) & 3)
+	{
+		case 0:
+			m_memory_write(m_aligned_addr, ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] >> 24)), dword, m_simplestation);
+			break;
+
+		case 1:
+			m_memory_write(m_aligned_addr, ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] >> 16)), dword, m_simplestation);
+			break;
+
+		case 2:
+			m_memory_write(m_aligned_addr, ((m_val & 0xFF000000) | (REGS[REGIDX_T] >> 8)), dword, m_simplestation);
+			break;
+
+		case 3:
+			m_memory_write(m_aligned_addr, ((m_val & 0x00000000) | (REGS[REGIDX_T] >> 0)), dword, m_simplestation);
+			break;
+
+		default:
+			__builtin_unreachable();
+	}
+}
+
+/*
 	SW (MIPS I)
 
 	Format:
