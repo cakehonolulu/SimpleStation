@@ -159,6 +159,11 @@ void p_mtlo(m_simplestation_state *m_simplestation)
 	printf("mtlo $%s\n", m_cpu_regnames[REGIDX_S]);
 }
 
+void p_mult(m_simplestation_state *m_simplestation)
+{
+	printf("mult $%s, $%s\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
+}
+
 void p_multu(m_simplestation_state *m_simplestation)
 {
 	printf("multu $%s, $%s\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
