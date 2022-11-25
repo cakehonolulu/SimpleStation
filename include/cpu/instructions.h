@@ -197,4 +197,7 @@ void m_swl(m_simplestation_state *m_simplestation);
 // 0x2B
 void m_sw(m_simplestation_state *m_simplestation);
 
+// 0x2E
+void m_swr(m_simplestation_state *m_simplestation);
+
 #endif /* INSTRUCTIONS_H */

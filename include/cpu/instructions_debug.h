@@ -204,4 +204,7 @@ void p_swl(m_simplestation_state *m_simplestation);
 // 0x2B
 void p_sw(m_simplestation_state *m_simplestation);
 
+// 0x2E
+void p_swr(m_simplestation_state *m_simplestation);
+
 #endif /* OPCODES_H */
