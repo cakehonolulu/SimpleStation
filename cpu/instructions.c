@@ -1270,6 +1270,25 @@ void m_ori(m_simplestation_state *m_simplestation)
 }
 
 /*
+	XORI (MIPS I)
+
+	Format:
+	XORI rt, rs, immediate
+	
+	Description:
+	Combine the contents of GPR rs and the 16-bit zero-extended immediate in a bitwise
+	logical exclusive OR operation and place the result into GPR rt.
+*/
+void m_xori(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("xori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
+#endif
+
+	REGS[REGIDX_T] = REGS[REGIDX_S] ^ IMMDT;
+}
+
+/*
 	LUI (MIPS I)
 	
 	Format:

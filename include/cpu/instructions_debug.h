@@ -162,6 +162,9 @@ void p_andi(m_simplestation_state *m_simplestation);
 // 0x0D
 void p_ori(m_simplestation_state *m_simplestation);
 
+// 0x0E
+void p_xori(m_simplestation_state *m_simplestation);
+
 // 0x0F
 void p_lui(m_simplestation_state *m_simplestation);
 

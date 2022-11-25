@@ -329,6 +329,11 @@ void p_ori(m_simplestation_state *m_simplestation)
 	printf("ori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
 }
 
+void p_xori(m_simplestation_state *m_simplestation)
+{
+	printf("xori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
+}
+
 void p_lui(m_simplestation_state *m_simplestation)
 {
 	printf("lui $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], IMMDT);

@@ -15,7 +15,7 @@ const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
 	{"sltiu", p_sltiu},	// 0x0B
 	{"andi", p_andi},	// 0x0C
 	{"ori", p_ori},		// 0x0D
-	{NULL, NULL},		// 0x00
+	{"xori", p_xori},	// 0x00
 	{"lui", p_lui},		// 0x0F
 	{"cop0", p_cop0},	// 0x10
 	{NULL, NULL},		// 0x11

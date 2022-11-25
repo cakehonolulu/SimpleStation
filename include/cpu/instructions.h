@@ -155,6 +155,9 @@ void m_andi(m_simplestation_state *m_simplestation);
 // 0x0D
 void m_ori(m_simplestation_state *m_simplestation);
 
+// 0x0E
+void m_xori(m_simplestation_state *m_simplestation);
+
 // 0x0F
 void m_lui(m_simplestation_state *m_simplestation);
 
