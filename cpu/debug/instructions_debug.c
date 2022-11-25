@@ -37,6 +37,12 @@ void p_cop1(m_simplestation_state *m_simplestation)
 	printf("cop1\n");
 }
 
+void p_cop2(m_simplestation_state *m_simplestation)
+{
+	(void) m_simplestation;
+	printf("cop2\n");
+}
+
 void p_cop3(m_simplestation_state *m_simplestation)
 {
 	(void) m_simplestation;

@@ -152,6 +152,9 @@ void m_cop0(m_simplestation_state *m_simplestation);
 // 0x11
 void m_cop1(m_simplestation_state *m_simplestation);
 
+// 0x12
+void m_cop2(m_simplestation_state *m_simplestation);
+
 // 0x13
 void m_cop3(m_simplestation_state *m_simplestation);
 

@@ -44,6 +44,16 @@ void m_cop1(m_simplestation_state *m_simplestation)
 	m_exception(m_exc, m_simplestation);
 }
 
+void m_cop2(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("cop2\n");
+#endif
+
+	printf(RED "[CPU] gte: Unimplemented 'GTE' Opcode: 0x%08X\n" NORMAL, m_simplestation->m_cpu->m_opcode);
+	m_simplestation_exit(m_simplestation, 1);
+}
+
 void m_cop3(m_simplestation_state *m_simplestation)
 {
 #ifdef DEBUG_INSTRUCTIONS
