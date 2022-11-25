@@ -344,6 +344,31 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		printf(YELLOW "[MEM] read: Dummy Timer Registers memory read! Ignoring...\n" NORMAL);
 #endif
 	}
+	// PSX GPU
+	else if ((0x1F801810 <= m_address) && (m_address < 0x1f801818))
+	{
+		// PSX GPU Dummy Read
+#ifdef DEBUG_MEMORY
+		printf(YELLOW "[MEM] read: GPU Registers memory read! Returning 0...\n" NORMAL);
+#endif
+		switch (m_size)
+		{
+			case byte:
+				m_return = 0;
+				break;
+
+			case word:
+				m_return = 0;
+				break;
+
+			case dword:
+				m_return = 0;
+				break;
+
+			default:
+				__builtin_unreachable();
+		}
+	}
 	// PSX SPU
 	else if ((0x1F801C00 <= m_address) && (m_address < 0x1F802000))
 	{
