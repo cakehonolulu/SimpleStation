@@ -389,10 +389,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F801080 ... 0x1F8010FF:
-			// DMA Registers Dummy Write
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] write: Dummy DMA Registers memory write! Ignoring...\n" NORMAL);
-#endif
+			// DMA Registers Write
+			m_dma_write((m_address - 0x1F801080), m_value, m_simplestation);
 			break;
 
 		case 0x1F801100 ... 0x1F80112F:
