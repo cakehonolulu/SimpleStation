@@ -81,6 +81,17 @@ typedef struct m_corewave_cw33300_cop0
 
 } m_mips_r3000a_cop0_t;
 
+typedef struct m_cpu_ints
+{	
+	uint32_t m_interrupt_stat;
+	uint32_t m_interrupt_mask;
+} m_psx_cpu_ints_t;
+
+typedef struct m_mem_dma
+{	
+	uint32_t m_control_reg;
+} m_psx_dma_t;
+
 typedef struct m_psx_memory
 {
 	// PSX RAM Memory Buffer
@@ -99,13 +110,9 @@ typedef struct m_psx_memory
 	uint32_t m_memory_ram_config_reg;
 	uint32_t m_memory_cache_control_reg;
 
-} m_psx_memory_t;
+	m_psx_dma_t *m_dma;
 
-typedef struct m_cpu_ints
-{	
-	uint32_t m_interrupt_stat;
-	uint32_t m_interrupt_mask;
-} m_psx_cpu_ints_t;
+} m_psx_memory_t;
 
 /* Structures */
 typedef struct
@@ -122,6 +129,7 @@ typedef struct
 	m_psx_cpu_ints_t *m_cpu_ints;
 
 	bool m_memory_state;
+	bool m_dma_state;
 	bool m_interrupts_state;
 	bool m_cpu_state;
 

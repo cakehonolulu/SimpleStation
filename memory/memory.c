@@ -51,7 +51,18 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 				{
 					m_simplestation->m_memory->m_memory_cache_control_reg = 0;
 					m_simplestation->m_memory->m_memory_ram_config_reg = 0;
-					m_simplestation->m_memory_state = ON;
+
+					m_dma_init(m_simplestation);
+
+					if (m_simplestation->m_dma_state == ON)
+					{
+						m_simplestation->m_memory_state = ON;
+					}
+					else
+					{
+						printf("[MEM] init: Couldn't initialize PSX's DMA, exiting...");
+						m_return = 1;
+					}
 				}
 				else
 				{
@@ -205,10 +216,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			break;
 		
 		case 0x1F801080 ... 0x1F8010FF:
-			// DMA Registers Dummy Read
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] read: Dummy DMA Registers memory read! Ignoring...\n" NORMAL);
-#endif
+			// DMA Registers Read
+			m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
 			break;
 
 		case 0x1F801100 ... 0x1F80112F:
