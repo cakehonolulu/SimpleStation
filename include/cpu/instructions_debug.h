@@ -7,19 +7,18 @@
 #include <stdlib.h>
 
 extern struct m_opc_names {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_instrs_opcodes[0x3F];
 
 extern struct m_opc_ext_names {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_extended_00_opcodes[0x3F];
 
 extern struct m_opc_cop0_names {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_cop0_opcodes[0x11];
+
+#define ILLEGAL NULL
 
 /* Instructions */
 

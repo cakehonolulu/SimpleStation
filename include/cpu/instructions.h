@@ -7,19 +7,18 @@
 #include <stdlib.h>
 
 extern struct m_corewave_cw33300_instrs {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_instrs[0x3F];
 
 extern struct m_corewave_cw33300_extended_00_instrs {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_extended_00[0x3F];
 
 extern struct m_corewave_cw33300_cop0_instrs {
-	const char *m_instr;
 	void *m_funct;
 } const m_psx_cop0[0x11];
+
+#define ILLEGAL NULL
 
 /* Instructions */
 

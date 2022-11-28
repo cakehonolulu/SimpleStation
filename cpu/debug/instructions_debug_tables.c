@@ -1,153 +1,29 @@
 #include <cpu/instructions_debug.h>
 
 const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
-	{"exp", p_exp},		// 0x00
-	{"bxx", p_bxx},		// 0x01
-	{"j", p_j},			// 0x02
-	{"jal", p_jal},		// 0x03
-	{"beq", p_beq},		// 0x04
-	{"bne", p_bne},		// 0x05
-	{"blez", p_blez},	// 0x06
-	{"bgtz", p_bgtz},	// 0x07
-	{"addi", p_addi},	// 0x08
-	{"addiu", p_addiu},	// 0x09
-	{"slti", p_slti},	// 0x00
-	{"sltiu", p_sltiu},	// 0x0B
-	{"andi", p_andi},	// 0x0C
-	{"ori", p_ori},		// 0x0D
-	{"xori", p_xori},	// 0x00
-	{"lui", p_lui},		// 0x0F
-	{"cop0", p_cop0},	// 0x10
-	{"cop1", p_cop1},	// 0x11
-	{"cop2", p_cop2},	// 0x02
-	{"cop3", p_cop3},	// 0x03
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
-	{NULL, NULL},		// 0x0A
-	{NULL, NULL},		// 0x0B
-	{NULL, NULL},		// 0x0C
-	{NULL, NULL},		// 0x0D
-	{NULL, NULL},		// 0x0E
-	{NULL, NULL},		// 0x0F
-	{"lb", p_lb},		// 0x20
-	{"lh", p_lh},		// 0x21
-	{NULL, NULL},		// 0x02
-	{"lw", p_lw},		// 0x23
-	{"lbu", p_lbu},		// 0x24
-	{"lhu", p_lhu},		// 0x25
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{"sb", p_sb},		// 0x28
-	{"sh", p_sh},		// 0x29
-	{"swl", p_swl},		// 0x2A
-	{"sw", p_sw},		// 0x2B
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{"swr", p_swr},		// 0x0E
-	{NULL, NULL},		// 0x00
-	{"lwc0", p_lwc0},	// 0x00
-	{"lwc1", p_lwc1},	// 0x00
-	{"lwc2", p_lwc2},	// 0x00
-	{"lwc3", p_lwc3},	// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{"swc0", p_swc0},	// 0x38
-	{"swc1", p_swc1},	// 0x00
-	{"swc2", p_swc2},	// 0x00
-	{"swc3", p_swc3},	// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL}		// 0x00
+	{p_exp}, 	{p_bxx},	{p_j},		{p_jal},	{p_beq},	{p_bne},	{p_blez},	{p_bgtz},
+	{p_addi},	{p_addiu},	{p_slti},	{p_sltiu},	{p_andi},	{p_ori},	{p_xori},	{p_lui},
+	{p_cop0},	{p_cop1},	{p_cop2},	{p_cop3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{p_lb},		{p_lh},		{ILLEGAL},	{p_lw},		{p_lbu},	{p_lhu},	{ILLEGAL},	{ILLEGAL},
+	{p_sb},		{p_sh},		{p_swl},	{p_sw},		{ILLEGAL},	{ILLEGAL},	{p_swr},	{ILLEGAL},
+	{p_lwc0},	{p_lwc1},	{p_lwc2},	{p_lwc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{p_swc0},	{p_swc1},	{p_swc2},	{p_swc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL}
 };
 
 const struct m_opc_ext_names m_psx_extended_00_opcodes[0x3F] = {
-	{"sll", p_sll},		// 0x00
-	{NULL, NULL},		// 0x01
-	{"srl", p_srl},		// 0x02
-	{"sra", p_sra},		// 0x03
-	{"sllv", p_sllv},	// 0x04
-	{NULL, NULL},		// 0x05
-	{"srlv", p_srlv},	// 0x06
-	{"srav", p_srav},	// 0x07
-	{"jr", p_jr},		// 0x08
-	{"jalr", p_jalr},	// 0x09
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x0B
-	{"syscall", p_syscall},	// 0x00
-	{"break", p_break},	// 0x0D
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x0F
-	{"mfhi", p_mfhi},	// 0x10
-	{"mthi", p_mthi},	// 0x11
-	{"mflo", p_mflo},	// 0x12
-	{"mtlo", p_mtlo},	// 0x13
-	{NULL, NULL},		// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{"mult", p_mult},	// 0x08
-	{"multu", p_multu},	// 0x19
-	{"div", p_div},		// 0x1A
-	{"divu", p_divu},	// 0x1B
-	{NULL, NULL},		// 0x0C
-	{NULL, NULL},		// 0x0D
-	{NULL, NULL},		// 0x0E
-	{NULL, NULL},		// 0x0F
-	{"add", p_add},		// 0x20
-	{"addu", p_addu},	// 0x21
-	{"sub", p_sub},		// 0x02
-	{"subu", p_subu},	// 0x23
-	{"and", p_and},		// 0x24
-	{"or", p_or},		// 0x25
-	{"xor", p_xor},		// 0x26
-	{"nor", p_nor},		// 0x27
-	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
-	{"slt", p_slt},		// 0x2A
-	{"sltu", p_sltu},	// 0x2B
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL},		// 0x00
-	{NULL, NULL}		// 0x00
+	{p_sll},	{ILLEGAL},	{p_srl},	{p_sra},	{p_sllv},	{ILLEGAL},	{p_srlv},	{p_srav},
+	{p_jr},		{p_jalr},	{ILLEGAL},	{ILLEGAL},	{p_syscall},{p_break},	{ILLEGAL},	{ILLEGAL},
+	{p_mfhi},	{p_mthi},	{p_mflo},	{p_mtlo},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{p_mult},	{p_multu},	{p_div},	{p_divu},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{p_add},	{p_addu},	{p_sub},	{p_subu},	{p_and},	{p_or},		{p_xor},	{p_nor},
+	{ILLEGAL},	{ILLEGAL},	{p_slt},	{p_sltu},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL}
 };
 
 const struct m_opc_cop0_names m_psx_cop0_opcodes[0x11] = {
-	{"mfc0", p_mfc0},	// 0x00
-	{NULL, NULL},		// 0x01
-	{NULL, NULL},		// 0x02
-	{NULL, NULL},		// 0x03
-	{"mtc0", p_mtc0},	// 0x04
-	{NULL, NULL},		// 0x05
-	{NULL, NULL},		// 0x06
-	{NULL, NULL},		// 0x07
-	{NULL, NULL},		// 0x08
-	{NULL, NULL},		// 0x09
-	{NULL, NULL},		// 0x0A
-	{NULL, NULL},		// 0x0B
-	{NULL, NULL},		// 0x0C
-	{NULL, NULL},		// 0x0D
-	{NULL, NULL},		// 0x0E
-	{NULL, NULL},		// 0x0F
-	{"rfe", p_rfe}		// 0x10
+	{p_mfc0},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{p_mtc0},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
+	{p_rfe}		
 };
