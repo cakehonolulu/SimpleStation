@@ -114,78 +114,6 @@ void m_memory_exit(m_simplestation_state *m_simplestation)
 	m_bios_exit(m_simplestation);
 }
 
-uint8_t m_memory_read_byte(uint32_t m_memory_address, int8_t *m_memory_source)
-{
-	return *(uint8_t*)(m_memory_source + (m_memory_address + 0));
-}
-
-uint8_t m_memory_write_byte(uint32_t m_memory_address, uint8_t m_value, int8_t *m_memory_source)
-{
-	return *(uint8_t *) (m_memory_address + m_memory_source) = m_value;
-}
-
-uint16_t m_memory_read_word(uint32_t m_memory_address, int8_t *m_memory_source)
-{
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-	/*
-		If on LE, it's safe to assume we'll read the bytes in the order we want them.
-		This reduces the function size by a large margin, and therefor, performs faster.
-	*/
-	return *(uint16_t*)(m_memory_source + (m_memory_address + 0));
-#else
-	/*
-		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
-	*/
-	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
-	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
-
-	return (b0 | (b1 << 8));
-#endif
-}
-
-uint16_t m_memory_write_word(uint32_t m_memory_address, uint16_t m_value, int8_t *m_memory_source)
-{
-	return *(uint16_t *) (m_memory_address + m_memory_source) = m_value;
-}
-
-/*
-	Function:
-	m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
-
-	Arguments:
-	-> m_memory_address: Acts as the memory pointer where the value will be read.
-	-> m_memory_source: The memory buffer where the value will be read at.
-
-	Description:
-	Reads a value at a determined memory address.
-	m_memory_source determines the buffer where it should look the value at.
-*/
-uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
-{
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-	/*
-		If on LE, it's safe to assume we'll read the bytes in the order we want them.
-		This reduces the function size by a large margin, and therefor, performs faster.
-	*/
-	return *(uint32_t*)(m_memory_source + (m_memory_address + 0));
-#else
-	/*
-		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
-	*/
-	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
-	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
-	uint8_t b2 = *(uint8_t*)(m_memory_source + (m_memory_address + 2));
-	uint8_t b3 = *(uint8_t*)(m_memory_source + (m_memory_address + 3));
-
-	return (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
-#endif
-}
-
-uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source)
-{
-	return *(uint32_t *) (m_memory_address + m_memory_source) = m_value;
-}
-
 /*
 	Function:
 	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
@@ -237,23 +165,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	switch (m_address)
 	{
 		case 0x00000000 ... 0x001FFFFF:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_read_byte(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				case word:
-					m_return = m_memory_read_word(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				case dword:
-					m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_return = m_memory_read_handle(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram, m_size, m_simplestation);
 			break;
 
 		case 0x1F000000 ... 0x1F3FFFFF:
@@ -264,43 +176,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			break;
 
 		case 0x1F800000 ... 0x1F8003FF:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_read_byte(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				case word:
-					m_return = m_memory_read_word(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				case dword:
-					m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_return = m_memory_read_handle(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad, m_size, m_simplestation);
 			break;
 		
 		case 0x1F800400 ... 0x1F80103F:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_read_byte(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				case word:
-					m_return = m_memory_read_word(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				case dword:
-					m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_return = m_memory_read_handle(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1, m_size, m_simplestation);
 			break;
 
 		case 0x1F801060:
@@ -390,23 +270,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			break;
 
 		case 0x1FC00000 ... 0x1FC7FFFF:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_read_byte(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-					break;
-
-				case word:
-					m_return = m_memory_read_word(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-					break;
-
-				case dword:
-					m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_return = m_memory_read_handle(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios, m_size, m_simplestation);
 			break;
 
 		case 0xFFFE0130:
@@ -477,23 +341,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	switch (m_address)
 	{
 		case 0x00000000 ... 0x001FFFFF:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_write_byte(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				case word:
-					m_return = m_memory_write_word(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				case dword:
-					m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_memory_write_handle(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram, m_size, m_simplestation);
 			break;
 
 		case 0x1F000000 ... 0x1F3FFFFF:
@@ -503,43 +351,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F800000 ... 0x1F8003FF:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_write_byte(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				case word:
-					m_return = m_memory_write_word(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				case dword:
-					m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_memory_write_handle(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad, m_size, m_simplestation);
 			break;
 
 		case 0x1F800400 ... 0x1F80103F:
-			switch (m_size)
-			{
-				case byte:
-					m_return = m_memory_write_byte(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				case word:
-					m_return = m_memory_write_word(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				case dword:
-					m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-					break;
-
-				default:
-					__builtin_unreachable();
-			}
+			m_memory_write_handle(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1, m_size, m_simplestation);
 			break;
 
 		case 0x1F801060:
@@ -616,4 +432,127 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	}
 
 	return m_return;
+}
+
+uint32_t m_memory_read_handle(uint32_t m_memory_address, int8_t *m_memory_source, m_memory_size m_size, m_simplestation_state *m_simplestation)
+{
+	uint32_t m_value = 0;
+
+	switch (m_size)
+	{
+		case byte:
+			m_value = m_memory_read_byte(m_memory_address, m_memory_source);
+			break;
+
+		case word:
+			m_value = m_memory_read_word(m_memory_address, m_memory_source);
+			break;
+
+		case dword:
+			m_value = m_memory_read_dword(m_memory_address, m_memory_source);
+			break;
+		
+		default:
+			printf(RED "[MEM] read: Unknown Size! (%d)\n" NORMAL, m_size);
+			m_value = m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
+
+	return m_value;
+}
+
+void m_memory_write_handle(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source, m_memory_size m_size, m_simplestation_state *m_simplestation)
+{
+	switch (m_size)
+	{
+		case byte:
+			m_memory_write_byte(m_memory_address, m_value, m_memory_source);
+			break;
+
+		case word:
+			m_memory_write_word(m_memory_address, m_value, m_memory_source);
+			break;
+
+		case dword:
+			m_memory_write_dword(m_memory_address, m_value, m_memory_source);
+			break;
+		
+		default:
+			printf(RED "[MEM] write: Unknown Size! (%d)\n" NORMAL, m_size);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
+}
+
+
+uint8_t m_memory_read_byte(uint32_t m_memory_address, int8_t *m_memory_source)
+{
+	return *(uint8_t*)(m_memory_source + (m_memory_address + 0));
+}
+
+uint8_t m_memory_write_byte(uint32_t m_memory_address, uint8_t m_value, int8_t *m_memory_source)
+{
+	return *(uint8_t *) (m_memory_address + m_memory_source) = m_value;
+}
+
+uint16_t m_memory_read_word(uint32_t m_memory_address, int8_t *m_memory_source)
+{
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	/*
+		If on LE, it's safe to assume we'll read the bytes in the order we want them.
+		This reduces the function size by a large margin, and therefor, performs faster.
+	*/
+	return *(uint16_t*)(m_memory_source + (m_memory_address + 0));
+#else
+	/*
+		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
+	*/
+	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
+	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
+
+	return (b0 | (b1 << 8));
+#endif
+}
+
+uint16_t m_memory_write_word(uint32_t m_memory_address, uint16_t m_value, int8_t *m_memory_source)
+{
+	return *(uint16_t *) (m_memory_address + m_memory_source) = m_value;
+}
+
+/*
+	Function:
+	m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
+
+	Arguments:
+	-> m_memory_address: Acts as the memory pointer where the value will be read.
+	-> m_memory_source: The memory buffer where the value will be read at.
+
+	Description:
+	Reads a value at a determined memory address.
+	m_memory_source determines the buffer where it should look the value at.
+*/
+uint32_t m_memory_read_dword(uint32_t m_memory_address, int8_t *m_memory_source)
+{
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	/*
+		If on LE, it's safe to assume we'll read the bytes in the order we want them.
+		This reduces the function size by a large margin, and therefor, performs faster.
+	*/
+	return *(uint32_t*)(m_memory_source + (m_memory_address + 0));
+#else
+	/*
+		Else, if on BE, use the legacy fallback method; it's clunkier and slower but works.
+	*/
+	uint8_t b0 = *(uint8_t*)(m_memory_source + (m_memory_address + 0));
+	uint8_t b1 = *(uint8_t*)(m_memory_source + (m_memory_address + 1));
+	uint8_t b2 = *(uint8_t*)(m_memory_source + (m_memory_address + 2));
+	uint8_t b3 = *(uint8_t*)(m_memory_source + (m_memory_address + 3));
+
+	return (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
+#endif
+}
+
+uint32_t m_memory_write_dword(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source)
+{
+	return *(uint32_t *) (m_memory_address + m_memory_source) = m_value;
 }
