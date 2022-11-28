@@ -234,229 +234,193 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
 	// PSX RAM
-	if (m_address < 0x00200000)
+	switch (m_address)
 	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_read_byte(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-				break;
+		case 0x00000000 ... 0x001FFFFF:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_read_byte(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			case word:
-				m_return = m_memory_read_word(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-				break;
+				case word:
+					m_return = m_memory_read_word(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			case dword:
-				m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
-				break;
+				case dword:
+					m_return = m_memory_read_dword(m_address & 0x1FFFFF, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Expansion 1
-	else if ((0x1F000000 <= m_address) && (m_address < 0x1F400000))
-	{
+				default:
+					__builtin_unreachable();
+			}
+			break;
+
+		case 0x1F000000 ... 0x1F3FFFFF:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Detected 'Expansion 1' memory read! No Expansion Pack detected, ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] read: Detected 'Expansion 1' memory read! No Expansion Pack detected, ignoring...\n" NORMAL);
 #endif
-		m_return = 0xFF;
-	}
-	// PSX Scratchpad
-	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
-	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_read_byte(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+			m_return = 0xFF;
+			break;
 
-			case word:
-				m_return = m_memory_read_word(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+		case 0x1F800000 ... 0x1F8003FF:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_read_byte(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			case dword:
-				m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+				case word:
+					m_return = m_memory_read_word(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Memory Control
-	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
-	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_read_byte(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				case dword:
+					m_return = m_memory_read_dword(m_address & 0x3FF, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			case word:
-				m_return = m_memory_read_word(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				default:
+					__builtin_unreachable();
+			}
+			break;
+		
+		case 0x1F800400 ... 0x1F80103F:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_read_byte(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+					break;
 
-			case dword:
-				m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				case word:
+					m_return = m_memory_read_word(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX RAM Register
-	else if (m_address == 0x1F801060)
-	{
+				case dword:
+					m_return = m_memory_read_dword(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1);
+					break;
+
+				default:
+					__builtin_unreachable();
+			}
+			break;
+
+		case 0x1F801060:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
+			printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
 #endif
-		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
-	}
-	// PSX Interrupt Stat Register
-	else if (m_address == 0x1F801070)
-	{
+			m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+			break;
+
+		case 0x1F801070:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Interrupt Stat Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat);
+			printf(YELLOW "[MEM] read: Interrupt Stat Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat);
 #endif
-		m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
-	}
-	// PSX Interrupt Mask Register
-	else if (m_address == 0x1F801074)
-	{
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
+			break;
+		
+		case 0x1F801074:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Interrupt Mask Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask);
+			printf(YELLOW "[MEM] read: Interrupt Mask Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask);
 #endif
-		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
-	}
-	// PSX DMA Registers
-	else if ((0x1F801080 <= m_address) && (m_address < 0x1F801100))
-	{
-		// DMA Registers Dummy Read
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+			break;
+		
+		case 0x1F801080 ... 0x1F8010FF:
+			// DMA Registers Dummy Read
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Dummy DMA Registers memory read! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] read: Dummy DMA Registers memory read! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX Timer Registers
-	else if ((0x1F801100 <= m_address) && (m_address < 0x1F801130))
-	{
-		// Timer Registers Dummy Read
+			break;
+
+		case 0x1F801100 ... 0x1F80112F:
+			// Timer Registers Dummy Read
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Dummy Timer Registers memory read! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] read: Dummy Timer Registers memory read! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX GPU
-	else if ((0x1F801810 <= m_address) && (m_address < 0x1f801818))
-	{
-		// PSX GPU Dummy Read
+			break;
+
+		case 0x1F801810 ... 0x1f801817:
+			// PSX GPU Dummy Read
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: GPU Registers read!\n" NORMAL);
+			printf(YELLOW "[MEM] read: GPU Registers read!\n" NORMAL);
 #endif
-		switch (m_size)
-		{
-			case byte:
-				printf(RED "[MEM] read: Unhandled GPU Registers Byte Read..\n" NORMAL);
-				m_simplestation_exit(m_simplestation, 1);
-				break;
+			switch (m_size)
+			{
+				case byte:
+					printf(RED "[MEM] read: Unhandled GPU Registers Byte Read..\n" NORMAL);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
 
-			case word:
-				printf(RED "[MEM] read: Unhandled GPU Registers Word Read..\n" NORMAL);
-				m_simplestation_exit(m_simplestation, 1);
-				break;
+				case word:
+					printf(RED "[MEM] read: Unhandled GPU Registers Word Read..\n" NORMAL);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
 
-			case dword:
-				switch(m_address)
-				{
-					case 0x1F801810:
-						m_return = 0;
-						break;
-					
-					case 0x1F801814:
-						m_return = 0x10000000;
-						break;
+				case dword:
+					switch(m_address)
+					{
+						case 0x1F801810:
+							m_return = 0;
+							break;
+						
+						case 0x1F801814:
+							m_return = 0x10000000;
+							break;
 
-					default:
-						__builtin_unreachable();
-				}
-				break;
+						default:
+							__builtin_unreachable();
+					}
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX SPU
-	else if ((0x1F801C00 <= m_address) && (m_address < 0x1F802000))
-	{
-		// SPU Dummy Read
+				default:
+					__builtin_unreachable();
+			}
+			break;
+
+		case 0x1F801C00 ... 0x1F801FFF:
+			// SPU Dummy Read
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX GPU
-	else if ((0x1F801810 <= m_address) && (m_address < 0x1f801818))
-	{
-		// PSX GPU Dummy Read
+			break;
+		
+		case 0x1F802000 ... 0x1F803FFF:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: GPU Registers memory read! Returning 0...\n" NORMAL);
+			printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);
 #endif
-		switch (m_size)
-		{
-			case byte:
-				m_return = 0;
-				break;
+			break;
 
-			case word:
-				m_return = 0;
-				break;
+		case 0x1FC00000 ... 0x1FC7FFFF:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_read_byte(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+					break;
 
-			case dword:
-				m_return = 0;
-				break;
+				case word:
+					m_return = m_memory_read_word(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Expansion 2
-	else if ((0x1F802000 <= m_address) && (m_address < 0x1F804000))
-	{
+				case dword:
+					m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
+					break;
+
+				default:
+					__builtin_unreachable();
+			}
+			break;
+
+		case 0xFFFE0130:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);
-#endif	
-	}
-	// PSX BIOS Space
-	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
-	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_read_byte(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-				break;
-
-			case word:
-				m_return = m_memory_read_word(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-				break;
-
-			case dword:
-				m_return = m_memory_read_dword(m_address & 0x7FFFF, m_simplestation->m_memory->m_mem_bios);
-				break;
-
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Cache Control Register
-	else if (m_address == 0xFFFE0130)
-	{
-#ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg);
+			printf(YELLOW "[MEM] read: Cache Control Register (Current Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg);
 #endif
-		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
-	}
-	else
-	{
-		printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
-		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		m_return = m_simplestation_exit(m_simplestation, 1);
+			m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
+			break;
+
+		default:
+			printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
+			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
+			m_return = m_simplestation_exit(m_simplestation, 1);
+			break;
 	}
 
  	return m_return;
@@ -510,161 +474,145 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 	m_placeholder = m_memory_offset >> 29;
 	m_address = m_memory_offset & m_memory_map[m_placeholder];
 
-	// PSX RAM
-	if (m_address < 0x00200000)
+	switch (m_address)
 	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_write_byte(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-				break;
+		case 0x00000000 ... 0x001FFFFF:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_write_byte(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			case word:
-				m_return = m_memory_write_word(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-				break;
+				case word:
+					m_return = m_memory_write_word(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
-				break;
+				case dword:
+					m_return = m_memory_write_dword(m_address & 0x1FFFFF, m_value, m_simplestation->m_memory->m_mem_ram);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Expansion 1
-	else if ((0x1F000000 <= m_address) && (m_address < 0x1F400000))
-	{
-#ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Detected 'Expansion 1' memory write! Ignoring...\n" NORMAL);
-#endif
-	}
-	// PSX Scratchpad
-	else if ((0x1F800000 <= m_address) && (m_address < 0x1F800400))
-	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_write_byte(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+				default:
+					__builtin_unreachable();
+			}
+			break;
 
-			case word:
-				m_return = m_memory_write_word(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+		case 0x1F000000 ... 0x1F3FFFFF:
+#ifdef DEBUG_MEMORY
+			printf(YELLOW "[MEM] write: Detected 'Expansion 1' memory write! Ignoring...\n" NORMAL);
+#endif
+			break;
 
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
-				break;
+		case 0x1F800000 ... 0x1F8003FF:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_write_byte(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX Memory Control
-	else if ((0x1F800400 <= m_address) && (m_address < 0x1F801040))
-	{
-		switch (m_size)
-		{
-			case byte:
-				m_return = m_memory_write_byte(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				case word:
+					m_return = m_memory_write_word(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			case word:
-				m_return = m_memory_write_word(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				case dword:
+					m_return = m_memory_write_dword(m_address & 0x3FF, m_value, m_simplestation->m_memory->m_mem_scratchpad);
+					break;
 
-			case dword:
-				m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
-				break;
+				default:
+					__builtin_unreachable();
+			}
+			break;
 
-			default:
-				__builtin_unreachable();
-		}
-	}
-	// PSX's RAM Register
-	else if (m_address == 0x1F801060)
-	{
+		case 0x1F800400 ... 0x1F80103F:
+			switch (m_size)
+			{
+				case byte:
+					m_return = m_memory_write_byte(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+					break;
+
+				case word:
+					m_return = m_memory_write_word(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+					break;
+
+				case dword:
+					m_return = m_memory_write_dword(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1);
+					break;
+
+				default:
+					__builtin_unreachable();
+			}
+			break;
+
+		case 0x1F801060:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
+			printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
 #endif
-		m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
-		m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
-	}
-	// PSX Interrupt Stat Register
-	else if (m_address == 0x1F801070)
-	{
+			m_simplestation->m_memory->m_memory_ram_config_reg = m_value;
+			m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
+			break;
+
+		case 0x1F801070:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Interrupt Stat Register (Current Value: 0x%0X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat, m_value);
+			printf(YELLOW "[MEM] write: Interrupt Stat Register (Current Value: 0x%0X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat, m_value);
 #endif
-		m_simplestation->m_cpu_ints->m_interrupt_stat = m_value;
-		m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
-	}
-	// PSX Interrupt Mask Register
-	else if (m_address == 0x1F801074)
-	{
+			m_simplestation->m_cpu_ints->m_interrupt_stat = m_value;
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
+			break;
+
+		case 0x1F801074:
+			m_simplestation->m_cpu_ints->m_interrupt_mask = m_value;
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+			break;
+
+		case 0x1F801080 ... 0x1F8010FF:
+			// DMA Registers Dummy Write
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Interrupt Mask Register (Current Value: 0x%0X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask, m_value);
+			printf(YELLOW "[MEM] write: Dummy DMA Registers memory write! Ignoring...\n" NORMAL);
 #endif
-		m_simplestation->m_cpu_ints->m_interrupt_mask = m_value;
-		m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
-	}
-	// PSX DMA Registers
-	else if ((0x1F801080 <= m_address) && (m_address < 0x1F801100))
-	{
-		// DMA Registers Dummy Write
+			break;
+
+		case 0x1F801100 ... 0x1F80112F:
+			// Timer Registers Dummy Write
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Dummy DMA Registers memory write! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] write: Dummy Timer Registers memory write! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX Timer Registers
-	else if ((0x1F801100 <= m_address) && (m_address < 0x1F801130))
-	{
-		// Timer Registers Dummy Write
+			break;
+
+		case 0x1F801C00 ... 0x1F801FFF:
+			// SPU Dummy Write
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Dummy Timer Registers memory write! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX SPU
-	else if ((0x1F801C00 <= m_address) && (m_address < 0x1F802000))
-	{
-		// SPU Dummy Write
+			break;
+
+		case 0x1F801810 ... 0x1F801817:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] write: GPU Registers memory write! Returning 0...\n" NORMAL);
 #endif
-	}
-	// PSX GPU
-	else if ((0x1F801810 <= m_address) && (m_address < 0x1f801818))
-	{
-		// PSX GPU Dummy Write
+		break;
+
+		case 0x1F802000 ... 0x1F803FFF:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: GPU Registers memory write! Returning 0...\n" NORMAL);
+			printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
 #endif
-	}
-	// PSX Expansion 2
-	else if ((0x1F802000 <= m_address) && (m_address < 0x1F804000))
-	{
+			break;
+
+		case 0x1FC00000 ... 0x1FC7FFFF:
+			m_return = m_interrupts_write(m_address, m_value, m_simplestation);
+			break;
+
+		case 0xFFFE0130:
 #ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
+			printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg , m_value);
 #endif
-	}
-	// PSX Interrupts
-	else if ((0x1FC00000 <= m_address) && (m_address < 0x1FC80000))
-	{
-		m_return = m_interrupts_write(m_address, m_value, m_simplestation);
-	}
-	// PSX Cache Control Register
-	else if (m_address == 0xFFFE0130)
-	{
-#ifdef DEBUG_MEMORY
-		printf(YELLOW "[MEM] write: Cache Control Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg , m_value);
-#endif
-		m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
-		m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
-	}
-	else
-	{
-		printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
-		printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-		m_return = m_simplestation_exit(m_simplestation, 1);
+			m_simplestation->m_memory->m_memory_cache_control_reg = m_value;
+			m_return = m_simplestation->m_memory->m_memory_cache_control_reg;
+			break;
+
+		default:
+			printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
+			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
+			m_return = m_simplestation_exit(m_simplestation, 1);
+			break;
 	}
 
 	return m_return;
