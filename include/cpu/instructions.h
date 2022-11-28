@@ -175,6 +175,9 @@ void m_lb(m_simplestation_state *m_simplestation);
 // 0x21
 void m_lh(m_simplestation_state *m_simplestation);
 
+// 0x22
+void m_lwl(m_simplestation_state *m_simplestation);
+
 // 0x23
 void m_lw(m_simplestation_state *m_simplestation);
 
@@ -183,6 +186,9 @@ void m_lbu(m_simplestation_state *m_simplestation);
 
 // 0x25
 void m_lhu(m_simplestation_state *m_simplestation);
+
+// 0x26
+void m_lwr(m_simplestation_state *m_simplestation);
 
 // 0x28
 void m_sb(m_simplestation_state *m_simplestation);

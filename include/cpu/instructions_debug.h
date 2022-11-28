@@ -182,6 +182,9 @@ void p_lb(m_simplestation_state *m_simplestation);
 // 0x21
 void p_lh(m_simplestation_state *m_simplestation);
 
+// 0x22
+void p_lwl(m_simplestation_state *m_simplestation);
+
 // 0x23
 void p_lw(m_simplestation_state *m_simplestation);
 
@@ -190,6 +193,9 @@ void p_lbu(m_simplestation_state *m_simplestation);
 
 // 0x25
 void p_lhu(m_simplestation_state *m_simplestation);
+
+// 0x26
+void p_lwr(m_simplestation_state *m_simplestation);
 
 // 0x28
 void p_sb(m_simplestation_state *m_simplestation);

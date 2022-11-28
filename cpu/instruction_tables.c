@@ -5,7 +5,7 @@ const struct m_corewave_cw33300_instrs m_psx_instrs[0x3F] = {
 	{m_addi},	{m_addiu},	{m_slti},	{m_sltiu},	{m_andi},	{m_ori},	{m_xori},	{m_lui},
 	{m_cop0},	{m_cop1},	{m_cop2},	{m_cop3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
 	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
-	{m_lb},		{m_lh},		{ILLEGAL},	{m_lw},		{m_lbu},	{m_lhu},	{ILLEGAL},	{ILLEGAL},
+	{m_lb},		{m_lh},		{m_lwl},	{m_lw},		{m_lbu},	{m_lhu},	{m_lwr},	{ILLEGAL},
 	{m_sb},		{m_sh},		{m_swl},	{m_sw},		{ILLEGAL},	{ILLEGAL},	{m_swr},	{ILLEGAL},
 	{m_lwc0},	{m_lwc1},	{m_lwc2},	{m_lwc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
 	{m_swc0},	{m_swc1},	{m_swc2},	{m_swc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL}

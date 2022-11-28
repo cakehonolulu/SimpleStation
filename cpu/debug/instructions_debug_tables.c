@@ -5,7 +5,7 @@ const struct m_opc_names m_psx_instrs_opcodes[0x3F] = {
 	{p_addi},	{p_addiu},	{p_slti},	{p_sltiu},	{p_andi},	{p_ori},	{p_xori},	{p_lui},
 	{p_cop0},	{p_cop1},	{p_cop2},	{p_cop3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
 	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
-	{p_lb},		{p_lh},		{ILLEGAL},	{p_lw},		{p_lbu},	{p_lhu},	{ILLEGAL},	{ILLEGAL},
+	{p_lb},		{p_lh},		{p_lwl},	{p_lw},		{p_lbu},	{p_lhu},	{p_lwr},	{ILLEGAL},
 	{p_sb},		{p_sh},		{p_swl},	{p_sw},		{ILLEGAL},	{ILLEGAL},	{p_swr},	{ILLEGAL},
 	{p_lwc0},	{p_lwc1},	{p_lwc2},	{p_lwc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL},
 	{p_swc0},	{p_swc1},	{p_swc2},	{p_swc3},	{ILLEGAL},	{ILLEGAL},	{ILLEGAL}

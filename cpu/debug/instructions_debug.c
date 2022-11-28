@@ -309,6 +309,11 @@ void p_lh(m_simplestation_state *m_simplestation)
 	printf("lh $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 }
 
+void p_lwl(m_simplestation_state *m_simplestation)
+{
+	printf("lwl $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+}
+
 void p_lw(m_simplestation_state *m_simplestation)
 {
 	printf("lw $%s, 0x%x($%x)\n", m_cpu_regnames[REGIDX_T], IMMDT, REGIDX_S);
@@ -322,6 +327,11 @@ void p_lbu(m_simplestation_state *m_simplestation)
 void p_lhu(m_simplestation_state *m_simplestation)
 {
 	printf("lhu $%s, %04X($%s)\n", m_cpu_regnames[REGIDX_T], (uint16_t) (SIMMDT & 0x0000FFFF), m_cpu_regnames[REGIDX_S]);
+}
+
+void p_lwr(m_simplestation_state *m_simplestation)
+{
+	printf("lwr $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 }
 
 void p_sb(m_simplestation_state *m_simplestation)

@@ -1110,6 +1110,79 @@ void m_lh(m_simplestation_state *m_simplestation)
 	m_cpu_load_delay_enqueue_dword(REGIDX_T, ((uint32_t) value), m_simplestation);
 }
 
+/*
+	LWL (MIPS I)
+
+	Format:
+	LWL rt, offset(base)
+
+	Description:
+	The 16-bit signed offset is added to the contents of GPR base to form an effective address
+	(EffAddr). EffAddr is the address of the most-significant of four consecutive bytes
+	forming a word in memory (W) starting at an arbitrary byte boundary. A part of W, the
+	most-significant one to four bytes, is in the aligned word containing EffAddr. This part
+	of W is loaded into the most-significant (left) part of the word in GPR rt. The remaining
+	least-significant part of the word in GPR rt is unchanged.
+	If GPR rt is a 64-bit register, the destination word is the low-order word of the register.
+	The loaded value is treated as a signed value; the word sign bit (bit 31) is always loaded
+	from memory and the new sign bit value is copied into bits 63..32.
+
+	The figure above illustrates this operation for big-endian byte ordering for 32-bit and
+	64-bit registers. The four consecutive bytes in 2..5 form an unaligned word starting at
+	location 2. A part of W, two bytes, is in the aligned word containing the most-
+	significant byte at 2. First, LWL loads these two bytes into the left part of the
+	destination register word and leaves the right part of the destination word unchanged.
+	Next, the complementary LWR loads the remainder of the unaligned word.
+	The bytes loaded from memory to the destination register depend on both the offset of
+	the effective address within an aligned word, i.e. the low two bits of the address
+	(vAddr1..0), and the current byte ordering mode of the processor (big- or little-endian).
+	The table below shows the bytes loaded for every combination of offset and byte
+	ordering.
+
+	The unaligned loads, LWL and LWR, are exceptions to the load-delay scheduling
+	restriction in the MIPS I architecture. An unaligned load instruction to GPR rt that
+	immediately follows another load to GPR rt can “read” the loaded data. It will
+	correctly merge the 1 to 4 loaded bytes with the data loaded by the previous
+	instruction.
+*/
+void m_lwl(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwl $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
+
+	uint32_t m_aligned = m_addr & !3;
+
+	uint32_t m_dword = m_memory_read(m_aligned, dword, m_simplestation);
+
+	uint32_t m_val;
+
+	switch (m_addr & 3)
+	{
+		case 0:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00FFFFFF) | (m_dword << 24)), dword, m_simplestation);
+			break;
+		
+		case 1:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0x0000FFFF) | (m_dword << 16)), dword, m_simplestation);
+			break;
+		
+		case 2:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0x000000FF) | (m_dword << 8)), dword, m_simplestation);
+			break;
+		
+		case 3:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0)), dword, m_simplestation);
+			break;
+
+		default:
+			__builtin_unreachable();
+	}
+
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, m_val, m_simplestation);
+}
 
 /*
 	LW (MIPS I)
@@ -1177,6 +1250,68 @@ void m_lhu(m_simplestation_state *m_simplestation)
 	uint16_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), word, m_simplestation);
 
 	m_cpu_load_delay_enqueue_word(REGIDX_T, value, m_simplestation);
+}
+
+/*
+	LWR (MIPS I)
+
+	Format:
+	LWR rt, offset(base)
+
+	Description:
+	The figure above illustrates this operation for big-endian byte ordering for 32-bit and
+	64-bit registers. The four consecutive bytes in 2..5 form an unaligned word starting at
+	location 2. A part of W, two bytes, is in the aligned word containing the least-significant
+	byte at 5. First, LWR loads these two bytes into the right part of the destination register.
+	Next, the complementary LWL loads the remainder of the unaligned word.
+	The bytes loaded from memory to the destination register depend on both the offset of
+	the effective address within an aligned word, i.e. the low two bits of the address
+	(vAddr1..0), and the current byte ordering mode of the processor (big- or little-endian).
+	The table below shows the bytes loaded for every combination of offset and byte
+	ordering.
+
+	The unaligned loads, LWL and LWR, are exceptions to the load-delay scheduling
+	restriction in the MIPS I architecture. An unaligned load to GPR rt that immediately
+	follows another load to GPR rt can “read” the loaded data. It will correctly merge the
+	1 to 4 loaded bytes with the data loaded by the previous instruction.
+*/
+void m_lwr(m_simplestation_state *m_simplestation)
+{
+#ifdef DEBUG_INSTRUCTIONS
+	printf("lwr $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
+#endif
+
+	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
+
+	uint32_t m_aligned = m_addr & !3;
+
+	uint32_t m_dword = m_memory_read(m_aligned, dword, m_simplestation);
+
+	uint32_t m_val;
+
+	switch (m_addr & 3)
+	{
+		case 0:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0)), dword, m_simplestation);
+			break;
+		
+		case 1:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFF000000) | (m_dword << 8)), dword, m_simplestation);
+			break;
+		
+		case 2:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFFFF0000) | (m_dword << 16)), dword, m_simplestation);
+			break;
+		
+		case 3:
+			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFFFFFF00) | (m_dword << 24)), dword, m_simplestation);
+			break;
+
+		default:
+			__builtin_unreachable();
+	}
+	
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, m_val, m_simplestation);
 }
 
 /*
