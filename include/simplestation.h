@@ -90,6 +90,16 @@ typedef struct m_cpu_ints
 typedef struct m_mem_dma
 {	
 	uint32_t m_control_reg;
+
+	bool m_irq_enable;
+
+	uint8_t m_irq_channel_enable;
+
+	uint8_t m_irq_channel_flags;
+
+	bool m_irq_force;
+	
+	uint8_t m_irq_dummy;
 } m_psx_dma_t;
 
 typedef struct m_psx_memory
