@@ -17,16 +17,19 @@
 
 ## 🖥️ Specs
 #### Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
-- [ ] 39 out of 68 instructions implemented (57%~)
-    - MIPS R3000 Coprocessor 0 _in-the-works_
-    - Instructions pipelining
+- [✅] 69 out of 69 instructions implemented (100%)
+    - Extended and Branch Opcodes
+    - MIPS Coprocessor 0 (28 out of 28 instructions implemented)
+    - MIPS Instruction Pipeline Emulation
+- [ ] Sony Coprocessor 2 (GTE, Geometry Transformation Engine) _in-the-works_
 #### MIPS R3000 Disassembler
 * Currently works on PSX's BIOS
-#### Common Memory Bus
+#### Memory Bus
 * Byte, Word, Double Word MMU Read/Write Handling
 * Unaligned memory access handling
-* Memory loads pipelining
-
+* Memory loads pipeline emulation
+#### DMA Bus
+* DMA subsystem _in the works_
 
 ## 👷🏼‍♂️ Roadmap
 * MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
