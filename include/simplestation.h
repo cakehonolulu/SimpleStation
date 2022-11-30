@@ -126,6 +126,8 @@ typedef struct m_mem_dma_channel
 	uint8_t m_dummy;
 
 	uint32_t m_base;
+	uint16_t m_block_size;
+	uint16_t m_block_count;
 } m_psx_dma_channel_t;
 
 typedef struct m_mem_dma

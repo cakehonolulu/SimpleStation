@@ -85,3 +85,15 @@ void m_channel_set_base(m_simplestation_state *m_simplestation, uint32_t m_value
 {
     m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_base = (m_value & 0xFFFFFF);
 }
+
+uint32_t m_channel_get_block_control(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    return (((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size) << 16)
+            | ((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size);
+}
+
+void m_channel_set_block_control(m_simplestation_state *m_simplestation, uint32_t m_value, uint8_t m_id)
+{
+    m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size = (uint16_t) (m_value);
+    m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_count = (uint16_t) (m_value >> 16);
+}
