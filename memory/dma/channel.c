@@ -97,3 +97,19 @@ void m_channel_set_block_control(m_simplestation_state *m_simplestation, uint32_
     m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size = (uint16_t) (m_value);
     m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_count = (uint16_t) (m_value >> 16);
 }
+
+bool m_channel_get_active(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    bool m_trigger;
+
+    if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size == manual)
+    {
+        m_trigger = m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_trigger;
+    }
+    else
+    {
+        m_trigger = true;
+    }
+
+    return m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_enabled && m_trigger;
+}
