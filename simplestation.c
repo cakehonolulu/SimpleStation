@@ -90,6 +90,14 @@ int main(int argc, char **argv)
 		}
 #endif
 
+		m_simplestation.m_dma_state = OFF;
+
+		m_simplestation.m_memory_state = OFF;
+
+		m_simplestation.m_interrupts_state = OFF;
+
+		m_simplestation.m_cpu_state = OFF;
+
 		// Check if BIOS file is specified
 		if (m_biosname)
 		{
@@ -140,8 +148,6 @@ int main(int argc, char **argv)
 
 uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal)
 {
-	m_printregs(m_simplestation);
-	
 	if (m_simplestation->m_dma_state)
 	{
 		m_dma_exit(m_simplestation);
@@ -159,6 +165,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 
 	if (m_simplestation->m_cpu_state)
 	{
+		m_printregs(m_simplestation);
 		m_cpu_exit(m_simplestation);
 	}
 
