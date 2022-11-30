@@ -108,6 +108,12 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     m_simplestation_exit(m_simplestation, 1);
                     break;
             }
+
+            if (m_channel_get_active(m_simplestation, m_major))
+            {
+                m_dma_run(m_simplestation, m_major);
+            }
+
             break;
         
         case 7:
@@ -125,11 +131,6 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
                     m_simplestation_exit(m_simplestation, 1);
                     break;
-            }
-
-            if (m_channel_get_active(m_simplestation, m_major))
-            {
-                m_dma_run(m_simplestation, m_major);
             }
 
             break;

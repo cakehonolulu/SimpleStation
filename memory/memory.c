@@ -245,18 +245,19 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 					break;
 
 				case dword:
-					switch(m_address)
-					{
-						case 0x1F801810:
-							m_return = 0;
-							break;
-						
-						case 0x1F801814:
-							m_return = 0x10000000;
+					switch(m_address & 0x0000000F)
+					{						
+						case 4:
+#ifdef DEBUG_MEMORY
+							printf(CYAN "[MEM] read: GPUSTAT Read..\n" NORMAL);
+#endif
+
+							m_return = 0x1C000000;
 							break;
 
 						default:
-							__builtin_unreachable();
+							m_return = 0;
+							break;
 					}
 					break;
 
