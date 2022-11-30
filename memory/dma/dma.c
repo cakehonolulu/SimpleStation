@@ -180,10 +180,12 @@ void m_dma_run(m_simplestation_state *m_simplestation, uint8_t m_id)
     switch(m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_sync)
     {
         case linked_list:
+            printf(YELLOW "[dma] run: Running DMA on channel %d (" MAGENTA "Linked List" YELLOW " approach)...\n" NORMAL, m_id);
             m_dma_run_linked_list(m_simplestation, m_id);
             break;
 
         default:
+            printf(YELLOW "[dma] run: Running DMA on channel %d (" CYAN "Block" YELLOW " approach)...\n" NORMAL, m_id);
             m_dma_run_block(m_simplestation, m_id);
             break;
     }
@@ -217,7 +219,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
         switch (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_direction)
         {
             case to_ram:
-                
+
                 switch(m_id)
                 {
                     case 6:
@@ -301,7 +303,7 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
         {
             m_address = (m_address + 4) & 0x1FFFFC;
             m_command = m_memory_read(m_address, dword, m_simplestation);
-            printf(BLUE "[dma] run_linked_list: Command 0x%08X\n" NORMAL, m_command);
+            printf(CYAN "[dma] run_linked_list: Command 0x%08X\n" NORMAL, m_command);
             m_size--;
         }
 
