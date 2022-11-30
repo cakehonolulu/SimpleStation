@@ -102,7 +102,7 @@ bool m_channel_get_active(m_simplestation_state *m_simplestation, uint8_t m_id)
 {
     bool m_trigger;
 
-    if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size == manual)
+    if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_sync == manual)
     {
         m_trigger = m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_trigger;
     }
