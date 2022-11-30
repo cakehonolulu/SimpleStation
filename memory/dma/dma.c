@@ -126,6 +126,12 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     m_simplestation_exit(m_simplestation, 1);
                     break;
             }
+
+            if (m_channel_get_active(m_simplestation, m_major))
+            {
+                m_dma_run(m_simplestation, m_major);
+            }
+
             break;
 
         default:
@@ -166,6 +172,147 @@ uint32_t m_get_interrupt(m_simplestation_state *m_simplestation)
     m_interrupt |= ((uint32_t) m_irq(m_simplestation)) << 24;
     
     return m_interrupt;
+}
+
+void m_dma_run(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    switch(m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_sync)
+    {
+        case linked_list:
+            m_dma_run_linked_list(m_simplestation, m_id);
+            break;
+
+        default:
+            m_dma_run_block(m_simplestation, m_id);
+            break;
+    }
+}
+
+void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    int8_t m_increment = -4;
+    uint32_t m_address;
+    uint32_t m_current_address;
+    uint32_t m_size;
+    uint32_t m_source;
+
+    if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_step == increment)
+    {
+        m_increment = 4;
+    }
+
+    m_address = m_channel_get_base(m_simplestation, m_id);
+
+    if ((m_size = m_channel_get_transfer_size(m_simplestation, m_id) == 0))
+    {
+        printf(RED "[dma] run_block: Failed to find transfer size!\n" NORMAL);
+        m_simplestation_exit(m_simplestation, 1);
+    }
+
+    while (m_size > 0)
+    {
+        m_current_address = m_address & 0x1FFFFC;
+
+        switch (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_direction)
+        {
+            case to_ram:
+                
+                switch(m_id)
+                {
+                    case 6:
+
+                        switch(m_size)
+                        {
+                            case 1:
+                                m_source = 0xFFFFFF;
+                                break;
+
+                            default:
+                                m_source = (m_address - 4) & 0x1FFFFF;
+                                break;
+                        }
+                        break;
+
+                    default:
+                        printf(RED "[dma] run_block: Unimplemented channel block copy to RAM\n" NORMAL);
+                        m_simplestation_exit(m_simplestation, 1);
+                        break;
+                }
+
+                m_memory_write(m_current_address, m_source, dword, m_simplestation);          
+                break;
+
+            case from_ram:
+                m_source = m_memory_read(m_current_address, dword, m_simplestation);
+
+                switch(m_id)
+                {
+                    case 2:
+                        printf("[dma] run_block: GPU Data...\n");
+                        break;
+
+                    default:
+                        printf(RED "[dma] run_block: Unimplemented block copy from RAM\n" NORMAL);
+                        m_simplestation_exit(m_simplestation, 1);
+                        break;
+                }
+                
+                break;
+
+            default:
+                break;
+        }
+
+        m_address += m_increment;
+        m_size--;
+    }
+
+    m_channel_set_done(m_simplestation, m_id);
+}
+
+void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    uint32_t m_address = 0;
+    uint32_t m_header = 0;
+    uint32_t m_size = 0;
+    uint32_t m_command = 0;
+
+    if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_direction == to_ram)
+    {
+        printf(RED "[dma] run_linked_list: Invalid direction!\n");
+        m_simplestation_exit(m_simplestation, 1);
+    }
+
+    if (m_id != 2)
+    {
+        printf(RED "[dma] run_linked_list: Invalid channel!\n");
+        m_simplestation_exit(m_simplestation, 1);
+    }
+
+    m_address = m_channel_get_base(m_simplestation, m_id) & 0x1FFFFC;
+
+    while (1)
+    {
+        m_header = m_memory_read(m_address, dword, m_simplestation);
+        m_size = m_header >> 24;
+
+        while (m_size > 0)
+        {
+            m_address = (m_address + 4) & 0x1FFFFC;
+            m_command = m_memory_read(m_address, dword, m_simplestation);
+            printf(BLUE "[dma] run_linked_list: Command 0x%08X\n" NORMAL, m_command);
+            m_size--;
+        }
+
+        if ((m_header & 0x800000) != 0)
+        {
+            break;
+        }
+
+        m_address = m_header & 0x1FFFFC;
+    }
+
+    m_channel_set_done(m_simplestation, m_id);
 }
 
 void m_dma_exit(m_simplestation_state *m_simplestation)

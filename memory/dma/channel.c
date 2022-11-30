@@ -113,3 +113,32 @@ bool m_channel_get_active(m_simplestation_state *m_simplestation, uint8_t m_id)
 
     return m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_enabled && m_trigger;
 }
+
+void m_channel_set_done(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_enabled = false;
+    m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_trigger = false;
+}
+
+uint32_t m_channel_get_transfer_size(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    size_t m_size = 0;
+
+    switch (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_sync)
+    {
+        case manual:
+            m_size = ((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size);
+            break;
+        
+        case request:
+            m_size = ((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size)
+                     * ((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_count);
+            break;
+        
+        default:
+            printf("[dma] channel: Unknown transfer size\n");
+            break;
+    }
+
+    return m_size;
+}
