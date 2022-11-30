@@ -206,7 +206,9 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 
     m_address = m_channel_get_base(m_simplestation, m_id);
 
-    if ((m_size = m_channel_get_transfer_size(m_simplestation, m_id) == 0))
+    m_size = m_channel_get_transfer_size(m_simplestation, m_id);
+
+    if (m_size == 0)
     {
         printf(RED "[dma] run_block: Failed to find transfer size!\n" NORMAL);
         m_simplestation_exit(m_simplestation, 1);
@@ -251,7 +253,9 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                 switch(m_id)
                 {
                     case 2:
-                        printf("[dma] run_block: GPU Data...\n");
+#ifdef DEBUG_DMA
+                        printf(CYAN "[dma] run_block: GPU Data Command 0x%08X\n" NORMAL, m_source);
+#endif
                         break;
 
                     default:
@@ -303,7 +307,6 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
         {
             m_address = (m_address + 4) & 0x1FFFFC;
             m_command = m_memory_read(m_address, dword, m_simplestation);
-            printf(CYAN "[dma] run_linked_list: Command 0x%08X\n" NORMAL, m_command);
             m_size--;
         }
 
