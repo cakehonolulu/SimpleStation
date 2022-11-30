@@ -16,45 +16,9 @@ void m_dma_init(m_simplestation_state *m_simplestation)
 	
 	m_simplestation->m_memory->m_dma->m_irq_dummy = 0;
 
+    m_channels_init(m_simplestation);
+
 	m_simplestation->m_dma_state = ON;
-}
-
-void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    uint8_t m_major = (m_addr & 0x70) >> 4;
-    uint8_t m_minor = (m_addr & 0xF);
-
-    switch (m_major)
-    {
-        case 0 ... 6:
-            printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
-            m_simplestation_exit(m_simplestation, 1);
-            break;
-        
-        case 7:
-            switch (m_minor)
-            {
-                case 0:
-                    m_simplestation->m_memory->m_dma->m_control_reg = m_value;
-                    break;
-
-                case 4:
-                    m_set_interrupt(m_value, m_simplestation);
-                    break;
-                
-                default:
-                    printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
-                    m_simplestation_exit(m_simplestation, 1);
-                    break;
-            }
-            break;
-
-        default:
-            printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
-            m_simplestation_exit(m_simplestation, 1);
-            break;
-    }
-
 }
 
 uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
@@ -67,8 +31,18 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
     switch (m_major)
     {
         case 0 ... 6:
-            printf(RED "[MEM] dma_read: Unhandled read! (@ 0x%08X)\n" NORMAL, m_addr);
-            m_value = m_simplestation_exit(m_simplestation, 1);
+            
+            switch(m_minor)
+            {
+                case 8:
+                    m_value = m_channel_get_control(m_simplestation, m_major);
+                    break;
+
+                default:
+                    printf(RED "[MEM] dma_read: Unhandled read! (@ 0x%08X)\n" NORMAL, m_addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
             break;
 
         case 7:
@@ -96,6 +70,54 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
     }
 
     return m_value;
+}
+
+void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    uint8_t m_major = (m_addr & 0x70) >> 4;
+    uint8_t m_minor = (m_addr & 0xF);
+
+    switch (m_major)
+    {
+        case 0 ... 6:
+
+            switch(m_minor)
+            {
+                case 8:
+                    m_channel_set_control(m_simplestation, m_value, m_major);
+                    break;
+
+                default:
+                    printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
+            break;
+        
+        case 7:
+            switch (m_minor)
+            {
+                case 0:
+                    m_simplestation->m_memory->m_dma->m_control_reg = m_value;
+                    break;
+
+                case 4:
+                    m_set_interrupt(m_value, m_simplestation);
+                    break;
+                
+                default:
+                    printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
+            break;
+
+        default:
+            printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
+
 }
 
 void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)

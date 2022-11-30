@@ -87,6 +87,45 @@ typedef struct m_cpu_ints
 	uint32_t m_interrupt_mask;
 } m_psx_cpu_ints_t;
 
+typedef enum {
+	to_ram = 0,
+	from_ram = 1
+} m_dma_directions;
+
+typedef enum {
+	increment = 0,
+	decrement = 1
+} m_dma_step;
+
+typedef enum {
+	manual = 0,
+	request = 1,
+	linked_list = 2
+} m_dma_sync;
+
+typedef enum {
+	mdec_in = 0,
+	mdec_out = 1,
+	gpu = 2,
+	cdrom = 3,
+	spu = 4,
+	pio = 5,
+	otc = 6
+} m_dma_ports;
+
+typedef struct m_mem_dma_channel
+{
+	bool m_enabled;
+	m_dma_directions m_direction;
+	m_dma_step m_step;
+	m_dma_sync m_sync;
+	bool m_trigger;
+	bool m_chop;
+	uint8_t m_chop_dma_size;
+	uint8_t m_chop_cpu_size;
+	uint8_t m_dummy;
+} m_psx_dma_channel_t;
+
 typedef struct m_mem_dma
 {	
 	uint32_t m_control_reg;
@@ -100,6 +139,8 @@ typedef struct m_mem_dma
 	bool m_irq_force;
 	
 	uint8_t m_irq_dummy;
+
+	m_psx_dma_channel_t m_dma_channels[7];
 } m_psx_dma_t;
 
 typedef struct m_psx_memory

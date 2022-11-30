@@ -2,6 +2,7 @@
 #define DMA_H
 
 #include <simplestation.h>
+#include <memory/dma/channel.h>
 #include <ui/termcolour.h>
 #include <stdlib.h>
 #include <stdio.h>
