@@ -2,7 +2,7 @@
 #define MEMORY_H
 
 #include <simplestation.h>
-#include <memory/dma.h>
+#include <memory/dma/dma.h>
 #include <stdint.h>
 
 // Main EDO RAM Size on Sony's PSX (2 MiB) 

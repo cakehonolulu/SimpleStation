@@ -1,4 +1,4 @@
-#include <memory/dma.h>
+#include <memory/dma/dma.h>
 
 void m_dma_init(m_simplestation_state *m_simplestation)
 {
