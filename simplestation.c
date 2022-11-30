@@ -142,6 +142,11 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 {
 	m_printregs(m_simplestation);
 	
+	if (m_simplestation->m_dma_state)
+	{
+		m_dma_exit(m_simplestation);
+	}
+
 	if (m_simplestation->m_memory_state)
 	{
 		m_memory_exit(m_simplestation);

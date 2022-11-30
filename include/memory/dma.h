@@ -17,4 +17,6 @@ void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation);
 bool m_irq(m_simplestation_state *m_simplestation);
 uint32_t m_get_interrupt(m_simplestation_state *m_simplestation);
 
+void m_dma_exit(m_simplestation_state *m_simplestation);
+
 #endif /* DMA_H */

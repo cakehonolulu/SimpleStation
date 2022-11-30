@@ -129,3 +129,12 @@ uint32_t m_get_interrupt(m_simplestation_state *m_simplestation)
     
     return m_interrupt;
 }
+
+void m_dma_exit(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_memory->m_dma)
+	{
+		// Free the DMA Buffer
+		free(m_simplestation->m_memory->m_dma);
+	}
+}
