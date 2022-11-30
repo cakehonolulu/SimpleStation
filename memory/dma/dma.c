@@ -26,7 +26,7 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
     uint8_t m_major = (m_addr & 0x70) >> 4;
     uint8_t m_minor = (m_addr & 0xF);
 
-    uint32_t m_value;
+    uint32_t m_value = 0;
 
     switch (m_major)
     {
@@ -83,6 +83,10 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
 
             switch(m_minor)
             {
+                case 0:
+                    m_channel_set_base(m_simplestation, m_value, m_major);
+                    break;
+
                 case 8:
                     m_channel_set_control(m_simplestation, m_value, m_major);
                     break;

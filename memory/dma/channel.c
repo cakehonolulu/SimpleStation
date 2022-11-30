@@ -75,3 +75,13 @@ void m_channel_set_control(m_simplestation_state *m_simplestation, uint32_t m_va
 
     m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_dummy = (uint8_t) ((m_value >> 29) & 3);
 }
+
+uint32_t m_channel_get_base(m_simplestation_state *m_simplestation, uint8_t m_id)
+{
+    return m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_base;
+}
+
+void m_channel_set_base(m_simplestation_state *m_simplestation, uint32_t m_value, uint8_t m_id)
+{
+    m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_base = (m_value & 0xFFFFFF);
+}
