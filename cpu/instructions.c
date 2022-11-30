@@ -1162,19 +1162,19 @@ void m_lwl(m_simplestation_state *m_simplestation)
 	switch (m_addr & 3)
 	{
 		case 0:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00FFFFFF) | (m_dword << 24)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0x00FFFFFF) | (m_dword << 24));
 			break;
 		
 		case 1:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0x0000FFFF) | (m_dword << 16)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0x0000FFFF) | (m_dword << 16));
 			break;
 		
 		case 2:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0x000000FF) | (m_dword << 8)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0x000000FF) | (m_dword << 8));
 			break;
 		
 		case 3:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0));
 			break;
 
 		default:
@@ -1292,19 +1292,19 @@ void m_lwr(m_simplestation_state *m_simplestation)
 	switch (m_addr & 3)
 	{
 		case 0:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0));
 			break;
 		
 		case 1:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFF000000) | (m_dword << 8)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0xFF000000) | (m_dword << 8));
 			break;
 		
 		case 2:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFFFF0000) | (m_dword << 16)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0xFFFF0000) | (m_dword << 16));
 			break;
 		
 		case 3:
-			m_val = m_memory_read(((REGS[REGIDX_T] & 0xFFFFFF00) | (m_dword << 24)), dword, m_simplestation);
+			m_val = ((REGS[REGIDX_T] & 0xFFFFFF00) | (m_dword << 24));
 			break;
 
 		default:
