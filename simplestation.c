@@ -2,6 +2,7 @@
 #include <cpu/cpu.h>
 #include <cpu/bios.h>
 #include <cpu/interrupts.h>
+#include <gpu/gpu.h>
 #include <memory/memory.h>
 #include <ui/termcolour.h>
 
@@ -98,6 +99,8 @@ int main(int argc, char **argv)
 
 		m_simplestation.m_cpu_state = OFF;
 
+		m_simplestation.m_gpu_state = OFF;
+
 		// Check if BIOS file is specified
 		if (m_biosname)
 		{
@@ -113,10 +116,18 @@ int main(int argc, char **argv)
 						// Initialize the Interrupts Subsystem
 						m_interrupts_init(&m_simplestation);
 
-						while (true)
+						if (m_gpu_init(&m_simplestation) == 0)
 						{
-							// Fetch, decode, execute
-							m_cpu_fde(&m_simplestation);
+							while (true)
+							{
+								// Fetch, decode, execute
+								m_cpu_fde(&m_simplestation);
+							}
+						}
+						else
+						{
+							// If GPU couldn't be initialized, exit out
+							m_simplestation_exit(&m_simplestation, 1);
 						}
 					}
 					else
@@ -151,6 +162,11 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	if (m_simplestation->m_dma_state)
 	{
 		m_dma_exit(m_simplestation);
+	}
+	
+	if (m_simplestation->m_gpu_state)
+	{
+		m_gpu_exit(m_simplestation);
 	}
 
 	if (m_simplestation->m_memory_state)

@@ -169,6 +169,70 @@ typedef struct m_psx_memory
 
 } m_psx_memory_t;
 
+
+typedef enum
+{
+    t4bit = 0,
+    t8bit = 1,
+    t15bit = 2
+} texture_depth;
+
+typedef enum
+{
+    top = 1,
+    bottom = 0
+} field;
+
+typedef enum
+{
+    y240lines = 0,
+    y480lines = 1
+} vertical_res;
+
+typedef enum
+{
+    ntsc = 0,
+    pal = 1
+} video_mode;
+
+typedef enum
+{
+    d15bits = 0,
+    d24bits = 1
+} display_depth;
+
+typedef enum
+{
+    off = 0,
+    fifo = 1,
+    cpu_to_gp0 = 2,
+    vram_to_cpu = 3
+} dma_direction;
+
+typedef struct m_gpu
+{
+	uint8_t m_page_base_x;
+	uint8_t m_page_base_y;
+
+	uint8_t m_semitransparency;
+    texture_depth m_texture_depth;
+    bool m_dithering;
+    bool m_draw_to_display;
+    bool m_force_set_mask_bit;
+    bool m_preserve_masked_pixels;
+    field m_field;
+    bool m_texture_disable;
+    uint8_t m_horizontal_resolution;
+    vertical_res m_vertical_resolution;
+    video_mode m_video_mode;
+    display_depth m_display_depth;
+    bool m_interlaced;
+    bool m_display_disabled;
+    bool m_interrupt;
+    dma_direction m_dma_direction;
+
+} m_psx_gpu_t;
+
 /* Structures */
 typedef struct
 {
@@ -183,10 +247,13 @@ typedef struct
 
 	m_psx_cpu_ints_t *m_cpu_ints;
 
+	m_psx_gpu_t *m_gpu;
+
 	bool m_memory_state;
 	bool m_dma_state;
 	bool m_interrupts_state;
 	bool m_cpu_state;
+	bool m_gpu_state;
 
 	uint32_t m_breakpoint;
 	uint32_t m_wp;
