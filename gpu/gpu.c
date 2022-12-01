@@ -37,7 +37,7 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_preserve_masked_pixels) << 12;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_field) << 13;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_texture_disable) << 15;
-    m_status |= ((uint32_t) m_simplestation->m_gpu->m_horizontal_resolution) << 16;
+    m_status |= m_gpu_get_into_status(m_simplestation);
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_vertical_resolution) << 19;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_video_mode) << 20;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_display_depth) << 21;
@@ -84,6 +84,11 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     }
 
     return m_status;
+}
+
+uint32_t m_gpu_get_into_status(m_simplestation_state *m_simplestation)
+{
+    return (((uint32_t) m_simplestation->m_gpu->m_horizontal_resolution) << 16);
 }
 
 uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
