@@ -231,6 +231,8 @@ typedef struct m_gpu
     bool m_interrupt;
     dma_direction m_dma_direction;
 
+	bool m_rectangle_texture_x_flip;
+	bool m_rectangle_texture_y_flip;
 } m_psx_gpu_t;
 
 /* Structures */

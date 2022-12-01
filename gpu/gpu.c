@@ -103,12 +103,48 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     switch (m_opcode)
     {
+        case 0xE1:
+            m_gpu_set_draw_mode(m_value, m_simplestation);
+            break;
 
         default:
             printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
             m_simplestation_exit(m_simplestation, 1);
             break;
     }
+}
+
+void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_page_base_x = ((uint8_t) (m_value & 0xF));
+    m_simplestation->m_gpu->m_page_base_y = ((uint8_t) ((m_value >> 4) & 1));
+    m_simplestation->m_gpu->m_semitransparency = ((uint8_t) ((m_value >> 5) & 3));
+
+    switch ((m_value >> 7) & 3)
+    {
+        case 0:
+            m_simplestation->m_gpu->m_texture_depth = t4bit;
+            break;
+
+        case 1:
+            m_simplestation->m_gpu->m_texture_depth = t8bit;
+            break;
+
+        case 2:
+            m_simplestation->m_gpu->m_texture_depth = t15bit;
+            break;
+
+        default:
+            printf(RED "[GPU] set_draw_mode: Unknown texture depth value!\n" NORMAL);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
+
+    m_simplestation->m_gpu->m_dithering = (((m_value >> 9) & 1) != 0);
+    m_simplestation->m_gpu->m_draw_to_display = (((m_value >> 10) & 1) != 0);
+    m_simplestation->m_gpu->m_texture_disable = (((m_value >> 11) & 1) != 0);
+    m_simplestation->m_gpu->m_rectangle_texture_x_flip = (((m_value >> 12) & 1) != 0);
+    m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_value >> 13) & 1) != 0);
 }
 
 void m_gpu_exit(m_simplestation_state *m_simplestation)
