@@ -231,38 +231,21 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: GPU Registers read!\n" NORMAL);
 #endif
-			switch (m_size)
-			{
-				case byte:
-					printf(RED "[MEM] read: Unhandled GPU Registers Byte Read..\n" NORMAL);
-					m_simplestation_exit(m_simplestation, 1);
-					break;
-
-				case word:
-					printf(RED "[MEM] read: Unhandled GPU Registers Word Read..\n" NORMAL);
-					m_simplestation_exit(m_simplestation, 1);
-					break;
-
-				case dword:
-					switch(m_address & 0x0000000F)
-					{						
-						case 4:
+			switch(m_address & 0x0000000F)
+			{						
+				case 4:
 #ifdef DEBUG_MEMORY
-							printf(CYAN "[MEM] read: GPUSTAT Read..\n" NORMAL);
+					printf(CYAN "[MEM] read: GPUSTAT Read..\n" NORMAL);
 #endif
-
-							m_return = 0x1C000000;
-							break;
-
-						default:
-							m_return = 0;
-							break;
-					}
+					m_return = 0x1C000000;
 					break;
 
 				default:
-					__builtin_unreachable();
+					printf(RED "[MEM] read: Unhandled GPU Read (Offset 0x%02X)!\n" NORMAL, (m_address & 0x0000000F));
+					m_simplestation_exit(m_simplestation, 1);
+					break;
 			}
+
 			break;
 
 		case 0x1F801C00 ... 0x1F801FFF:
