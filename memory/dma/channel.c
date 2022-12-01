@@ -62,7 +62,7 @@ void m_channel_set_control(m_simplestation_state *m_simplestation, uint32_t m_va
             break;
 
         default:
-            printf(RED "[dma] Unknown DMA Sync Mode!\n" NORMAL);
+            printf(RED "[DMA] Unknown DMA Sync Mode!\n" NORMAL);
             m_simplestation_exit(m_simplestation, 1);
             break;
     }
@@ -136,7 +136,7 @@ uint32_t m_channel_get_transfer_size(m_simplestation_state *m_simplestation, uin
             break;
         
         default:
-            printf("[dma] channel: Unknown transfer size\n");
+            printf("[DMA] channel: Unknown transfer size\n");
             break;
     }
 

@@ -181,14 +181,14 @@ void m_dma_run(m_simplestation_state *m_simplestation, uint8_t m_id)
     {
         case linked_list:
 #ifdef DEBUG_DMA
-            printf(YELLOW "[dma] run: Running DMA on channel %d (" MAGENTA "Linked List" YELLOW " approach)...\n" NORMAL, m_id);
+            printf(YELLOW "[DMA] run: Running DMA on channel %d (" MAGENTA "Linked List" YELLOW " approach)...\n" NORMAL, m_id);
 #endif
             m_dma_run_linked_list(m_simplestation, m_id);
             break;
 
         default:
 #ifdef DEBUG_DMA
-            printf(YELLOW "[dma] run: Running DMA on channel %d (" CYAN "Block" YELLOW " approach)...\n" NORMAL, m_id);
+            printf(YELLOW "[DMA] run: Running DMA on channel %d (" CYAN "Block" YELLOW " approach)...\n" NORMAL, m_id);
 #endif
             m_dma_run_block(m_simplestation, m_id);
             break;
@@ -214,7 +214,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 
     if (m_size == 0)
     {
-        printf(RED "[dma] run_block: Failed to find transfer size!\n" NORMAL);
+        printf(RED "[DMA] run_block: Failed to find transfer size!\n" NORMAL);
         m_simplestation_exit(m_simplestation, 1);
     }
 
@@ -243,7 +243,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         break;
 
                     default:
-                        printf(RED "[dma] run_block: Unimplemented channel block copy to RAM\n" NORMAL);
+                        printf(RED "[DMA] run_block: Unimplemented channel block copy to RAM\n" NORMAL);
                         m_simplestation_exit(m_simplestation, 1);
                         break;
                 }
@@ -258,12 +258,12 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                 {
                     case 2:
 #ifdef DEBUG_DMA
-                        printf(CYAN "[dma] run_block: GPU Data Command 0x%08X\n" NORMAL, m_source);
+                        printf(CYAN "[DMA] run_block: GPU Data Command 0x%08X\n" NORMAL, m_source);
 #endif
                         break;
 
                     default:
-                        printf(RED "[dma] run_block: Unimplemented block copy from RAM\n" NORMAL);
+                        printf(RED "[DMA] run_block: Unimplemented block copy from RAM\n" NORMAL);
                         m_simplestation_exit(m_simplestation, 1);
                         break;
                 }
@@ -290,13 +290,13 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
 
     if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_direction == to_ram)
     {
-        printf(RED "[dma] run_linked_list: Invalid direction!\n");
+        printf(RED "[DMA] run_linked_list: Invalid direction!\n");
         m_simplestation_exit(m_simplestation, 1);
     }
 
     if (m_id != 2)
     {
-        printf(RED "[dma] run_linked_list: Invalid channel!\n");
+        printf(RED "[DMA] run_linked_list: Invalid channel!\n");
         m_simplestation_exit(m_simplestation, 1);
     }
 
@@ -311,11 +311,9 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
         {
             m_address = (m_address + 4) & 0x1FFFFC;
             m_command = m_memory_read(m_address, dword, m_simplestation);
-#ifdef DEBUG_DMA
-            printf("[dma] run_linked_list: Command 0x%08X\n", m_command);
-#else
+
             (void) m_command;
-#endif
+
             m_size--;
         }
 

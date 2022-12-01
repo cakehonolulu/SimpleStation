@@ -33,6 +33,9 @@ endif
 ifdef DEBUG_MEMORY
 CFLAGS += -DDEBUG_MEMORY
 endif
+ifdef DEBUG_DMA
+CFLAGS += -DDEBUG_DMA
+endif
 ifdef DBG
 CFLAGS += -g
 endif
