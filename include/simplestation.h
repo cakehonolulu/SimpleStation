@@ -233,6 +233,29 @@ typedef struct m_gpu
 
 	bool m_rectangle_texture_x_flip;
 	bool m_rectangle_texture_y_flip;
+
+	uint8_t m_texture_window_x_mask;
+	uint8_t m_texture_window_y_mask;
+	
+	uint8_t m_texture_window_x_offset;
+	uint8_t m_texture_window_y_offset;
+
+	uint16_t m_drawing_area_left;
+	uint16_t m_drawing_area_top;
+	uint16_t m_drawing_area_right;
+	uint16_t m_drawing_area_bottom;
+	
+	int16_t m_drawing_x_offset;
+	int16_t m_drawing_y_offset;
+
+	uint16_t m_display_vram_x_start;
+	uint16_t m_display_vram_y_start;
+	
+	uint16_t m_display_horizontal_start;
+	uint16_t m_display_horizontal_end;
+	uint16_t m_display_line_start;
+	uint16_t m_display_line_end;
+	
 } m_psx_gpu_t;
 
 /* Structures */

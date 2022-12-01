@@ -105,7 +105,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
     {
         case 0x00:
             break;
-            
+
         case 0xE1:
             m_gpu_set_draw_mode(m_value, m_simplestation);
             break;
@@ -116,6 +116,35 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             break;
     }
 }
+
+void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    uint32_t m_opcode = (m_value >> 24) & 0xFF;
+
+    switch (m_opcode)
+    {
+        case 0x00:
+            m_gpu_reset(m_value, m_simplestation);
+            break;
+
+        default:
+            printf(RED "[GPU] gp1: Unhandled GP1 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
+}
+
+void m_gpu_exit(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_gpu_state)
+    {
+        free(m_simplestation->m_gpu);
+    }
+
+    m_simplestation->m_gpu_state = OFF;
+}
+
+/* GP0 Commands */
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
@@ -150,12 +179,19 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
     m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_value >> 13) & 1) != 0);
 }
 
-void m_gpu_exit(m_simplestation_state *m_simplestation)
+/* GP1 Commands */
+void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_gpu_state)
-    {
-        free(m_simplestation->m_gpu);
-    }
+    m_value = (uint32_t) m_simplestation->m_gpu->m_field;
 
-    m_simplestation->m_gpu_state = OFF;
+    memset(m_simplestation->m_gpu, 0, sizeof(m_psx_gpu_t));
+
+    m_simplestation->m_gpu->m_field = m_value;
+
+    m_simplestation->m_gpu->m_interlaced = true;
+
+    m_simplestation->m_gpu->m_display_horizontal_start = 0x200;
+	m_simplestation->m_gpu->m_display_horizontal_end = 0xC00;
+	m_simplestation->m_gpu->m_display_line_start = 0x10;
+	m_simplestation->m_gpu->m_display_line_end = 0x100;
 }
