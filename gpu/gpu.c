@@ -103,6 +103,9 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     switch (m_opcode)
     {
+        case 0x00:
+            break;
+            
         case 0xE1:
             m_gpu_set_draw_mode(m_value, m_simplestation);
             break;
