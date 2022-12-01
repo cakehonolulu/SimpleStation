@@ -1,14 +1,26 @@
 #include <cpu/interrupts.h>
 #include <stdlib.h>
 
-void m_interrupts_init(m_simplestation_state *m_simplestation)
+uint8_t m_interrupts_init(m_simplestation_state *m_simplestation)
 {
+	uint8_t m_return = 0;
+
 	m_simplestation->m_cpu_ints = (m_psx_cpu_ints_t *) malloc(sizeof(m_psx_cpu_ints_t));
 
-	m_simplestation->m_cpu_ints->m_interrupt_stat = 0;
-	m_simplestation->m_cpu_ints->m_interrupt_mask = 0;
+	if (m_simplestation->m_cpu_ints)
+	{
+		m_simplestation->m_cpu_ints->m_interrupt_stat = 0;
+		m_simplestation->m_cpu_ints->m_interrupt_mask = 0;
 
-	m_simplestation->m_interrupts_state = ON;
+		m_simplestation->m_interrupts_state = ON;
+	}
+	else
+	{
+		printf("[INT] init: Couldn't initialize PSX's Interrupts, exiting...");
+		m_return = 1;
+	}
+
+	return m_return;
 }
 
 uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation_state *m_simplestation)

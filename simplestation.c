@@ -114,21 +114,27 @@ int main(int argc, char **argv)
 					if (m_cpu_init(&m_simplestation) == 0)
 					{
 						// Initialize the Interrupts Subsystem
-						m_interrupts_init(&m_simplestation);
-
-						if (m_gpu_init(&m_simplestation) == 0)
+						if (m_interrupts_init(&m_simplestation) == 0)
 						{
-							while (true)
+							if (m_gpu_init(&m_simplestation) == 0)
 							{
-								// Fetch, decode, execute
-								m_cpu_fde(&m_simplestation);
+								while (true)
+								{
+									// Fetch, decode, execute
+									m_cpu_fde(&m_simplestation);
+								}
+							}
+							else
+							{
+								// If GPU couldn't be initialized, exit out
+								m_simplestation_exit(&m_simplestation, 1);
 							}
 						}
 						else
 						{
-							// If GPU couldn't be initialized, exit out
+							// If Interrupt systen couldn't be initialized, exit out
 							m_simplestation_exit(&m_simplestation, 1);
-						}
+						}			
 					}
 					else
 					{
