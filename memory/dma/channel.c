@@ -1,8 +1,10 @@
 #include <memory/dma/dma.h>
 
-void m_channels_init(m_simplestation_state *m_simplestation)
+uint8_t m_channels_init(m_simplestation_state *m_simplestation)
 {
     memset(m_simplestation->m_memory->m_dma->m_dma_channels, 0, (sizeof(m_psx_dma_channel_t) * 7));
+
+    return 0;
 }
 
 uint32_t m_channel_get_control(m_simplestation_state *m_simplestation, uint8_t m_id)

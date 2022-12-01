@@ -20,9 +20,15 @@ uint8_t m_dma_init(m_simplestation_state *m_simplestation)
         
         m_simplestation->m_memory->m_dma->m_irq_dummy = 0;
 
-        m_channels_init(m_simplestation);
-
-	    m_simplestation->m_dma_state = ON;
+        if (m_channels_init(m_simplestation) == 0)
+        {
+            m_simplestation->m_dma_state = ON;
+        }
+        else
+        {
+            printf("[DMA] channels_init: Failed to initialize PSX's DMA Channels Subsystem!\n");
+            m_result = 1;
+        }
     }
     else
     {

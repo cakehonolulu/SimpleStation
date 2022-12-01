@@ -182,7 +182,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 
 	if (m_simplestation->m_interrupts_state)
 	{
-		// Do nothing for now
+		m_interrupts_exit(m_simplestation);
 	}
 
 	if (m_simplestation->m_cpu_state)

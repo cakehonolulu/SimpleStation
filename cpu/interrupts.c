@@ -39,3 +39,13 @@ uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplesta
 	 printf(RED "[INT] write: Abnormal path in emulator code, continuing might break things; exiting...\n" NORMAL);
 	 return m_simplestation_exit(m_simplestation, 1);
 }
+
+void m_interrupts_exit(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_interrupts_state)
+    {
+        free(m_simplestation->m_cpu_ints);
+    }
+
+    m_simplestation->m_gpu_state = OFF;
+}
