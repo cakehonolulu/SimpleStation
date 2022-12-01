@@ -232,7 +232,14 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			printf(YELLOW "[MEM] read: GPU Registers read!\n" NORMAL);
 #endif
 			switch(m_address & 0x0000000F)
-			{						
+			{
+				case 0:
+#ifdef DEBUG_MEMORY
+					printf(CYAN "[MEM] read: GPUREAD Read..\n" NORMAL);
+#endif
+					m_return = 0;
+					break;
+
 				case 4:
 #ifdef DEBUG_MEMORY
 					printf(CYAN "[MEM] read: GPUSTAT Read..\n" NORMAL);
