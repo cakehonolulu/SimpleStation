@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 /* Function Definitions */
-void m_dma_init(m_simplestation_state *m_simplestation);
+uint8_t m_dma_init(m_simplestation_state *m_simplestation);
 
 void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_simplestation);
 uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation);

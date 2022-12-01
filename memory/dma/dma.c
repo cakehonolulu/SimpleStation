@@ -1,24 +1,35 @@
 #include <memory/dma/dma.h>
 
-void m_dma_init(m_simplestation_state *m_simplestation)
+uint8_t m_dma_init(m_simplestation_state *m_simplestation)
 {
+    uint8_t m_result = 0;
+
 	m_simplestation->m_memory->m_dma = (m_psx_dma_t *) malloc(sizeof(m_psx_dma_t));
+    
+    if (m_simplestation->m_memory->m_dma)
+    {
+        m_simplestation->m_memory->m_dma->m_control_reg = 0x07654321;
 
-	m_simplestation->m_memory->m_dma->m_control_reg = 0x07654321;
+        m_simplestation->m_memory->m_dma->m_irq_enable = false;
 
-    m_simplestation->m_memory->m_dma->m_irq_enable = false;
+        m_simplestation->m_memory->m_dma->m_irq_channel_enable = 0;
 
-    m_simplestation->m_memory->m_dma->m_irq_channel_enable = 0;
+        m_simplestation->m_memory->m_dma->m_irq_channel_flags = 0;
 
-	m_simplestation->m_memory->m_dma->m_irq_channel_flags = 0;
+        m_simplestation->m_memory->m_dma->m_irq_force = false;
+        
+        m_simplestation->m_memory->m_dma->m_irq_dummy = 0;
 
-	m_simplestation->m_memory->m_dma->m_irq_force = false;
-	
-	m_simplestation->m_memory->m_dma->m_irq_dummy = 0;
+        m_channels_init(m_simplestation);
 
-    m_channels_init(m_simplestation);
+	    m_simplestation->m_dma_state = ON;
+    }
+    else
+    {
+        m_result = 1;
+    }
 
-	m_simplestation->m_dma_state = ON;
+    return m_result;
 }
 
 uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
