@@ -2,6 +2,7 @@
 #include <cpu/instructions.h>
 #include <cpu/interrupts.h>
 #include <cpu/bios.h>
+#include <gpu/gpu.h>
 #include <ui/termcolour.h>
 #include <endian.h>
 #include <stdlib.h>
@@ -407,9 +408,17 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F801810 ... 0x1F801817:
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] write: GPU Registers memory write! Returning 0...\n" NORMAL);
-#endif
+			switch (m_address & 0x0000000F)
+			{
+				case 0:
+					m_gpu_gp0(m_value, m_simplestation);
+					break;
+
+				default:
+					printf(RED "[GPU] write: Unhandled GPU Write!\n" NORMAL);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
 		break;
 
 		case 0x1F802000 ... 0x1F803FFF:

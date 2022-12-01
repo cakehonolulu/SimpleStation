@@ -1,4 +1,5 @@
 #include <gpu/gpu.h>
+#include <ui/termcolour.h>
 #include <stdio.h>
 
 uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
@@ -94,6 +95,20 @@ uint32_t m_gpu_get_into_status(m_simplestation_state *m_simplestation)
 uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
 {
     return ((m_hoz_res2 & 1) | ((m_hoz_res1 & 3) << 1));
+}
+
+void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    uint32_t m_opcode = (m_value >> 24) & 0xFF;
+
+    switch (m_opcode)
+    {
+
+        default:
+            printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
 }
 
 void m_gpu_exit(m_simplestation_state *m_simplestation)
