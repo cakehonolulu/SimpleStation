@@ -12,6 +12,7 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
     }
     else
     {
+        printf("[GPU] init: Couldn't initialize PSX's GPU, exiting...");
         m_result = 1;
     }
 
