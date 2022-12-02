@@ -118,6 +118,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_set_draw_area_bottom_right(m_value, m_simplestation);
             break;
 
+        case 0xE5:
+            m_gpu_set_draw_offset(m_value, m_simplestation);
+            break;
+
         default:
             printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
             m_simplestation_exit(m_simplestation, 1);
