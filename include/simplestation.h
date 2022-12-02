@@ -209,6 +209,12 @@ typedef enum
     vram_to_cpu = 3
 } dma_direction;
 
+typedef struct
+{
+	uint32_t m_cmd_buf[12];
+	uint8_t m_length;
+} m_psx_gpu_command_buffer_t;
+
 typedef struct m_gpu
 {
 	uint8_t m_page_base_x;
@@ -255,6 +261,8 @@ typedef struct m_gpu
 	uint16_t m_display_horizontal_end;
 	uint16_t m_display_line_start;
 	uint16_t m_display_line_end;
+
+	m_psx_gpu_command_buffer_t *m_gpu_command_buffer;
 	
 } m_psx_gpu_t;
 
@@ -279,6 +287,7 @@ typedef struct
 	bool m_interrupts_state;
 	bool m_cpu_state;
 	bool m_gpu_state;
+	bool m_gpu_command_buffer_state;
 
 	uint32_t m_breakpoint;
 	uint32_t m_wp;

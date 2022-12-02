@@ -3,6 +3,7 @@
 #include <cpu/bios.h>
 #include <cpu/interrupts.h>
 #include <gpu/gpu.h>
+#include <gpu/command_buffer.h>
 #include <memory/memory.h>
 #include <ui/termcolour.h>
 
@@ -101,6 +102,8 @@ int main(int argc, char **argv)
 
 		m_simplestation.m_gpu_state = OFF;
 
+		m_simplestation.m_gpu_command_buffer_state = OFF;
+
 		// Check if BIOS file is specified
 		if (m_biosname)
 		{
@@ -169,7 +172,12 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	{
 		m_dma_exit(m_simplestation);
 	}
-	
+		
+	if (m_simplestation->m_gpu_command_buffer_state)
+	{
+		m_gpu_command_buffer_exit(m_simplestation);
+	}
+
 	if (m_simplestation->m_gpu_state)
 	{
 		m_gpu_exit(m_simplestation);

@@ -1,4 +1,5 @@
 #include <gpu/gpu.h>
+#include <gpu/command_buffer.h>
 #include <ui/termcolour.h>
 #include <stdio.h>
 
@@ -10,11 +11,19 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
 
     if (m_simplestation->m_gpu)
     {
-        m_result = 0;
-
         memset(m_simplestation->m_gpu, 0, sizeof(m_psx_gpu_t));
 
         m_simplestation->m_gpu->m_field = top;
+
+        if (m_gpu_command_buffer_init(m_simplestation))
+        {
+            printf(RED "[GPU] command_buffer_init: Failed to allocate PSX's GPU Command Buffer!\n" NORMAL);
+            m_result = 1;
+        }
+        else
+        {
+            m_simplestation->m_gpu_command_buffer_state = ON;
+        }
     }
     else
     {
