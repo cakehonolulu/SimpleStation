@@ -127,6 +127,10 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_reset(m_value, m_simplestation);
             break;
 
+        case 0x04:
+            m_gpu_set_dma_direction(m_value, m_simplestation);
+            break;
+
         case 0x08:
             m_gpu_set_display_mode(m_value, m_simplestation);
             break;
@@ -199,6 +203,32 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 	m_simplestation->m_gpu->m_display_horizontal_end = 0xC00;
 	m_simplestation->m_gpu->m_display_line_start = 0x10;
 	m_simplestation->m_gpu->m_display_line_end = 0x100;
+}
+
+void m_gpu_set_dma_direction(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    switch (m_value & 3)
+    {
+        case 0:
+            m_simplestation->m_gpu->m_dma_direction = off;
+            break;
+
+        case 1:
+            m_simplestation->m_gpu->m_dma_direction = fifo;
+            break;
+
+        case 2:
+            m_simplestation->m_gpu->m_dma_direction = cpu_to_gp0;
+            break;
+
+        case 3:
+            m_simplestation->m_gpu->m_dma_direction = vram_to_cpu;
+            break;
+
+        default:
+            __builtin_unreachable();
+            break;
+    }
 }
 
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation)

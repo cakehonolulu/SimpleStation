@@ -29,6 +29,9 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
 // 0x00
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0x04
+void m_gpu_set_dma_direction(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0x08
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
