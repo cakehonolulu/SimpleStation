@@ -127,6 +127,10 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_reset(m_value, m_simplestation);
             break;
 
+        case 0x08:
+            m_gpu_set_display_mode(m_value, m_simplestation);
+            break;
+
         default:
             printf(RED "[GPU] gp1: Unhandled GP1 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
             m_simplestation_exit(m_simplestation, 1);
@@ -180,6 +184,7 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
 }
 
 /* GP1 Commands */
+
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     m_value = (uint32_t) m_simplestation->m_gpu->m_field;
@@ -194,4 +199,45 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 	m_simplestation->m_gpu->m_display_horizontal_end = 0xC00;
 	m_simplestation->m_gpu->m_display_line_start = 0x10;
 	m_simplestation->m_gpu->m_display_line_end = 0x100;
+}
+
+void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(
+            ((uint8_t) (m_value & 3)), ((uint8_t) ((m_value >> 6) & 1)));
+    
+    if ((m_value & 0x4) != 0)
+    {
+        m_simplestation->m_gpu->m_vertical_resolution = y480lines;
+    }
+    else
+    {
+        m_simplestation->m_gpu->m_vertical_resolution = y240lines;
+    }
+
+    if ((m_value & 0x8) != 0)
+    {
+        m_simplestation->m_gpu->m_video_mode = pal;
+    }
+    else
+    {
+        m_simplestation->m_gpu->m_video_mode = ntsc;
+    }
+
+    if ((m_value & 0x20) != 0)
+    {
+        m_simplestation->m_gpu->m_display_depth = d15bits;
+    }
+    else
+    {
+        m_simplestation->m_gpu->m_display_depth = d24bits;
+    }
+
+    m_simplestation->m_gpu->m_interlaced = ((m_value & 0x20) != 0);
+
+    if ((m_value & 0x80) != 0)
+    {
+        printf(RED "[GP1] set_display_mode: Unsupported display mode (0x%08X)\n" NORMAL, m_value);
+        m_simplestation_exit(m_simplestation, 1);
+    }
 }

@@ -20,10 +20,16 @@ void m_gpu_exit(m_simplestation_state *m_simplestation);
 /* GPU Opcodes */
 
 /* GP0 */
+
 // 0xE1
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
 /* GP1 */
+
+// 0x00
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation);
+
+// 0x08
+void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
 #endif /* GPU_H */
