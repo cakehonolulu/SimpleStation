@@ -1,4 +1,5 @@
 #include <memory/dma/dma.h>
+#include <gpu/gpu.h>
 
 uint8_t m_dma_init(m_simplestation_state *m_simplestation)
 {
@@ -329,7 +330,8 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
             m_address = (m_address + 4) & 0x1FFFFC;
             m_command = m_memory_read(m_address, dword, m_simplestation);
 
-            (void) m_command;
+            // Send command from DMA linked list to GP0
+            m_gpu_gp0(m_command, m_simplestation);
 
             m_size--;
         }
