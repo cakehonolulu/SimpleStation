@@ -262,8 +262,9 @@ typedef struct m_gpu
 	uint16_t m_display_line_start;
 	uint16_t m_display_line_end;
 
-	m_psx_gpu_command_buffer_t *m_gpu_command_buffer;
-	
+	uint32_t m_gp0_command_remaining;
+	uint32_t m_gp0_current_cmd;
+
 } m_psx_gpu_t;
 
 /* Structures */
@@ -281,6 +282,8 @@ typedef struct
 	m_psx_cpu_ints_t *m_cpu_ints;
 
 	m_psx_gpu_t *m_gpu;
+
+	m_psx_gpu_command_buffer_t *m_gpu_command_buffer;
 
 	bool m_memory_state;
 	bool m_dma_state;

@@ -108,42 +108,71 @@ uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
 
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    uint32_t m_opcode = (m_value >> 24) & 0xFF;
+    uint32_t m_opcode = 0, m_length = 0;
 
-    switch (m_opcode)
+    void *m_method;
+
+    if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
     {
-        case 0x00:
-            break;
+        m_opcode = (m_value >> 24) & 0xFF;
 
-        case 0xE1:
-            m_gpu_set_draw_mode(m_value, m_simplestation);
-            break;
+        switch (m_opcode)
+        {
+            case 0x00:
+                m_length = 1;
+                break;
 
-        case 0xE2:
-            m_gpu_set_texture_window(m_value, m_simplestation);
-            break;
+            case 0xE1:
+                m_method = (void *) &m_gpu_set_draw_mode;
+                m_length = 1;
+                break;
 
-        case 0xE3:
-            m_gpu_set_draw_area_top_left(m_value, m_simplestation);
-            break;
+            case 0xE2:
+                m_method = (void *) &m_gpu_set_texture_window;
+                m_length = 1;
+                break;
 
-        case 0xE4:
-            m_gpu_set_draw_area_bottom_right(m_value, m_simplestation);
-            break;
+            case 0xE3:
+                m_method = (void *) &m_gpu_set_draw_area_top_left;
+                m_length = 1;
+                break;
 
-        case 0xE5:
-            m_gpu_set_draw_offset(m_value, m_simplestation);
-            break;
+            case 0xE4:
+                m_method = (void *) &m_gpu_set_draw_area_bottom_right;
+                m_length = 1;
+                break;
 
-        case 0xE6:
-            m_gpu_set_mask_bit(m_value, m_simplestation);
-            break;
+            case 0xE5:
+                m_method = (void *) &m_gpu_set_draw_offset;
+                m_length = 1;
+                break;
 
-        default:
-            printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
-            m_simplestation_exit(m_simplestation, 1);
-            break;
+            case 0xE6:
+                m_method = (void *) &m_gpu_set_mask_bit;
+                m_length = 1;
+                break;
+
+            default:
+                printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
+                m_simplestation_exit(m_simplestation, 1);
+                break;
+        }
+
+        m_simplestation->m_gpu->m_gp0_command_remaining = m_length;
+        m_gpu_command_buffer_clear(m_simplestation);
     }
+
+    m_gpu_command_buffer_push_word(m_simplestation, m_value);
+    m_simplestation->m_gpu->m_gp0_command_remaining -= 1;
+
+    if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+    {
+        if (m_opcode != 0)
+        {
+            ((void (*) (uint8_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
+        }
+    }
+    
 }
 
 void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
