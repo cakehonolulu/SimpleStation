@@ -323,29 +323,29 @@ void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplesta
     
     if ((m_value & 0x4) != 0)
     {
-        m_simplestation->m_gpu->m_vertical_resolution = y480lines;
+        m_simplestation->m_gpu->m_vertical_resolution = y240lines;
     }
     else
     {
-        m_simplestation->m_gpu->m_vertical_resolution = y240lines;
+        m_simplestation->m_gpu->m_vertical_resolution = y480lines;
     }
 
     if ((m_value & 0x8) != 0)
     {
-        m_simplestation->m_gpu->m_video_mode = pal;
+        m_simplestation->m_gpu->m_video_mode = ntsc;
     }
     else
     {
-        m_simplestation->m_gpu->m_video_mode = ntsc;
+        m_simplestation->m_gpu->m_video_mode = pal;
     }
 
     if ((m_value & 0x20) != 0)
     {
-        m_simplestation->m_gpu->m_display_depth = d15bits;
+        m_simplestation->m_gpu->m_display_depth = d24bits;
     }
     else
     {
-        m_simplestation->m_gpu->m_display_depth = d24bits;
+        m_simplestation->m_gpu->m_display_depth = d15bits;
     }
 
     m_simplestation->m_gpu->m_interlaced = ((m_value & 0x20) != 0);
