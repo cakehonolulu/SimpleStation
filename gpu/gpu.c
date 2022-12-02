@@ -48,7 +48,7 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_field) << 13;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_texture_disable) << 15;
     m_status |= m_gpu_get_into_status(m_simplestation);
-    m_status |= ((uint32_t) m_simplestation->m_gpu->m_vertical_resolution) << 19;
+    //m_status |= ((uint32_t) m_simplestation->m_gpu->m_vertical_resolution) << 19;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_video_mode) << 20;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_display_depth) << 21;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_interlaced) << 22;
@@ -114,53 +114,56 @@ uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
 
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    uint32_t m_opcode = 0, m_length = 0;
+    uint32_t m_opcode = 0;
 
     void *m_method;
 
     if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
     {
+        m_gpu_command_buffer_clear(m_simplestation);
+        
         m_opcode = (m_value >> 24) & 0xFF;
 
         switch (m_opcode)
         {
             case 0x00:
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0x28:
                 m_method = (void *) &m_gpu_draw_monochrome_opaque_quad;
-                m_length = 5;
+                // FIXME Look what happens if set to 1
+                m_simplestation->m_gpu->m_gp0_command_remaining = 5;
                 break;
 
             case 0xE1:
                 m_method = (void *) &m_gpu_set_draw_mode;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE2:
                 m_method = (void *) &m_gpu_set_texture_window;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE3:
                 m_method = (void *) &m_gpu_set_draw_area_top_left;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE4:
                 m_method = (void *) &m_gpu_set_draw_area_bottom_right;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE5:
                 m_method = (void *) &m_gpu_set_draw_offset;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE6:
                 m_method = (void *) &m_gpu_set_mask_bit;
-                m_length = 1;
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             default:
@@ -168,22 +171,33 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation_exit(m_simplestation, 1);
                 break;
         }
-
-        m_simplestation->m_gpu->m_gp0_command_remaining = m_length;
-        m_gpu_command_buffer_clear(m_simplestation);
     }
-
-    m_gpu_command_buffer_push_word(m_simplestation, m_value);
     m_simplestation->m_gpu->m_gp0_command_remaining -= 1;
 
-    if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+    switch (m_simplestation->m_gpu->m_gp0_mode)
     {
-        if (m_opcode != 0)
-        {
-            ((void (*) (uint32_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
-        }
+        case command:
+            m_gpu_command_buffer_push_word(m_simplestation, m_value);
+            if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+            {
+                if (m_opcode != 0)
+                {
+                    ((void (*) (uint32_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
+                }
+            }
+            break;
+
+        case image_load:
+            if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+            {
+                m_simplestation->m_gpu->m_gp0_mode = command;
+            }
+            break;
+
+        default:
+            printf(YELLOW "[GP0] Unknown GP0 mode!\n" NORMAL);
+            break;
     }
-    
 }
 
 void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)

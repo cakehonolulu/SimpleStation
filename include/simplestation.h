@@ -209,6 +209,12 @@ typedef enum
     vram_to_cpu = 3
 } dma_direction;
 
+typedef enum
+{
+	command,
+	image_load
+} gp0_mode;
+
 typedef struct
 {
 	uint32_t m_buffer[12];
@@ -264,6 +270,8 @@ typedef struct m_gpu
 
 	uint32_t m_gp0_command_remaining;
 	uint32_t m_gp0_current_cmd;
+
+	gp0_mode m_gp0_mode;
 
 } m_psx_gpu_t;
 
