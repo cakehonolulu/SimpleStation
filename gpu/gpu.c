@@ -110,6 +110,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_set_draw_mode(m_value, m_simplestation);
             break;
 
+        case 0xE2:
+            m_gpu_set_texture_window(m_value, m_simplestation);
+            break;
+
         case 0xE3:
             m_gpu_set_draw_area_top_left(m_value, m_simplestation);
             break;
@@ -197,6 +201,14 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
     m_simplestation->m_gpu->m_texture_disable = (((m_value >> 11) & 1) != 0);
     m_simplestation->m_gpu->m_rectangle_texture_x_flip = (((m_value >> 12) & 1) != 0);
     m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_value >> 13) & 1) != 0);
+}
+
+void m_gpu_set_texture_window(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_texture_window_x_mask = ((uint8_t) (m_value & 0x1F));
+	m_simplestation->m_gpu->m_texture_window_y_mask = ((uint8_t) ((m_value >> 5) & 0x1F));
+	m_simplestation->m_gpu->m_texture_window_x_offset = ((uint8_t) ((m_value >> 10) & 0x1F));
+	m_simplestation->m_gpu->m_texture_window_y_offset = ((uint8_t) ((m_value >> 15) & 0x1F));
 }
 
 void m_gpu_set_draw_area_top_left(uint32_t m_value, m_simplestation_state *m_simplestation)

@@ -24,6 +24,9 @@ void m_gpu_exit(m_simplestation_state *m_simplestation);
 // 0xE1
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0xE2
+void m_gpu_set_texture_window(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0xE3
 void m_gpu_set_draw_area_top_left(uint32_t m_value, m_simplestation_state *m_simplestation);
 
