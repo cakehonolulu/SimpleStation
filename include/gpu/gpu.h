@@ -36,6 +36,9 @@ void m_gpu_set_draw_area_bottom_right(uint32_t m_value, m_simplestation_state *m
 // 0xE5
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0xE6
+void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 /* GP1 */
 
 // 0x00
@@ -43,6 +46,9 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation);
 
 // 0x04
 void m_gpu_set_dma_direction(uint32_t m_value, m_simplestation_state *m_simplestation);
+
+// 0x05
+void m_gpu_set_display_vram_start(uint32_t m_value, m_simplestation_state *m_simplestation);
 
 // 0x08
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation);

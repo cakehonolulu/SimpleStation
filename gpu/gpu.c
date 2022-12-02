@@ -126,6 +126,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_set_draw_offset(m_value, m_simplestation);
             break;
 
+        case 0xE6:
+            m_gpu_set_mask_bit(m_value, m_simplestation);
+            break;
+
         default:
             printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
             m_simplestation_exit(m_simplestation, 1);
@@ -145,6 +149,10 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
 
         case 0x04:
             m_gpu_set_dma_direction(m_value, m_simplestation);
+            break;
+
+        case 0x05:
+            m_gpu_set_display_vram_start(m_value, m_simplestation);
             break;
 
         case 0x08:
@@ -232,6 +240,12 @@ void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestat
     m_simplestation->m_gpu->m_drawing_y_offset = ((int16_t) (m_y << 5)) >> 5;
 }
 
+void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_force_set_mask_bit = ((m_value & 1) != 0);
+    m_simplestation->m_gpu->m_preserve_masked_pixels = ((m_value & 2) != 0);
+}
+
 /* GP1 Commands */
 
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -274,6 +288,12 @@ void m_gpu_set_dma_direction(uint32_t m_value, m_simplestation_state *m_simplest
             __builtin_unreachable();
             break;
     }
+}
+
+void m_gpu_set_display_vram_start(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+	m_simplestation->m_gpu->m_display_vram_x_start = ((uint16_t) (m_value & 0x3FE));
+	m_simplestation->m_gpu->m_display_vram_y_start = ((uint16_t) ((m_value >> 10) & 0x1FF));
 }
 
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
