@@ -211,7 +211,7 @@ typedef enum
 
 typedef struct
 {
-	uint32_t m_cmd_buf[12];
+	uint32_t m_buffer[12];
 	uint8_t m_length;
 } m_psx_gpu_command_buffer_t;
 
