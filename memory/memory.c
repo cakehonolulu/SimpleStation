@@ -244,7 +244,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #ifdef DEBUG_MEMORY
 					printf(CYAN "[MEM] read: GPUSTAT Read..\n" NORMAL);
 #endif
-					m_return = 0x1C000000;
+					m_return = m_gpu_get_status(m_simplestation);
 					break;
 
 				default:
