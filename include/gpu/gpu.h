@@ -50,6 +50,12 @@ void m_gpu_set_dma_direction(uint32_t m_value, m_simplestation_state *m_simplest
 // 0x05
 void m_gpu_set_display_vram_start(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0x06
+void m_gpu_set_display_horizontal_range(uint32_t m_value, m_simplestation_state *m_simplestation);
+
+// 0x07
+void m_gpu_set_display_vertical_range(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0x08
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 

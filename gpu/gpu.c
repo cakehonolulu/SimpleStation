@@ -155,6 +155,14 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_set_display_vram_start(m_value, m_simplestation);
             break;
 
+        case 0x06:
+            m_gpu_set_display_horizontal_range(m_value, m_simplestation);
+            break;
+
+        case 0x07:
+            m_gpu_set_display_vertical_range(m_value, m_simplestation);
+            break;
+
         case 0x08:
             m_gpu_set_display_mode(m_value, m_simplestation);
             break;
@@ -294,6 +302,18 @@ void m_gpu_set_display_vram_start(uint32_t m_value, m_simplestation_state *m_sim
 {
 	m_simplestation->m_gpu->m_display_vram_x_start = ((uint16_t) (m_value & 0x3FE));
 	m_simplestation->m_gpu->m_display_vram_y_start = ((uint16_t) ((m_value >> 10) & 0x1FF));
+}
+
+void m_gpu_set_display_horizontal_range(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_display_horizontal_start = ((uint16_t) (m_value & 0xFFF));
+    m_simplestation->m_gpu->m_display_horizontal_end = ((uint16_t) ((m_value >> 12) & 0xFFF));
+}
+
+void m_gpu_set_display_vertical_range(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_display_line_start = ((uint16_t) (m_value & 0x3FF));
+    m_simplestation->m_gpu->m_display_line_end = ((uint16_t) ((m_value >> 10) & 0x3FF));
 }
 
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
