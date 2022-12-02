@@ -122,6 +122,11 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_length = 1;
                 break;
 
+            case 0x28:
+                m_method = (void *) &m_gpu_draw_monochrome_opaque_quad;
+                m_length = 5;
+                break;
+
             case 0xE1:
                 m_method = (void *) &m_gpu_set_draw_mode;
                 m_length = 1;
@@ -169,7 +174,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
     {
         if (m_opcode != 0)
         {
-            ((void (*) (uint8_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
+            ((void (*) (uint32_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
         }
     }
     
@@ -223,6 +228,11 @@ void m_gpu_exit(m_simplestation_state *m_simplestation)
 }
 
 /* GP0 Commands */
+
+void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
+}
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
 {

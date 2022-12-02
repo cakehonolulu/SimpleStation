@@ -22,6 +22,9 @@ void m_gpu_exit(m_simplestation_state *m_simplestation);
 
 /* GP0 */
 
+// 0x28
+void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0xE1
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
