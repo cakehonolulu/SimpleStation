@@ -96,6 +96,12 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     return m_status;
 }
 
+uint32_t m_gpu_get_read(m_simplestation_state *m_simplestation)
+{
+    (void) m_simplestation;
+    return 0;
+}
+
 uint32_t m_gpu_get_into_status(m_simplestation_state *m_simplestation)
 {
     return (((uint32_t) m_simplestation->m_gpu->m_horizontal_resolution) << 16);
@@ -231,6 +237,9 @@ void m_gpu_exit(m_simplestation_state *m_simplestation)
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    (void) m_value;
+    (void) m_simplestation;
+    
     printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
 }
 
