@@ -110,6 +110,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_set_draw_mode(m_value, m_simplestation);
             break;
 
+        case 0xE3:
+            m_gpu_set_draw_offset(m_value, m_simplestation);
+            break;
+
         default:
             printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
             m_simplestation_exit(m_simplestation, 1);
@@ -185,6 +189,15 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
     m_simplestation->m_gpu->m_texture_disable = (((m_value >> 11) & 1) != 0);
     m_simplestation->m_gpu->m_rectangle_texture_x_flip = (((m_value >> 12) & 1) != 0);
     m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_value >> 13) & 1) != 0);
+}
+
+void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
+    uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));
+
+    m_simplestation->m_gpu->m_drawing_x_offset = ((int16_t) (m_x << 5)) >> 5;
+    m_simplestation->m_gpu->m_drawing_y_offset = ((int16_t) (m_y << 5)) >> 5;
 }
 
 /* GP1 Commands */
