@@ -112,62 +112,94 @@ uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
     return ((m_hoz_res2 & 1) | ((m_hoz_res1 & 3) << 1));
 }
 
+void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
+{
+    switch (m_simplestation->m_gpu->m_gp0_cmd_ins)
+    {
+            case 0x00:
+                break;
+
+            case 0x28:
+                m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE1:
+                m_gpu_set_draw_mode(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE2:
+                m_gpu_set_texture_window(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE3:
+                m_gpu_set_draw_area_top_left(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE4:
+                m_gpu_set_draw_area_bottom_right(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE5:
+                m_gpu_set_draw_offset(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0xE6:
+                m_gpu_set_mask_bit(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            default:
+                printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X\n" NORMAL, m_simplestation->m_gpu->m_gp0_cmd_ins);
+                m_simplestation_exit(m_simplestation, 1);
+                break;
+    }
+}
+
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    uint32_t m_opcode = 0;
-
-    void *m_method;
-
+    m_simplestation->m_gpu->m_gp0_instruction = (m_value >> 24) & 0xFF;
+    
     if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
     {
         m_gpu_command_buffer_clear(m_simplestation);
         
-        m_opcode = (m_value >> 24) & 0xFF;
+        m_simplestation->m_gpu->m_gp0_cmd_ins = m_simplestation->m_gpu->m_gp0_instruction;
 
-        switch (m_opcode)
+        switch (m_simplestation->m_gpu->m_gp0_instruction)
         {
             case 0x00:
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0x28:
-                m_method = (void *) &m_gpu_draw_monochrome_opaque_quad;
-                // FIXME Look what happens if set to 1
                 m_simplestation->m_gpu->m_gp0_command_remaining = 5;
                 break;
 
             case 0xE1:
-                m_method = (void *) &m_gpu_set_draw_mode;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE2:
-                m_method = (void *) &m_gpu_set_texture_window;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE3:
-                m_method = (void *) &m_gpu_set_draw_area_top_left;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE4:
-                m_method = (void *) &m_gpu_set_draw_area_bottom_right;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE5:
-                m_method = (void *) &m_gpu_set_draw_offset;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             case 0xE6:
-                m_method = (void *) &m_gpu_set_mask_bit;
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
             default:
-                printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_opcode, m_value);
+                printf(RED "[GPU] gp0: Unhandled GP0 Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, m_simplestation->m_gpu->m_gp0_instruction, m_value);
                 m_simplestation_exit(m_simplestation, 1);
                 break;
         }
@@ -178,12 +210,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
     {
         case command:
             m_gpu_command_buffer_push_word(m_simplestation, m_value);
+
             if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
             {
-                if (m_opcode != 0)
-                {
-                    ((void (*) (uint32_t m_value, m_simplestation_state *m_simplestation))m_method)(m_value, m_simplestation);
-                }
+                m_gpu_gp0_handler(m_simplestation);
             }
             break;
 
@@ -253,7 +283,7 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
 {
     (void) m_value;
     (void) m_simplestation;
-    
+
     printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
 }
 

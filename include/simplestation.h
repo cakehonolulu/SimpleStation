@@ -273,6 +273,9 @@ typedef struct m_gpu
 
 	gp0_mode m_gp0_mode;
 
+	uint32_t m_gp0_cmd_ins;
+	uint32_t m_gp0_instruction;
+
 } m_psx_gpu_t;
 
 /* Structures */
