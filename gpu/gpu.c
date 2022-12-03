@@ -118,6 +118,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
     {
             case 0x00:
                 break;
+            
+            case 0x01:
+                m_gpu_clear_cache(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
 
             case 0x28:
                 m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
@@ -167,6 +171,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
         switch (m_simplestation->m_gpu->m_gp0_instruction)
         {
             case 0x00:
+                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                break;
+
+            case 0x01:
                 m_simplestation->m_gpu->m_gp0_command_remaining = 1;
                 break;
 
@@ -278,6 +286,14 @@ void m_gpu_exit(m_simplestation_state *m_simplestation)
 }
 
 /* GP0 Commands */
+
+void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    (void) m_value;
+    (void) m_simplestation;
+
+    return;
+}
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
