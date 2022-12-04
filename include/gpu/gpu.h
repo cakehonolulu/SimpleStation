@@ -65,6 +65,9 @@ void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation
 // 0x00
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0x02
+void m_gpu_acknowledge_interrupt(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0x03
 void m_gpu_set_display_enabled(uint32_t m_value, m_simplestation_state *m_simplestation);
 

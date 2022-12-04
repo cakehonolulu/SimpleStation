@@ -280,6 +280,10 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
             m_gpu_reset(m_value, m_simplestation);
             break;
 
+        case 0x02:
+            m_gpu_acknowledge_interrupt(m_value, m_simplestation);
+            break;
+
         case 0x03:
             m_gpu_set_display_enabled(m_value, m_simplestation);
             break;
@@ -467,6 +471,11 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 	m_simplestation->m_gpu->m_display_horizontal_end = 0xC00;
 	m_simplestation->m_gpu->m_display_line_start = 0x10;
 	m_simplestation->m_gpu->m_display_line_end = 0x100;
+}
+
+void m_gpu_acknowledge_interrupt(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_gpu->m_interrupt = false;
 }
 
 void m_gpu_set_display_enabled(uint32_t m_value, m_simplestation_state *m_simplestation)
