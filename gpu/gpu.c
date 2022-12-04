@@ -131,6 +131,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_image_draw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0xC0:
+                m_gpu_image_store(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0xE1:
                 m_gpu_set_draw_mode(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -187,6 +191,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 break;
 
             case 0xA0:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 3;
+                break;
+
+            case 0xC0:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 3;
                 break;
 
@@ -330,6 +338,17 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 
     m_simplestation->m_gpu->m_gp0_mode = image_load;
+}
+
+void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    uint32_t m_resolution = m_simplestation->m_gpu_command_buffer->m_buffer[2];
+
+    uint16_t m_width = m_resolution & 0xFFFF;
+
+    uint16_t m_height = m_resolution >> 16;
+
+    printf(MAGENTA "[GP0] image_store: Unhandled image store size: %d, %d\n" NORMAL, m_height, m_width);
 }
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
