@@ -162,7 +162,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_gpu->m_gp0_instruction = (m_value >> 24) & 0xFF;
     
-    if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+    if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
     {
         m_gpu_command_buffer_clear(m_simplestation);
         
@@ -171,39 +171,39 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
         switch (m_simplestation->m_gpu->m_gp0_instruction)
         {
             case 0x00:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0x01:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0x28:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 5;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 5;
                 break;
 
             case 0xE1:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0xE2:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0xE3:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0xE4:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0xE5:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             case 0xE6:
-                m_simplestation->m_gpu->m_gp0_command_remaining = 1;
+                m_simplestation->m_gpu->m_gp0_words_remaining = 1;
                 break;
 
             default:
@@ -212,21 +212,21 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 break;
         }
     }
-    m_simplestation->m_gpu->m_gp0_command_remaining -= 1;
+    m_simplestation->m_gpu->m_gp0_words_remaining -= 1;
 
     switch (m_simplestation->m_gpu->m_gp0_mode)
     {
         case command:
             m_gpu_command_buffer_push_word(m_simplestation, m_value);
 
-            if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+            if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
                 m_gpu_gp0_handler(m_simplestation);
             }
             break;
 
         case image_load:
-            if (m_simplestation->m_gpu->m_gp0_command_remaining == 0)
+            if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
                 m_simplestation->m_gpu->m_gp0_mode = command;
             }

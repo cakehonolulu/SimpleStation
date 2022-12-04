@@ -268,7 +268,7 @@ typedef struct m_gpu
 	uint16_t m_display_line_start;
 	uint16_t m_display_line_end;
 
-	uint32_t m_gp0_command_remaining;
+	uint32_t m_gp0_words_remaining;
 	uint32_t m_gp0_current_cmd;
 
 	gp0_mode m_gp0_mode;
