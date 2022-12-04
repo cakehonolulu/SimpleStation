@@ -127,6 +127,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x38:
+                m_gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0xA0:
                 m_gpu_image_draw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -188,6 +192,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x28:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 5;
+                break;
+
+            case 0x38:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 8;
                 break;
 
             case 0xA0:
@@ -321,6 +329,14 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_simplestation;
 
     printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
+}
+
+void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    (void) m_value;
+    (void) m_simplestation;
+
+    printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
