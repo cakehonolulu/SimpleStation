@@ -755,7 +755,7 @@ void m_nor(m_simplestation_state *m_simplestation)
 	printf("nor $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	REGS[REGIDX_D] = !(REGS[REGIDX_S] | REGS[REGIDX_T]);
+	REGS[REGIDX_D] = ~(REGS[REGIDX_S] | REGS[REGIDX_T]);
 }
 
 /*
@@ -1153,7 +1153,7 @@ void m_lwl(m_simplestation_state *m_simplestation)
 
 	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
 
-	uint32_t m_aligned = m_addr & !3;
+	uint32_t m_aligned = m_addr & ~3;
 
 	uint32_t m_dword = m_memory_read(m_aligned, dword, m_simplestation);
 
@@ -1404,26 +1404,26 @@ void m_swl(m_simplestation_state *m_simplestation)
 	printf("swl $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	uint32_t m_aligned_addr = ((REGS[REGIDX_S] + SIMMDT) & !3);
+	uint32_t m_aligned_addr = ((REGS[REGIDX_S] + SIMMDT) & ~3);
 
 	uint32_t m_val = m_memory_read(m_aligned_addr, dword, m_simplestation);
 
 	switch ((REGS[REGIDX_S] + SIMMDT) & 3)
 	{
 		case 0:
-			m_memory_write(m_aligned_addr, ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] >> 24)), dword, m_simplestation);
+			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] >> 24)), dword, m_simplestation);
 			break;
 
 		case 1:
-			m_memory_write(m_aligned_addr, ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] >> 16)), dword, m_simplestation);
+			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] >> 16)), dword, m_simplestation);
 			break;
 
 		case 2:
-			m_memory_write(m_aligned_addr, ((m_val & 0xFF000000) | (REGS[REGIDX_T] >> 8)), dword, m_simplestation);
+			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFF000000) | (REGS[REGIDX_T] >> 8)), dword, m_simplestation);
 			break;
 
 		case 3:
-			m_memory_write(m_aligned_addr, ((m_val & 0x00000000) | (REGS[REGIDX_T] >> 0)), dword, m_simplestation);
+			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0x00000000) | (REGS[REGIDX_T] >> 0)), dword, m_simplestation);
 			break;
 
 		default:
@@ -1494,24 +1494,24 @@ void m_swr(m_simplestation_state *m_simplestation)
 
 	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
 
-	uint32_t m_val = m_memory_read((m_addr & !3), dword, m_simplestation);
+	uint32_t m_val = m_memory_read((m_addr & ~3), dword, m_simplestation);
 
 	switch (m_addr & 3)
 	{
 		case 0:
-			m_memory_write((m_addr & !3), ((m_val & 0x00000000) | (REGS[REGIDX_T] << 0)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0x00000000) | (REGS[REGIDX_T] << 0)), dword, m_simplestation);
 			break;
 
 		case 1:
-			m_memory_write((m_addr & !3), ((m_val & 0xFF000000) | (REGS[REGIDX_T] << 8)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0xFF000000) | (REGS[REGIDX_T] << 8)), dword, m_simplestation);
 			break;
 
 		case 2:
-			m_memory_write((m_addr & !3), ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] << 16)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] << 16)), dword, m_simplestation);
 			break;
 
 		case 3:
-			m_memory_write((m_addr & !3), ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] << 24)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] << 24)), dword, m_simplestation);
 			break;
 
 		default:

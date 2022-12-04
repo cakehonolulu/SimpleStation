@@ -170,7 +170,7 @@ void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)
 
     uint8_t m_ack = ((m_val >> 24) & 0x3F);
 
-    m_simplestation->m_memory->m_dma->m_irq_channel_flags &= !m_ack;
+    m_simplestation->m_memory->m_dma->m_irq_channel_flags &= ~m_ack;
 }
 
 bool m_irq(m_simplestation_state *m_simplestation)
@@ -278,6 +278,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 #ifdef DEBUG_DMA
                         printf(CYAN "[DMA] run_block: GPU Data Command 0x%08X\n" NORMAL, m_source);
 #endif
+                        m_gpu_gp0(m_source, m_simplestation);
                         break;
 
                     default:
