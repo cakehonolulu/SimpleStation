@@ -30,6 +30,9 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
 // 0x28
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0xA0
+void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0xE1
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation);
 
