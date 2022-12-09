@@ -1,9 +1,7 @@
 # Setup the basic compilation flags
 # Warn all, extra and compile for c23
-CFLAGS := -Wall -Wextra -Iinclude/
-SDLCFLAGS = `sdl2-config --cflags`
-SDLLDFLAGS = `sdl2-config --libs`
-LDFLAGS := -lm
+CFLAGS := -Wall -Wextra -Iinclude/ `pkg-config --cflags sdl2 glew`
+LDFLAGS := -lm `pkg-config --libs sdl2 glew`
 
 ifdef USE_GCC
 # Use GNU's GCC Compiler
@@ -86,7 +84,7 @@ $(BINARY): $(C_OBJECTS)
 	@echo " 🚧 Linking..."
 ifeq ($(HOST), Linux)
 	@echo " \033[0;36mLD \033[0msimplestation"
-	@$(CC) $(LDFLAGS) $(SDLLDFLAGS) -o $@ $(shell find . -name '*.o')
+	@$(CC) $(LDFLAGS) -o $@ $(shell find . -name '*.o')
 endif
 ifeq ($(HOST), Windows)
 	$(MINGW64) $(CFLAGS) -I$(Win32SDL2Headers) -L$(Win32SDL2Libs) $^ -o $@ -lmingw32 -lSDL2main -lSDL2
