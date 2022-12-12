@@ -8,10 +8,10 @@ out vec3 color;
 void main() {
   // NOTE: mapping VRAM to OpenGL, (0;1023, 0;511) -> (-1;1, -1;1)
 
-  float xpos = (float(vertex_position.x) / 512) - 1.0;
+  float xpos = (float(vertex_position.x) / 320) - 1.0;
 
   // NOTE: VRAM top-left based, OpenGL bottom-left
-  float ypos = 1.0 - (float(vertex_position.y) / 256);
+  float ypos = 1.0 - (float(vertex_position.y) / 240);
 
   gl_Position.xyzw = vec4(xpos, ypos, 0.0, 1.0);
 
