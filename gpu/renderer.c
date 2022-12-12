@@ -30,7 +30,8 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  1024, 512, SDL_WINDOW_OPENGL);
+							  640, 480, SDL_WINDOW_OPENGL);
+						  // 1024, 512
 
 	m_gl_context = SDL_GL_CreateContext(m_window);
 
@@ -202,6 +203,27 @@ int put_triangle(const RendererPosition positions[3], const RendererColor colors
   }
 
   for (int i = 0; i < 3; ++i) {
+    positionsBuffer[count_vertices] = positions[i];
+    colorsBuffer[count_vertices] = colors[i];
+    ++count_vertices;
+  }
+
+  return 0;
+}
+
+int put_quad(const RendererPosition positions[4], const RendererColor colors[4]) {
+  if (count_vertices + 6 >= VERTEX_BUFFER_LEN) {
+    printf("Vertex attribute buffers full, forcing_draw\n");
+    draw();
+  }
+
+  for (int i = 0; i < 3; ++i) {
+    positionsBuffer[count_vertices] = positions[i];
+    colorsBuffer[count_vertices] = colors[i];
+    ++count_vertices;
+  }
+
+  for (int i = 1; i < 4; ++i) {
     positionsBuffer[count_vertices] = positions[i];
     colorsBuffer[count_vertices] = colors[i];
     ++count_vertices;

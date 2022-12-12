@@ -346,7 +346,21 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-    //printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
+     RendererPosition positions[4] = {
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
+  };
+
+  RendererColor colors[4] = {
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+  };
+
+  put_quad(positions, colors);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -368,13 +382,29 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
 
     put_triangle(positions, colors);
     
-    printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
+    //printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
 }
 
 void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
     (void) m_simplestation;
+
+    RendererPosition positions[4] = {
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
+  };
+
+  RendererColor colors[4] = {
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
+      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]),
+  };
+
+  put_quad(positions, colors);
 
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
