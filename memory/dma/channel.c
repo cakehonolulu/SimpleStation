@@ -90,7 +90,7 @@ void m_channel_set_base(m_simplestation_state *m_simplestation, uint32_t m_value
 
 uint32_t m_channel_get_block_control(m_simplestation_state *m_simplestation, uint8_t m_id)
 {
-    return (((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size) << 16)
+    return (((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_count) << 16)
             | ((uint32_t) m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_block_size);
 }
 

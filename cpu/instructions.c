@@ -257,7 +257,7 @@ void m_srlv(m_simplestation_state *m_simplestation)
 	printf("srlv $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
 #endif
 
-	REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F)));
+	REGS[REGIDX_D] = (REGS[REGIDX_T] >> (((int32_t) REGS[REGIDX_S]) & 0x1F));
 }
 
 /*
@@ -278,7 +278,7 @@ void m_srav(m_simplestation_state *m_simplestation)
 	printf("srav $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S]);
 #endif
 
-	REGS[REGIDX_D] = ((REGS[REGIDX_T]) >> (REGS[REGIDX_T] & 0x1F));
+	REGS[REGIDX_D] = (((int32_t) REGS[REGIDX_T]) >> (REGS[REGIDX_S] & 0x1F));
 }
 
 /*
@@ -598,14 +598,14 @@ void m_add(m_simplestation_state *m_simplestation)
 	printf("add $%s, $%s, $%s\n", m_cpu_regnames[REGIDX_D], m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T]);
 #endif
 
-	if (m_cpu_check_signed_addition(REGS[REGIDX_S], REGS[REGIDX_T]))
+	if (m_cpu_check_signed_addition((int32_t) REGS[REGIDX_S], REGS[REGIDX_T]))
 	{
 		m_exc_types m_exc = overflow;
 		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{
-		REGS[REGIDX_D] = ((int32_t) (((int32_t) REGS[REGIDX_S]) + ((int32_t) REGS[REGIDX_T])));
+		REGS[REGIDX_D] = ((uint32_t) (((int32_t) REGS[REGIDX_S]) + ((int32_t) REGS[REGIDX_T])));
 	}
 }
 
@@ -988,14 +988,14 @@ void m_addi(m_simplestation_state *m_simplestation)
 	printf("addi $%s, $%s, %d\n", m_cpu_regnames[REGIDX_S], m_cpu_regnames[REGIDX_T], SIMMDT);
 #endif
 
-	if (m_cpu_check_signed_addition(REGS[REGIDX_S], SIMMDT))
+	if (m_cpu_check_signed_addition((int32_t) REGS[REGIDX_S], SIMMDT))
 	{
 		m_exc_types m_exc = overflow;
 		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{
-		REGS[REGIDX_T] = ((uint32_t) ( ((int32_t) REGS[REGIDX_S]) + ( (int32_t) SIMMDT)));
+		REGS[REGIDX_T] = ((uint32_t) ( ((int32_t) REGS[REGIDX_S]) + (SIMMDT)));
 	}
 }
 
@@ -1153,9 +1153,7 @@ void m_lwl(m_simplestation_state *m_simplestation)
 
 	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
 
-	uint32_t m_aligned = m_addr & ~3;
-
-	uint32_t m_dword = m_memory_read(m_aligned, dword, m_simplestation);
+	uint32_t m_dword = m_memory_read(m_addr & ~3, dword, m_simplestation);
 
 	uint32_t m_val;
 
@@ -1283,28 +1281,26 @@ void m_lwr(m_simplestation_state *m_simplestation)
 
 	uint32_t m_addr = REGS[REGIDX_S] + SIMMDT;
 
-	uint32_t m_aligned = m_addr & !3;
-
-	uint32_t m_dword = m_memory_read(m_aligned, dword, m_simplestation);
+	uint32_t m_dword = m_memory_read(m_addr & ~3, dword, m_simplestation);
 
 	uint32_t m_val;
 
 	switch (m_addr & 3)
 	{
 		case 0:
-			m_val = ((REGS[REGIDX_T] & 0x00000000) | (m_dword << 0));
+			m_val = ((REGS[REGIDX_T] & 0x00000000) | (m_dword >> 0));
 			break;
 		
 		case 1:
-			m_val = ((REGS[REGIDX_T] & 0xFF000000) | (m_dword << 8));
+			m_val = ((REGS[REGIDX_T] & 0xFF000000) | (m_dword >> 8));
 			break;
 		
 		case 2:
-			m_val = ((REGS[REGIDX_T] & 0xFFFF0000) | (m_dword << 16));
+			m_val = ((REGS[REGIDX_T] & 0xFFFF0000) | (m_dword >> 16));
 			break;
 		
 		case 3:
-			m_val = ((REGS[REGIDX_T] & 0xFFFFFF00) | (m_dword << 24));
+			m_val = ((REGS[REGIDX_T] & 0xFFFFFF00) | (m_dword >> 24));
 			break;
 
 		default:
@@ -1404,26 +1400,26 @@ void m_swl(m_simplestation_state *m_simplestation)
 	printf("swl $%s, 0x%x($%s)\n", m_cpu_regnames[REGIDX_T], IMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	uint32_t m_aligned_addr = ((REGS[REGIDX_S] + SIMMDT) & ~3);
+	uint32_t m_addr = (REGS[REGIDX_S] + SIMMDT);
 
-	uint32_t m_val = m_memory_read(m_aligned_addr, dword, m_simplestation);
+ 	uint32_t m_val = m_memory_read(m_addr & ~3, dword, m_simplestation);
 
-	switch ((REGS[REGIDX_S] + SIMMDT) & 3)
+	switch (m_addr & 3)
 	{
 		case 0:
-			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] >> 24)), dword, m_simplestation);
+			m_memory_write(m_addr & ~3, ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] >> 24)), dword, m_simplestation);
 			break;
 
 		case 1:
-			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] >> 16)), dword, m_simplestation);
+			m_memory_write(m_addr & ~3, ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] >> 16)), dword, m_simplestation);
 			break;
 
 		case 2:
-			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0xFF000000) | (REGS[REGIDX_T] >> 8)), dword, m_simplestation);
+			m_memory_write(m_addr & ~3, ((m_val & 0xFF000000) | (REGS[REGIDX_T] >> 8)), dword, m_simplestation);
 			break;
 
 		case 3:
-			m_memory_write((REGS[REGIDX_S] + SIMMDT) & ~3, ((m_val & 0x00000000) | (REGS[REGIDX_T] >> 0)), dword, m_simplestation);
+			m_memory_write(m_addr & ~3, ((m_val & 0x00000000) | (REGS[REGIDX_T] >> 0)), dword, m_simplestation);
 			break;
 
 		default:
@@ -1503,15 +1499,15 @@ void m_swr(m_simplestation_state *m_simplestation)
 			break;
 
 		case 1:
-			m_memory_write((m_addr & ~3), ((m_val & 0xFF000000) | (REGS[REGIDX_T] << 8)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0x000000FF) | (REGS[REGIDX_T] << 8)), dword, m_simplestation);
 			break;
 
 		case 2:
-			m_memory_write((m_addr & ~3), ((m_val & 0xFFFF0000) | (REGS[REGIDX_T] << 16)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0x0000FFFF) | (REGS[REGIDX_T] << 16)), dword, m_simplestation);
 			break;
 
 		case 3:
-			m_memory_write((m_addr & ~3), ((m_val & 0xFFFFFF00) | (REGS[REGIDX_T] << 24)), dword, m_simplestation);
+			m_memory_write((m_addr & ~3), ((m_val & 0x00FFFFFF) | (REGS[REGIDX_T] << 24)), dword, m_simplestation);
 			break;
 
 		default:
@@ -1664,7 +1660,7 @@ void m_xori(m_simplestation_state *m_simplestation)
 	printf("xori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
 #endif
 
-	REGS[REGIDX_T] = REGS[REGIDX_S] ^ IMMDT;
+	REGS[REGIDX_T] = REGS[REGIDX_S] ^ SIMMDT;
 }
 
 /*

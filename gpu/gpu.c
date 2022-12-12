@@ -417,9 +417,9 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     uint16_t m_height = m_resolution >> 16;
 
-    uint32_t m_image_sz = m_height * m_width;
+    uint32_t m_image_sz = ((m_height * m_width) + 1) & ~1;
 
-    m_image_sz = (m_image_sz + 1) & !1;
+    printf("[DEBUG] Image Size = 0x%08X\n", m_image_sz);
 
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 
@@ -511,18 +511,40 @@ void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation
 
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_value = (uint32_t) m_simplestation->m_gpu->m_field;
-
-    memset(m_simplestation->m_gpu, 0, sizeof(m_psx_gpu_t));
-
-    m_simplestation->m_gpu->m_field = m_value;
-
-    m_simplestation->m_gpu->m_interlaced = true;
-
-    m_simplestation->m_gpu->m_display_horizontal_start = 0x200;
+    m_simplestation->m_gpu->m_page_base_x = 0;
+	m_simplestation->m_gpu->m_page_base_y = 0;
+	m_simplestation->m_gpu->m_semitransparency = 0;
+    m_simplestation->m_gpu->m_texture_depth = t4bit;
+	m_simplestation->m_gpu->m_texture_window_x_mask = 0;
+	m_simplestation->m_gpu->m_texture_window_y_mask = 0;
+	m_simplestation->m_gpu->m_texture_window_x_offset = 0;
+	m_simplestation->m_gpu->m_texture_window_y_offset = 0;
+    m_simplestation->m_gpu->m_dithering = false;
+    m_simplestation->m_gpu->m_draw_to_display = false;
+    m_simplestation->m_gpu->m_texture_disable = false;
+	m_simplestation->m_gpu->m_rectangle_texture_x_flip = false;
+	m_simplestation->m_gpu->m_rectangle_texture_y_flip = false;
+	m_simplestation->m_gpu->m_drawing_area_left = 0;
+	m_simplestation->m_gpu->m_drawing_area_top = 0;
+	m_simplestation->m_gpu->m_drawing_area_right = 0;
+	m_simplestation->m_gpu->m_drawing_area_bottom = 0;
+	m_simplestation->m_gpu->m_drawing_x_offset = 0;
+	m_simplestation->m_gpu->m_drawing_y_offset = 0;
+    m_simplestation->m_gpu->m_force_set_mask_bit = false;
+    m_simplestation->m_gpu->m_preserve_masked_pixels = false;
+    m_simplestation->m_gpu->m_dma_direction = off;
+    m_simplestation->m_gpu->m_display_disabled = true;
+	m_simplestation->m_gpu->m_display_vram_x_start = 0;
+	m_simplestation->m_gpu->m_display_vram_y_start = 0;
+    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(0, 0);
+    m_simplestation->m_gpu->m_vertical_resolution = y240lines;
+    m_simplestation->m_gpu->m_video_mode = ntsc;
+    m_simplestation->m_gpu->m_interlaced = false;
+	m_simplestation->m_gpu->m_display_horizontal_start = 0x200;
 	m_simplestation->m_gpu->m_display_horizontal_end = 0xC00;
 	m_simplestation->m_gpu->m_display_line_start = 0x10;
 	m_simplestation->m_gpu->m_display_line_end = 0x100;
+    m_simplestation->m_gpu->m_display_depth = d15bits;
 }
 
 void m_gpu_reset_command_buffer(uint32_t m_value, m_simplestation_state *m_simplestation)

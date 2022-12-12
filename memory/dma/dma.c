@@ -165,7 +165,7 @@ void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_memory->m_dma->m_irq_dummy = (uint8_t) (m_val & 0x3F);
     m_simplestation->m_memory->m_dma->m_irq_force = ((m_val >> 15) & 1) != 0;
-    m_simplestation->m_memory->m_dma->m_irq_channel_enable = (uint8_t) ((m_val >> 24) & 0x3F);
+    m_simplestation->m_memory->m_dma->m_irq_channel_enable = (uint8_t) ((m_val >> 16) & 0x7F);
     m_simplestation->m_memory->m_dma->m_irq_enable = ((m_val >> 23) & 1) != 0;
 
     uint8_t m_ack = ((m_val >> 24) & 0x3F);
@@ -175,8 +175,8 @@ void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)
 
 bool m_irq(m_simplestation_state *m_simplestation)
 {
-    bool m_irq_channel = m_simplestation->m_memory->m_dma->m_irq_channel_flags & m_simplestation->m_memory->m_dma->m_irq_channel_enable;
-    return ((m_simplestation->m_memory->m_dma->m_irq_force) || (m_simplestation->m_memory->m_dma->m_irq_enable && m_irq_channel != 0));
+    return m_simplestation->m_memory->m_dma->m_irq_force || ((m_simplestation->m_memory->m_dma->m_irq_enable &&
+        (m_simplestation->m_memory->m_dma->m_irq_channel_flags & m_simplestation->m_memory->m_dma->m_irq_channel_enable)) != 0);
 }
 
 uint32_t m_get_interrupt(m_simplestation_state *m_simplestation)
