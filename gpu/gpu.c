@@ -128,6 +128,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
             case 0x28:
                 m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
+            
+            case 0x2C:
+                m_gpu_draw_texture_blend_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
 
             case 0x30:
                 m_gpu_draw_shaded_opaque_triangle(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
@@ -198,6 +202,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x28:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 5;
+                break;
+
+            case 0x2C:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 9;
                 break;
 
             case 0x30:
@@ -361,6 +369,11 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
   };
 
   put_quad(positions, colors);
+}
+
+void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    (void) m_value;
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
