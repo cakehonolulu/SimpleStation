@@ -25,7 +25,10 @@ typedef struct {
 
 RendererPosition pos_from_gp0(uint32_t val);
 RendererColor color_from_gp0(uint32_t val);
+RendererColor color(GLubyte r, GLubyte g, GLubyte b);
 void display();
+
+void renderer_LoadImage(m_simplestation_state *m_simplestation);
 
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation);
 uint8_t m_renderer_buffers_init(m_simplestation_state *m_simplestation);

@@ -221,6 +221,18 @@ typedef struct
 	uint8_t m_length;
 } m_psx_gpu_command_buffer_t;
 
+#define MAX_IMAGE_SIZE 64 *  256
+#define IMAGEBUFFER_MAX 32 * MAX_IMAGE_SIZE
+
+typedef struct {
+	uint16_t x, y;
+	uint16_t w, h;
+	uint32_t index;
+	// Buffer used for temp storing of single images
+	uint16_t buffer[IMAGEBUFFER_MAX];
+	uint32_t image_index;
+} m_psx_gpu_image_buffer_t;
+
 typedef struct m_gpu
 {
 	uint8_t m_page_base_x;
@@ -295,6 +307,8 @@ typedef struct
 	m_psx_gpu_t *m_gpu;
 
 	m_psx_gpu_command_buffer_t *m_gpu_command_buffer;
+
+	m_psx_gpu_image_buffer_t *m_gpu_image_buffer;
 
 	bool m_memory_state;
 	bool m_dma_state;

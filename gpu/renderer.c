@@ -196,6 +196,15 @@ RendererColor color_from_gp0(uint32_t val) {
 	return col;
 }
 
+RendererColor color(GLubyte r, GLubyte g, GLubyte b) {
+	RendererColor colorr;
+
+	colorr.r = r;
+	colorr.g = g;
+	colorr.b = b;
+  return colorr;
+}
+
 int put_triangle(const RendererPosition positions[3], const RendererColor colors[3]) {
   if (count_vertices + 3 >= VERTEX_BUFFER_LEN) {
     printf("Vertex attribute buffers full, forcing_draw\n");
@@ -230,4 +239,9 @@ int put_quad(const RendererPosition positions[4], const RendererColor colors[4])
   }
 
   return 0;
+}
+
+void renderer_LoadImage(m_simplestation_state *m_simplestation)
+{
+
 }

@@ -1,5 +1,6 @@
 #include <gpu/gpu.h>
 #include <gpu/command_buffer.h>
+#include <gpu/imagebuffer.h>
 #include <gpu/renderer.h>
 #include <ui/termcolour.h>
 #include <stdio.h>
@@ -24,6 +25,7 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
         else
         {
             m_renderer_init(m_simplestation);
+            imageBuffer_Create(m_simplestation);
             m_simplestation->m_gpu_command_buffer_state = ON;
         }
     }
@@ -268,8 +270,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             break;
 
         case image_load:
+            imageBuffer_Store(m_simplestation, m_value);
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
+                renderer_LoadImage(m_simplestation);
                 m_simplestation->m_gpu->m_gp0_mode = command;
             }
             break;
@@ -374,6 +378,22 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
+
+    RendererPosition positions[4] = {
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
+      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
+  };
+
+  RendererColor colors[4] = {
+      color(0x80, 0x00, 0x00),
+      color(0x80, 0x00, 0x00),
+      color(0x80, 0x00, 0x00),
+      color(0x80, 0x00, 0x00),
+  };
+
+  put_quad(positions, colors);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -424,7 +444,14 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
 
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    uint32_t m_position = m_simplestation->m_gpu_command_buffer->m_buffer[1];
+
     uint32_t m_resolution = m_simplestation->m_gpu_command_buffer->m_buffer[2];
+
+	uint16_t m_x = (uint16_t)m_position;
+	uint16_t m_y = (uint16_t)(m_position >> 16);
+
+
 
     uint16_t m_width = m_resolution & 0xFFFF;
 
@@ -437,6 +464,11 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 
     m_simplestation->m_gpu->m_gp0_mode = image_load;
+
+    if (m_simplestation->m_gpu->m_gp0_words_remaining > 0)
+    {
+        imageBuffer_Reset(m_simplestation, m_x, m_y, m_width, m_height);
+    }
 }
 
 void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
