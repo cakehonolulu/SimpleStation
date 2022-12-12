@@ -379,19 +379,31 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 {
     (void) m_value;
 
-    RendererPosition positions[4] = {
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
-  };
 
-  RendererColor colors[4] = {
-      color(0x80, 0x00, 0x00),
-      color(0x80, 0x00, 0x00),
-      color(0x80, 0x00, 0x00),
-      color(0x80, 0x00, 0x00),
-  };
+    RendererPosition positions[4];
+	RendererColor colors[4];
+    RendererPosition textcoords[4];
+	RendererPosition clut;
+	RendererPosition page;
+	RendererPosition tex_coords;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		positions[i] = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1 + (i * 2)]);
+		colors[i] = color(0x80, 0x00, 0x00);
+        textcoords[i] = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2 + (i * 2)]);
+	}
+
+
+	clut.x = (uint8_t)textcoords[0].y;
+	clut.y = (uint8_t)(textcoords[0].y >> 8);
+	printf("Texcoord1: 0x%04X Palette: (X: %04u Y: %04u)\n", textcoords[0].x, clut.x, clut.y);
+	page.x = (uint8_t)textcoords[1].y;
+	page.y = (uint8_t)(textcoords[1].y >> 8);
+	printf("Texcoord2: 0x%04X Texpage: (X: %04u Y: %04u)\n", textcoords[1].x, page.x, page.y);
+	tex_coords.x = (uint8_t)textcoords[2].y;
+	tex_coords.y = (uint8_t)(textcoords[2].y >> 8);
+
 
   put_quad(positions, colors);
 }

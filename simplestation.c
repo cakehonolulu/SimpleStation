@@ -168,6 +168,12 @@ int main(int argc, char **argv)
 
 uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal)
 {
+#ifdef DUMP_VRAM
+	FILE *f = fopen("vram.bin", "wb");
+	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(uint16_t [32 * (64 *  256)]), f);
+	fclose(f);
+#endif
+
 	if (m_simplestation->m_dma_state)
 	{
 		m_dma_exit(m_simplestation);
