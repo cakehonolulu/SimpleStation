@@ -346,7 +346,7 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-    printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
+    //printf(CYAN "[OPENGL] Draw Monochrome Opaque Quadrilateral\n" NORMAL);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -354,6 +354,20 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
+    RendererPosition positions[3] = {
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
+    };
+
+    RendererColor colors[3] = {
+        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
+        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
+        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
+    };
+
+    put_triangle(positions, colors);
+    
     printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
 }
 
@@ -362,7 +376,7 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     (void) m_value;
     (void) m_simplestation;
 
-    printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
+    //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -453,6 +467,8 @@ void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestat
 
     m_simplestation->m_gpu->m_drawing_x_offset = ((int16_t) (m_x << 5)) >> 5;
     m_simplestation->m_gpu->m_drawing_y_offset = ((int16_t) (m_y << 5)) >> 5;
+
+    display();
 }
 
 void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)
