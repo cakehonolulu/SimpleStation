@@ -151,6 +151,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	}
 #endif
 
+#ifdef DEBUG_CPU
 	// Check if next PC value equals 0xB0
 	if (NXT_PC == 0xB0)
 	{
@@ -168,6 +169,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 			}
 		}
 	}
+#endif
 
 	PC = NXT_PC;
 
