@@ -273,7 +273,6 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             imageBuffer_Store(m_simplestation, m_value);
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
-                renderer_LoadImage(m_simplestation);
                 m_simplestation->m_gpu->m_gp0_mode = command;
             }
             break;
@@ -379,33 +378,20 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 {
     (void) m_value;
 
+    RendererColor c = color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-    RendererPosition positions[4];
-	RendererColor colors[4];
-    RendererPosition textcoords[4];
-	RendererPosition clut;
-	RendererPosition page;
-	RendererPosition tex_coords;
-	int i;
+    RendererPosition positions[4] = {
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
+        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
+    };
 
-	for (i = 0; i < 4; i++) {
-		positions[i] = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1 + (i * 2)]);
-		colors[i] = color(0x80, 0x00, 0x00);
-        textcoords[i] = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2 + (i * 2)]);
-	}
+    RendererColor colors[4] = {
+        c, c, c, c
+    };
 
-
-	clut.x = (uint8_t)textcoords[0].y;
-	clut.y = (uint8_t)(textcoords[0].y >> 8);
-	printf("Texcoord1: 0x%04X Palette: (X: %04u Y: %04u)\n", textcoords[0].x, clut.x, clut.y);
-	page.x = (uint8_t)textcoords[1].y;
-	page.y = (uint8_t)(textcoords[1].y >> 8);
-	printf("Texcoord2: 0x%04X Texpage: (X: %04u Y: %04u)\n", textcoords[1].x, page.x, page.y);
-	tex_coords.x = (uint8_t)textcoords[2].y;
-	tex_coords.y = (uint8_t)(textcoords[2].y >> 8);
-
-
-  put_quad(positions, colors);
+    put_quad(positions, colors);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -470,8 +456,6 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
     uint16_t m_height = m_resolution >> 16;
 
     uint32_t m_image_sz = ((m_height * m_width) + 1) & ~1;
-
-    printf("[DEBUG] Image Size = 0x%08X\n", m_image_sz);
 
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 

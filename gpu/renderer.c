@@ -252,8 +252,3 @@ int put_quad(const RendererPosition positions[4], const RendererColor colors[4])
 
   return 0;
 }
-
-void renderer_LoadImage(m_simplestation_state *m_simplestation)
-{
-
-}
