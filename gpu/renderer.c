@@ -6,10 +6,15 @@ SDL_GLContext *m_gl_context;
 RendererColor *colorsBuffer = NULL;
 RendererPosition *positionsBuffer = NULL;
 
-GLuint colorsObject;
-GLuint positionsObject;
+// OpenGL's VBO (Vertex Buffer Object)
+GLuint m_vbo;
 
-GLuint vertex_arrays = 0;
+// OpenGL's VAO (Vertex Array Object)
+GLuint m_vao;
+
+GLuint colorsObject;
+
+GLuint positionsObject;
 
 GLuint vertex_shader = 0;
 GLuint fragment_shader = 0;
@@ -62,17 +67,24 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glDetachShader(program, vertex_shader);
 	glDetachShader(program, fragment_shader);
-	glUseProgram(program);
 
 	m_renderer_buffers_init(m_simplestation);
+
+	glUseProgram(program);
 }
 
 uint8_t m_renderer_buffers_init(m_simplestation_state *m_simplestation)
 {
-	// Create vertex buffer
-	glGenVertexArrays(1, &vertex_arrays);
-	glBindVertexArray(vertex_arrays);
 
+	/* Vertex Array Buffer Initialization */
+
+	// Allocate space for the OpenGL Vertex Array Buffer
+	glGenVertexArrays(1, &m_vao);
+
+	// Bind to it (Set it as active)
+	glBindVertexArray(m_vao);
+
+	
 	
 	{
 		glGenBuffers(1, &positionsObject);
