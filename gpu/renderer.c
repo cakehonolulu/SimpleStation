@@ -3,21 +3,21 @@
 SDL_Window   *m_window;
 SDL_GLContext *m_gl_context;
 
-RendererColor *colorsBuffer = NULL;
-RendererPosition *positionsBuffer = NULL;
+// OpenGL's VAO (Vertex Array Object)
+GLuint m_vao;
 
 // OpenGL's VBO (Vertex Buffer Object)
 GLuint m_vbo;
 
-// OpenGL's VAO (Vertex Array Object)
-GLuint m_vao;
+Vertex *m_vertex_buffer = NULL;
 
-GLuint colorsObject;
-
-GLuint positionsObject;
-
+// GLSL Vertex Shader
 GLuint vertex_shader = 0;
+
+// GLSL Fragment Shader
 GLuint fragment_shader = 0;
+
+// GLSL Program
 GLuint program = 0;
 
 uint32_t count_vertices = 0;
@@ -31,21 +31,44 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
         return EXIT_FAILURE;
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  640, 480, SDL_WINDOW_OPENGL);
+							  1024, 512, SDL_WINDOW_OPENGL);
 						  // 1024, 512
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
 	m_gl_context = SDL_GL_CreateContext(m_window);
 
-	SDL_GL_SetSwapInterval(1);
+	glewInit();
 
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_DEBUG_OUTPUT);
 
-	SDL_GL_SwapWindow(m_window);
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glViewport(0, 0, 1024, 512);
 
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
 	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);
@@ -65,63 +88,67 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
     return -1;
   }
 
-	glDetachShader(program, vertex_shader);
-	glDetachShader(program, fragment_shader);
-
-	m_renderer_buffers_init(m_simplestation);
-
-	glUseProgram(program);
-}
-
-uint8_t m_renderer_buffers_init(m_simplestation_state *m_simplestation)
-{
-
-	/* Vertex Array Buffer Initialization */
-
-	// Allocate space for the OpenGL Vertex Array Buffer
 	glGenVertexArrays(1, &m_vao);
-
-	// Bind to it (Set it as active)
 	glBindVertexArray(m_vao);
 
-	
-	
-	{
-		glGenBuffers(1, &positionsObject);
-		glBindBuffer(GL_ARRAY_BUFFER, positionsObject);
+	GLsizei stride = sizeof(Vertex);
+	uint64_t offset = 0;
 
-		// Compute size
-		GLsizeiptr buffer_size = (sizeof(RendererPosition)) * VERTEX_BUFFER_LEN;
-		GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-		glBufferStorage(GL_ARRAY_BUFFER, buffer_size, NULL, flags);
-		positionsBuffer = (RendererPosition *) glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, flags);
+	GLsizeiptr elementSize = sizeof(Vertex);
+	GLsizeiptr bufferSize = elementSize * VERTEX_BUFFER_LEN;
 
-		memset(positionsBuffer, 0, buffer_size);
+	glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+	m_vertex_buffer = (Vertex *) glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
-		GLuint index = glGetAttribLocation(program, "vertex_position");
-		glEnableVertexAttribArray(index);
-		glVertexAttribIPointer(index, 2, GL_SHORT, 0, NULL);
-	}
+	memset(m_vertex_buffer, 0, bufferSize);
 
-	{
-		// Colors buffer
-		glGenBuffers(1, &colorsObject);
-		glBindBuffer(GL_ARRAY_BUFFER, colorsObject);
 
-		GLsizeiptr buffer_size = (sizeof(RendererColor)) * VERTEX_BUFFER_LEN;
-		GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+	glBindAttribLocation(program, 0, "vertex_position");
+	glEnableVertexAttribArray(0);
+	glVertexAttribIPointer(0, 2, GL_SHORT, stride, (void*)offset);
+	offset += sizeof(Position);
 
-		glBufferStorage(GL_ARRAY_BUFFER, buffer_size, NULL, flags);
-		colorsBuffer = (RendererColor *) glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, flags);
+	glBindAttribLocation(program, 1, "vertex_color");
+	glEnableVertexAttribArray(1);
+	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, stride, (void*)offset);
+	offset += sizeof(Colour);
 
-		memset(colorsBuffer, 0, buffer_size);
+	glBindAttribLocation(program, 2, "texture_page");
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, stride, (void*)offset);
+	offset += sizeof(TexPage);
 
-		// Colors attr
-		GLuint index = glGetAttribLocation(program, "vertex_color");
-		glEnableVertexAttribArray(index);
-		glVertexAttribIPointer(index, 3, GL_UNSIGNED_BYTE, 0, NULL);
-	}
+	glBindAttribLocation(program, 3, "texture_coord");
+	glEnableVertexAttribArray(3);
+	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, stride, (void*)offset);
+	offset += sizeof(TexCoord);
+
+	glBindAttribLocation(program, 4, "clut");
+	glEnableVertexAttribArray(4);
+	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, stride, (void*)offset);
+	offset += sizeof(ClutAttr);
+
+	glBindAttribLocation(program, 5, "texture_depth");
+	glEnableVertexAttribArray(5);
+	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, stride, (void*)offset);
+	offset += sizeof(TextureColourDepth);
+
+	glBindAttribLocation(program, 6, "texture_blend_mode");
+	glEnableVertexAttribArray(6);
+	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, stride, (void*)offset);
+	offset += sizeof(GLubyte);
+
+	/*glGenTextures(1, &vramTexture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, vramTexture);
+	glUniform1i(glGetUniformLocation(program, "vramTexture"), 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);*/
+
+	glUseProgram(program);
 }
 
 uint64_t readFile(char *filePath, char **contents) {
@@ -188,67 +215,89 @@ void display() {
   SDL_GL_SwapWindow(m_window);
 }
 
-RendererPosition pos_from_gp0(uint32_t val) {
-	RendererPosition pos;
-	int16_t a = val;
-	int16_t b = val >> 16;
-	pos.x = a;
-	pos.y = b;
+Position pos_from_gp0(uint32_t value)
+{
+	Position pos;
+	pos.x = (GLshort) (value & 0xFFFF);
+	pos.y = (GLshort) (value >> 16);
 	return pos;
 }
 
-RendererColor color_from_gp0(uint32_t val) {
-	RendererColor col;
-	uint8_t a = val;
-	uint8_t b = val >> 8;
-	uint8_t c = val >> 16;
-	col.r = a;
-	col.g = b;
-	col.b = c;
+Colour col_from_gp0(uint32_t value)
+{
+	Colour col;
+	col.r = (GLubyte) (value & 0xFF);
+	col.g = (GLubyte) ((value >> 8) & 0xFF);
+	col.b = (GLubyte) ((value >> 16) & 0xFF);
 	return col;
 }
 
-RendererColor color(GLubyte r, GLubyte g, GLubyte b) {
-	RendererColor colorr;
+TexPage texpage_from_gp0(uint32_t value)
+{
+	TexPage texp;
+	texp.xBase = ((value >> 16) & 0xF) * 64;
+	texp.yBase = (((value >> 16) >> 4) & 1) * 256;
+	return texp;
+}
+
+TexCoord texcoord_from_gp0(uint32_t value)
+{
+	TexCoord texc;
+	texc.x = value & 0xFF;
+	texc.y = (value >> 8) & 0xFF;
+	return texc;
+}
+
+ClutAttr clutattr_from_gp0(uint32_t value)
+{
+	ClutAttr clut;
+	clut.x = ((value >> 16) & 0x3F) * 16;
+	clut.y = ((value >> 16) >> 6) & 0x1FF;
+	return clut;
+}
+
+TextureColourDepth tcd_from_gp0(uint32_t value)
+{
+	TextureColourDepth tcd;
+	tcd.depth = ((value >> 16) >> 7) & 0x3;
+	return tcd;
+}
+
+TextureColourDepth tcd_from_val(textureColourDepthValue value)
+{
+	TextureColourDepth tcd;
+	tcd.depth = (GLubyte) value;
+	return tcd;
+}
+
+Colour color(GLubyte r, GLubyte g, GLubyte b) {
+	Colour colorr;
 
 	colorr.r = r;
 	colorr.g = g;
 	colorr.b = b;
-  return colorr;
+	return colorr;
 }
 
-int put_triangle(const RendererPosition positions[3], const RendererColor colors[3]) {
-  if (count_vertices + 3 >= VERTEX_BUFFER_LEN) {
-    printf("Vertex attribute buffers full, forcing_draw\n");
-    draw();
-  }
+int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
+	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
+	{
+		printf("Vertex attribute buffers full, forcing_draw\n");
+		draw();
+	}
 
-  for (int i = 0; i < 3; ++i) {
-    positionsBuffer[count_vertices] = positions[i];
-    colorsBuffer[count_vertices] = colors[i];
-    ++count_vertices;
-  }
+	m_vertex_buffer[count_vertices] = v1;
+	count_vertices++;
 
-  return 0;
+	m_vertex_buffer[count_vertices] = v2;
+	count_vertices++;
+	
+	m_vertex_buffer[count_vertices] = v3;
+	count_vertices++;
 }
 
-int put_quad(const RendererPosition positions[4], const RendererColor colors[4]) {
-  if (count_vertices + 6 >= VERTEX_BUFFER_LEN) {
-    printf("Vertex attribute buffers full, forcing_draw\n");
-    draw();
-  }
-
-  for (int i = 0; i < 3; ++i) {
-    positionsBuffer[count_vertices] = positions[i];
-    colorsBuffer[count_vertices] = colors[i];
-    ++count_vertices;
-  }
-
-  for (int i = 1; i < 4; ++i) {
-    positionsBuffer[count_vertices] = positions[i];
-    colorsBuffer[count_vertices] = colors[i];
-    ++count_vertices;
-  }
-
-  return 0;
+int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
+	put_triangle(v1, v2, v3);
+	put_triangle(v2, v3, v4);
+	return 0;
 }

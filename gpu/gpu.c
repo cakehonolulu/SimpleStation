@@ -357,41 +357,47 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-     RendererPosition positions[4] = {
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
-  };
 
-  RendererColor colors[4] = {
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-  };
+    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-  put_quad(positions, colors);
+    Vertex v1, v2, v3, v4;
+
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col;
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.colour = col;
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v3.colour = col;
+
+    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v4.colour = col;
+
+    put_quad(v1, v2, v3, v4);
 }
 
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
 
-    RendererColor c = color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-    RendererPosition positions[4] = {
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
-    };
+    Vertex v1, v2, v3, v4;
 
-    RendererColor colors[4] = {
-        c, c, c, c
-    };
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col;
 
-    put_quad(positions, colors);
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.colour = col;
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.colour = col;
+
+    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v4.colour = col;
+
+    put_quad(v1, v2, v3, v4);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -399,19 +405,18 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-    RendererPosition positions[3] = {
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
-        pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
-    };
+    Vertex v1, v2, v3;
 
-    RendererColor colors[3] = {
-        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
-        color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
-    };
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-    put_triangle(positions, colors);
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+
+    put_triangle(v1, v2, v3);
     
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
 }
@@ -421,22 +426,23 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     (void) m_value;
     (void) m_simplestation;
 
-    RendererPosition positions[4] = {
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]),
-      pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]),
-  };
+    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-  RendererColor colors[4] = {
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]),
-      color_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]),
-  };
+    Vertex v1, v2, v3, v4;
 
-  put_quad(positions, colors);
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+
+    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+
+    put_quad(v1, v2, v3, v4);
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
