@@ -70,75 +70,95 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, 640, 480);
 
+	// Initialize the buffers
+	m_renderer_buffers_init();
+
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
 	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);
 
 	// Create program
 	program = glCreateProgram();
+
+	// Attatch the compiled shaders
 	glAttachShader(program, vertex_shader);
 	glAttachShader(program, fragment_shader);
+	
+	// Bind the shader's parameters to the VBO Attributes
+	glBindAttribLocation(program, 0, "vertex_position");
+    glBindAttribLocation(program, 1, "vertex_color");
+	glBindAttribLocation(program, 2, "texture_page");
+    glBindAttribLocation(program, 3, "texture_coord");
+	glBindAttribLocation(program, 4, "clut");
+    glBindAttribLocation(program, 5, "texture_depth");
+    glBindAttribLocation(program, 6, "texture_blend_mode");
+
+	// Linke the program...
 	glLinkProgram(program);
 
 	status = GL_FALSE;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 
-	if(status != GL_TRUE) {
-    printf("OpenGL program linking failed!\n");
-    glDeleteProgram(program);
-    return -1;
-  }
+	if(status != GL_TRUE)
+	{
+    	printf("OpenGL program linking failed!\n");
+    	glDeleteProgram(program);
+    	return -1;
+	}
 
+	// ...and run it!
+	glUseProgram(program);
+}
+
+void m_renderer_buffers_init()
+{
+	// Generate the Vertex Arary Object
 	glGenVertexArrays(1, &m_vao);
+
+	// Bind to it
 	glBindVertexArray(m_vao);
 
+	// Generate the Vertex Buffer Object
 	glGenBuffers(1, &m_vbo);
+
+	// Bind to it
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
+	/* Allocate the buffer for use in the emulator */
+
+	// Get the size of the structure
 	GLsizeiptr elementSize = sizeof(Vertex);
+
+	// Find the total buffer size
 	GLsizeiptr bufferSize = elementSize * VERTEX_BUFFER_LEN;
 
+	// Setup the buffer...
 	glBufferStorage(GL_ARRAY_BUFFER, bufferSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 	m_vertex_buffer = (Vertex *) glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
+	// ...and clear it
 	memset(m_vertex_buffer, 0, bufferSize);
 
-	glBindAttribLocation(program, 0, "vertex_position");
-	glEnableVertexAttribArray(0);
+	/* Setup OpenGL Vertex Attributes */
 	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
 
-	glBindAttribLocation(program, 1, "vertex_color");
-	glEnableVertexAttribArray(1);
 	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, colour));
+	glEnableVertexAttribArray(1);
 
-	glBindAttribLocation(program, 2, "texture_page");
-	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, texPage));
+	glEnableVertexAttribArray(2);
 
-	glBindAttribLocation(program, 3, "texture_coord");
-	glEnableVertexAttribArray(3);
 	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texCoord));
+	glEnableVertexAttribArray(3);
 
-	glBindAttribLocation(program, 4, "clut");
-	glEnableVertexAttribArray(4);
 	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, clut));
+	glEnableVertexAttribArray(4);
 
-	glBindAttribLocation(program, 5, "texture_depth");
-	glEnableVertexAttribArray(5);
 	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texDepth));
+	glEnableVertexAttribArray(5);
 
-	glBindAttribLocation(program, 6, "texture_blend_mode");
-	glEnableVertexAttribArray(6);
 	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, blendMode));
-
-
-	/*glGenTextures(1, &vramTexture);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, vramTexture);
-	glUniform1i(glGetUniformLocation(program, "vramTexture"), 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);*/
-
-	glUseProgram(program);
+	glEnableVertexAttribArray(6);
 }
 
 uint64_t readFile(char *filePath, char **contents) {
