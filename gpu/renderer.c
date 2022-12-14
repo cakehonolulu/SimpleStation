@@ -33,7 +33,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  1024, 512, SDL_WINDOW_OPENGL);
+							  640, 480, SDL_WINDOW_OPENGL);
 						  // 1024, 512
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -68,7 +68,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glViewport(0, 0, 1024, 512);
+	glViewport(0, 0, 640, 480);
 
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
 	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);

@@ -390,6 +390,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
 	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
 	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+
 	GLubyte blend = (GLubyte) BlendTexture;
 
     Vertex v1, v2, v3, v4;
