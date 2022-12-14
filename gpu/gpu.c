@@ -357,11 +357,15 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-
     Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
     Vertex v1, v2, v3, v4;
 
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
 
@@ -383,19 +387,49 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 
     Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
+    ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+	GLubyte blend = (GLubyte) BlendTexture;
+
     Vertex v1, v2, v3, v4;
 
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
+    v1.texPage = texPage;
+    v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v1.clut = clut;
+    v1.texDepth = texDepth;
+    v1.blendMode = blend;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v2.colour = col;
+    v2.texPage = texPage;
+    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v2.clut = clut;
+    v2.texDepth = texDepth;
+    v2.blendMode = blend;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v3.colour = col;
+    v3.texPage = texPage;
+    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+    v3.clut = clut;
+    v3.texDepth = texDepth;
+    v3.blendMode = blend;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
     v4.colour = col;
+    v4.texPage = texPage;
+    v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
+    v4.clut = clut;
+    v4.texDepth = texDepth;
+    v4.blendMode = blend;
 
     put_quad(v1, v2, v3, v4);
 }
@@ -407,6 +441,10 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
 
     Vertex v1, v2, v3;
 
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
@@ -430,6 +468,11 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
 
     Vertex v1, v2, v3, v4;
 
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
