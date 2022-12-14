@@ -91,55 +91,45 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
-	GLsizei stride = sizeof(Vertex);
-	uint64_t offset = 0;
-
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 	GLsizeiptr elementSize = sizeof(Vertex);
 	GLsizeiptr bufferSize = elementSize * VERTEX_BUFFER_LEN;
 
-	glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+	glBufferStorage(GL_ARRAY_BUFFER, bufferSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 	m_vertex_buffer = (Vertex *) glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
 	memset(m_vertex_buffer, 0, bufferSize);
 
-
 	glBindAttribLocation(program, 0, "vertex_position");
 	glEnableVertexAttribArray(0);
-	glVertexAttribIPointer(0, 2, GL_SHORT, stride, (void*)offset);
-	offset += sizeof(Position);
+	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, position));
 
 	glBindAttribLocation(program, 1, "vertex_color");
 	glEnableVertexAttribArray(1);
-	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, stride, (void*)offset);
-	offset += sizeof(Colour);
+	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, colour));
 
 	glBindAttribLocation(program, 2, "texture_page");
 	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, stride, (void*)offset);
-	offset += sizeof(TexPage);
+	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, texPage));
 
 	glBindAttribLocation(program, 3, "texture_coord");
 	glEnableVertexAttribArray(3);
-	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, stride, (void*)offset);
-	offset += sizeof(TexCoord);
+	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texCoord));
 
 	glBindAttribLocation(program, 4, "clut");
 	glEnableVertexAttribArray(4);
-	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, stride, (void*)offset);
-	offset += sizeof(ClutAttr);
+	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, clut));
 
 	glBindAttribLocation(program, 5, "texture_depth");
 	glEnableVertexAttribArray(5);
-	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, stride, (void*)offset);
-	offset += sizeof(TextureColourDepth);
+	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texDepth));
 
 	glBindAttribLocation(program, 6, "texture_blend_mode");
 	glEnableVertexAttribArray(6);
-	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, stride, (void*)offset);
-	offset += sizeof(GLubyte);
+	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, blendMode));
+
 
 	/*glGenTextures(1, &vramTexture);
 	glActiveTexture(GL_TEXTURE0);
