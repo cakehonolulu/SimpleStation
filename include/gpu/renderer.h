@@ -24,6 +24,8 @@ typedef enum
 	BlendTexture = 2
 } BlendMode;
 
+
+#pragma pack(push, 1)
 typedef struct
 {
 	GLshort x;
@@ -70,6 +72,7 @@ typedef struct
 	TextureColourDepth texDepth;
 	GLubyte blendMode;
 } Vertex;
+#pragma pack(pop)
 
 Position pos_from_gp0(uint32_t val);
 Colour color_from_gp0(uint32_t val);
