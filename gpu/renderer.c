@@ -82,15 +82,6 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	// Attatch the compiled shaders
 	glAttachShader(program, vertex_shader);
 	glAttachShader(program, fragment_shader);
-	
-	// Bind the shader's parameters to the VBO Attributes
-	glBindAttribLocation(program, 0, "vertex_position");
-    glBindAttribLocation(program, 1, "vertex_color");
-	glBindAttribLocation(program, 2, "texture_page");
-    glBindAttribLocation(program, 3, "texture_coord");
-	glBindAttribLocation(program, 4, "clut");
-    glBindAttribLocation(program, 5, "texture_depth");
-    glBindAttribLocation(program, 6, "texture_blend_mode");
 
 	// Linke the program...
 	glLinkProgram(program);

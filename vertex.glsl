@@ -1,12 +1,12 @@
 #version 330 core
 
-in ivec2 vertex_position;
-in uvec3 vertex_color;
-in uvec2 texture_page;
-in uvec2 texture_coord;
-in uvec2 clut;
-in uint texture_depth;
-in uint texture_blend_mode;
+layout (location = 0) in ivec2 vertex_position;
+layout (location = 1) in uvec3 vertex_color;
+layout (location = 2) in uvec2 texture_page;
+layout (location = 3) in uvec2 texture_coord;
+layout (location = 4) in uvec2 clut;
+layout (location = 5) in uint texture_depth;
+layout (location = 6) in uint texture_blend_mode;
 
 out vec3 color;
 flat out uvec2 frag_texture_page;
