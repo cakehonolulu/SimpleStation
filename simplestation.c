@@ -6,10 +6,12 @@
 #include <gpu/command_buffer.h>
 #include <memory/memory.h>
 #include <ui/termcolour.h>
+#include <SDL2/SDL.h>
 
 int main(int argc, char **argv)
 {
 	m_simplestation_state m_simplestation;
+	SDL_Event m_event;
 
 	// Define a char pointer that will hold the file name
 	const char *m_biosname = NULL;
@@ -120,11 +122,24 @@ int main(int argc, char **argv)
 						if (m_interrupts_init(&m_simplestation) == 0)
 						{
 							if (m_gpu_init(&m_simplestation) == 0)
-							{
+							{	
 								while (true)
 								{
-									// Fetch, decode, execute
-									m_cpu_fde(&m_simplestation);
+									for (int i = 0; i < 30000; i++)
+									{
+										// Fetch, decode, execute
+										m_cpu_fde(&m_simplestation);
+									}
+
+									while( SDL_PollEvent( &m_event ) )
+									{
+										if( m_event.type == SDL_QUIT )
+										{
+											//Quit the program
+											m_simplestation_exit(&m_simplestation, 1);
+										}
+									}
+
 								}
 							}
 							else
