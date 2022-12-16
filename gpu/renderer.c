@@ -62,7 +62,15 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	m_gl_context = SDL_GL_CreateContext(m_window);
 
-	glewInit();
+	GLenum err = glewInit();
+
+	if (GLEW_OK != err)
+	{
+		printf("[GLEW] glewInit(): %s\n", glewGetErrorString(err));
+		m_simplestation_exit(m_simplestation, 1);
+	}
+	printf("[GLEW] glewInit(): Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
 
 	glEnable(GL_DEBUG_OUTPUT);
 
