@@ -73,8 +73,6 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	}
 	printf("[GLEW] glewInit(): Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-
-
 	glEnable(GL_DEBUG_OUTPUT);
 
 	glDisable(GL_DEPTH_TEST);
@@ -113,9 +111,11 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 void m_renderer_buffers_init()
 {
+	m_vertex_buffer = (Vertex *) malloc(sizeof(Vertex) * VERTEX_BUFFER_LEN);
+
 	// Generate the Vertex Arary Object
 	glGenVertexArrays(1, &m_vao);
-
+	
 	// Bind to it
 	glBindVertexArray(m_vao);
 
@@ -124,21 +124,7 @@ void m_renderer_buffers_init()
 
 	// Bind to it
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-	/* Allocate the buffer for use in the emulator */
-
-	// Get the size of the structure
-	GLsizeiptr elementSize = sizeof(Vertex);
-
-	// Find the total buffer size
-	GLsizeiptr bufferSize = elementSize * VERTEX_BUFFER_LEN;
-
-	// Setup the buffer...
-	glBufferStorage(GL_ARRAY_BUFFER, bufferSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-	m_vertex_buffer = (Vertex *) glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-
-	// ...and clear it
-	memset(m_vertex_buffer, 0, bufferSize);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
 	/* Setup OpenGL Vertex Attributes */
 	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, position));
@@ -208,18 +194,9 @@ static GLuint find_program_attrib(GLuint program, const char *attr) {
 }
 
 void draw() {
-  glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
-
-  glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
-
-  GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-
-  GLenum status;
-  do {
-    status = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 10000000);
-  } while (status != GL_ALREADY_SIGNALED && status != GL_CONDITION_SATISFIED);
-
-  count_vertices = 0;
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
+	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
+	count_vertices = 0;
 }
 
 void display() {
@@ -306,6 +283,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	
 	m_vertex_buffer[count_vertices] = v3;
 	count_vertices++;
+	
 }
 
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
