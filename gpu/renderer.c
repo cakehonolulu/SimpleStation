@@ -72,14 +72,12 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	printf("[GLEW] glewInit(): Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
 
+	
 	glEnable(GL_DEBUG_OUTPUT);
 
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, 640, 480);
-
-	// Initialize the buffers
-	m_renderer_buffers_init();
 
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
 	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);
@@ -103,6 +101,9 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
     	glDeleteProgram(program);
     	return -1;
 	}
+
+	// Initialize the buffers
+	m_renderer_buffers_init();
 
 	// ...and run it!
 	glUseProgram(program);
