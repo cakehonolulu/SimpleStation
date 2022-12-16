@@ -23,7 +23,7 @@ void main() {
   // NOTE: VRAM top-left based, OpenGL bottom-left
   float ypos = (float(vertex_position.y) / 480 * (-2) + 1);
 
-  gl_Position.xyzw = vec4(xpos, ypos, 0.0, 1.0);
+  gl_Position = vec4(xpos, ypos, 0.0, 1.0);
 
   color = vec3(float(vertex_color.r) / 255,
 	       float(vertex_color.g) / 255,
