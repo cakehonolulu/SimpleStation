@@ -176,10 +176,20 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 	glCompileShader(shader);
 	GLint status = GL_FALSE;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	
 	if (status == GL_FALSE) {
 		printf("Failed to compile shader %s\n", path);
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+		// The maxLength includes the NULL character
+		GLchar infoLog[maxLength];
+		glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+
+		printf("Error: %s\n", infoLog);
+
 		exit(1);
 	}
+
 	return shader;
 }
 
