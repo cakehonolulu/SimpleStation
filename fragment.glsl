@@ -8,22 +8,21 @@ flat in uint frag_texture_depth;
 flat in uint frag_blend_mode;
 flat in uint frag_texture_draw;
 
-out vec4 frag_color;
+out vec3 frag_color;
 
 void main() {
 	
 	// No texture drawing
 	if (frag_texture_draw == 4U)
 	{
-		frag_color = vec4(color, 1.0);
+		frag_color = color;
 	}
 	else
 	{
 		// Draw texture, hardcoded to 4bpp mode for now
-		frag_color = vec4(float(color.r) * 155,
+		frag_color = vec3(float(color.r) * 155,
 	       float(color.g) * 155,
-	       float(color.b) * 155,
-		   1.0);
+	       float(color.b) * 155);
 	}
 
 }

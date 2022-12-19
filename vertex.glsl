@@ -32,7 +32,7 @@ void main() {
 	       float(vertex_color.b) / 255);
   
   frag_texture_page = texture_page;
-  frag_texture_coord = vec2(texture_coord);
+  frag_texture_coord = texture_coord;
   frag_clut = clut;
   frag_texture_depth = texture_depth;
   frag_blend_mode = texture_blend_mode;
