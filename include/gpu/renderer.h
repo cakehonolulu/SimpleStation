@@ -71,6 +71,7 @@ typedef struct
 	ClutAttr clut;
 	TextureColourDepth texDepth;
 	GLubyte blendMode;
+	GLubyte drawTexture;
 } Vertex;
 #pragma pack(pop)
 

@@ -157,6 +157,9 @@ void m_renderer_buffers_init()
 
 	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, blendMode));
 	glEnableVertexAttribArray(6);
+
+	glVertexAttribIPointer(7, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, drawTexture));
+	glEnableVertexAttribArray(7);
 }
 
 uint64_t readFile(char *filePath, char **contents) {

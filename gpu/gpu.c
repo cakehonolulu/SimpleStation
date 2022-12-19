@@ -368,15 +368,19 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
+    v1.drawTexture = 4;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
     v2.colour = col;
+    v2.drawTexture = 4;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v3.colour = col;
+    v3.drawTexture = 4;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
     v4.colour = col;
+    v4.drawTexture = 4;
 
     put_quad(v1, v2, v3, v4);
 }
@@ -407,6 +411,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v1.clut = clut;
     v1.texDepth = texDepth;
     v1.blendMode = blend;
+    v1.drawTexture = 0;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v2.colour = col;
@@ -415,6 +420,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v2.clut = clut;
     v2.texDepth = texDepth;
     v2.blendMode = blend;
+    v2.drawTexture = 0;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v3.colour = col;
@@ -423,6 +429,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v3.clut = clut;
     v3.texDepth = texDepth;
     v3.blendMode = blend;
+    v3.drawTexture = 0;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
     v4.colour = col;
@@ -431,6 +438,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v4.clut = clut;
     v4.texDepth = texDepth;
     v4.blendMode = blend;
+    v4.drawTexture = 0;
 
     put_quad(v1, v2, v3, v4);
 }
@@ -448,12 +456,15 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.drawTexture = 4;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.drawTexture = 4;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v3.drawTexture = 4;
 
     put_triangle(v1, v2, v3);
     
@@ -476,15 +487,19 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.drawTexture = 4;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.drawTexture = 4;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v3.drawTexture = 4;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
     v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+    v4.drawTexture = 4;
 
     put_quad(v1, v2, v3, v4);
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
