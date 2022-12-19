@@ -8,6 +8,14 @@
 #include <ui/termcolour.h>
 #include <SDL2/SDL.h>
 
+
+#ifdef DUMP_VRAM
+#include <GL/glew.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#endif
+
 int main(int argc, char **argv)
 {
 	m_simplestation_state m_simplestation;
@@ -185,8 +193,17 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 {
 #ifdef DUMP_VRAM
 	FILE *f = fopen("vram.bin", "wb");
-	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(uint16_t [32 * (64 *  256)]), f);
+	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(m_simplestation->m_gpu_image_buffer->buffer), f);
 	fclose(f);
+	
+	extern GLint texture;
+	glBindTexture(GL_TEXTURE_2D, texture);
+	GLint width, height, level = 0;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
+	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
+
+	stbi_write_bmp( "vram.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 #endif
 
 	if (m_simplestation->m_dma_state)

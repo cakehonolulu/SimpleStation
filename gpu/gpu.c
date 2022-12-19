@@ -589,7 +589,7 @@ void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestat
     m_simplestation->m_gpu->m_drawing_x_offset = ((int16_t) (m_x << 5)) >> 5;
     m_simplestation->m_gpu->m_drawing_y_offset = ((int16_t) (m_y << 5)) >> 5;
 
-    display();
+    display(m_simplestation);
 }
 
 void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)

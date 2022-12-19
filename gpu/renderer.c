@@ -22,6 +22,8 @@ GLuint program = 0;
 
 uint32_t count_vertices = 0;
 
+GLuint texture;
+
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
 	GLint status = 0;
@@ -104,6 +106,14 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	// Initialize the buffers
 	m_renderer_buffers_init();
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+#ifdef DUMP_VRAM
+	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
+#endif
 
 	// ...and run it!
 	glUseProgram(program);
@@ -203,14 +213,17 @@ static GLuint find_program_attrib(GLuint program, const char *attr) {
   return attr_index;
 }
 
-void draw() {
+void draw(m_simplestation_state *m_simplestation) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
 }
 
-void display() {
-  draw();
+void display(m_simplestation_state *m_simplestation) {
+  draw(m_simplestation);
   SDL_GL_SwapWindow(m_window);
 }
 
@@ -282,7 +295,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		printf("Vertex attribute buffers full, forcing_draw\n");
-		draw();
+		//draw();
 	}
 
 	m_vertex_buffer[count_vertices] = v1;

@@ -231,6 +231,7 @@ typedef struct {
 	// Buffer used for temp storing of single images
 	uint16_t buffer[IMAGEBUFFER_MAX];
 	uint32_t image_index;
+
 } m_psx_gpu_image_buffer_t;
 
 typedef struct m_gpu
@@ -319,6 +320,10 @@ typedef struct
 
 	uint32_t m_breakpoint;
 	uint32_t m_wp;
+
+#ifdef DUMP_VRAM
+	uint8_t *m_vram_data;
+#endif
 
 	bool m_debugger;
 
