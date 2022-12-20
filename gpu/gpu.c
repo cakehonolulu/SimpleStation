@@ -540,7 +540,9 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     uint16_t m_height = m_resolution >> 16;
 
+#ifdef DEBUG_GP0
     printf(MAGENTA "[GP0] image_store: Unhandled image store size: %d, %d\n" NORMAL, m_height, m_width);
+#endif
 }
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
