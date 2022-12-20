@@ -79,7 +79,7 @@ Position pos_from_gp0(uint32_t val);
 Colour color_from_gp0(uint32_t val);
 Colour color(GLubyte r, GLubyte g, GLubyte b);
 void display(m_simplestation_state *m_simplestation);
-
+void m_window_changetitle(char *buffer);
 Position pos_from_gp0(uint32_t value);
 Colour col_from_gp0(uint32_t value);
 TexPage texpage_from_gp0(uint32_t value);

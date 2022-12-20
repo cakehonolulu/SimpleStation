@@ -230,6 +230,11 @@ void display(m_simplestation_state *m_simplestation) {
   SDL_GL_SwapWindow(m_window);
 }
 
+void m_window_changetitle(char *buffer)
+{
+	SDL_SetWindowTitle(m_window, buffer);
+}
+
 Position pos_from_gp0(uint32_t value)
 {
 	Position pos;

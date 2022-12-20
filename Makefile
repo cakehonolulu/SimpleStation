@@ -1,7 +1,7 @@
 # Setup the basic compilation flags
 # Warn all, extra and compile for c23
-CFLAGS := -Wall -Wextra -Iinclude/ `pkg-config --cflags sdl2 glew`
-LDFLAGS := -lm `pkg-config --libs sdl2 glew`
+CFLAGS := -Wall -Wextra -Iinclude/ `pkg-config --cflags sdl2 glew glfw3`
+LDFLAGS := -lm `pkg-config --libs sdl2 glew glfw3`
 
 ifdef USE_GCC
 # Use GNU's GCC Compiler

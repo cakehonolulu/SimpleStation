@@ -7,7 +7,10 @@
 #include <memory/memory.h>
 #include <ui/termcolour.h>
 #include <SDL2/SDL.h>
+#include <gpu/renderer.h>
 
+
+#include <GLFW/glfw3.h>
 
 #ifdef DUMP_VRAM
 #include <GL/glew.h>
@@ -130,23 +133,49 @@ int main(int argc, char **argv)
 						if (m_interrupts_init(&m_simplestation) == 0)
 						{
 							if (m_gpu_init(&m_simplestation) == 0)
-							{	
+							{
+								glfwInit();
+								double lastTime = glfwGetTime();
+								int nbFrames = 0;
+
 								while (true)
 								{
-									for (int i = 0; i < 30000; i++)
+									for (int i = 0; i < 400000; i++)
 									{
 										// Fetch, decode, execute
 										m_cpu_fde(&m_simplestation);
 									}
 
+    								display(&m_simplestation);
+
+									double currentTime = glfwGetTime();
+								    double delta = currentTime - lastTime;
+								    nbFrames++;
+
+									if ( delta >= 1.0 )
+									{
+										double frametime = 1000.0/(double)nbFrames;
+
+										double fps = (double) nbFrames / delta;
+
+										char buffer[1024];
+										snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | MS/F: %.4F | FPS: %.2F", frametime, fps);
+
+										m_window_changetitle(buffer);
+
+										nbFrames = 0;
+										lastTime = currentTime;
+    								}
+
 									while( SDL_PollEvent( &m_event ) )
 									{
 										if( m_event.type == SDL_QUIT )
 										{
-											//Quit the program
+											// Quit the program
 											m_simplestation_exit(&m_simplestation, 1);
 										}
 									}
+									
 
 								}
 							}
