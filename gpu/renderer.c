@@ -109,7 +109,10 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 #ifdef DUMP_VRAM
 	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
@@ -216,10 +219,14 @@ static GLuint find_program_attrib(GLuint program, const char *attr) {
   return attr_index;
 }
 
-void draw(m_simplestation_state *m_simplestation) {
+void m_texture_upload(m_simplestation_state *m_simplestation)
+{
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+}
 
+void draw(m_simplestation_state *m_simplestation) {
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;

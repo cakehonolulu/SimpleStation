@@ -88,6 +88,7 @@ ClutAttr clutattr_from_gp0(uint32_t value);
 TextureColourDepth tcd_from_gp0(uint32_t value);
 TextureColourDepth tcd_from_val(textureColourDepthValue value);
 
+void m_texture_upload(m_simplestation_state *m_simplestation);
 
 void renderer_LoadImage(m_simplestation_state *m_simplestation);
 

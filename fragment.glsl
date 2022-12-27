@@ -2,27 +2,80 @@
 
 in vec3 color;
 flat in uvec2 frag_texture_page;
-flat in vec2 frag_texture_coord;
+in vec2 frag_texture_coord;
 flat in uvec2 frag_clut;
 flat in uint frag_texture_depth;
 flat in uint frag_blend_mode;
 flat in uint frag_texture_draw;
 
-out vec3 frag_color;
+out vec4 frag_color;
+
+uniform sampler2D vram_texture;
+
+vec4 vram_read(uint x, uint y)
+{
+    return texelFetch(vram_texture, ivec2(int(x), int(y)), 0);
+}
+
+// Thanks Avocado (https://github.com/JaCzekanski/Avocado)!
+
+uint unpack_texel(vec4 texel)
+{
+    uint i0 = uint(texel.a);
+
+    texel *= ivec4(0x1f);
+    uint i1 = uint(texel.b + 0.5);
+    uint i2 = uint(texel.g + 0.5);
+    uint i3 = uint(texel.r + 0.5);
+
+    return (i0 << 15) | (i1 << 10) | (i2 << 5) | i3;
+}
+
+
+
+vec4 sample_texel(vec2 tc)
+{
+    vec4 pixel = vec4(1.0, 0.0, 0.0, 1.0);
+    float stride_divisor = 16.0;
+    if (frag_texture_depth == 0u)
+    {
+        stride_divisor /= 4.0;
+        int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
+        int tc_y = int(frag_texture_page.y) + int(tc.y);
+
+        // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
+        uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
+
+        // We now fetch each pixel (located in the clut) in the texel in
+        // 4bit chunks, based on the current texture co-ordinate's x value.
+        // Therefore, for each fragment on screen, we read out 4-pixels worth
+        // of data from VRAM (or so I think..) based on this texcoord x-value.
+        uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
+        pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
+    }
+
+    // According to No$cash, a texel of 0x0000 is transparent.
+    // As this is the case, any fragment we encounter that is pure black we
+    // discard from rendition.
+    if (pixel == vec4(0))
+        discard;
+
+    return pixel;
+}
+
+
 
 void main() {
 	
-	// No texture drawing
-	if (frag_texture_draw == 4U)
+	// Texture drawing
+	if (frag_texture_draw == 1U)
 	{
-		frag_color = color;
+		frag_color = sample_texel(frag_texture_coord);	
 	}
 	else
 	{
-		// Draw texture, hardcoded to 4bpp mode for now
-		frag_color = vec3(float(color.r) * 155,
-	       float(color.g) * 155,
-	       float(color.b) * 155);
+		// Triangle with Goraud Shading
+		frag_color = vec4(color, 1.0);
 	}
 
 }
