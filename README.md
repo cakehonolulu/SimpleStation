@@ -10,6 +10,13 @@
 
 [![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
 
+<p align="center">
+  <img src="resources/current.png" alt="Current State" width="325px" height="275px"/>
+</p>
+
+
+![]()
+
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
 * LLE Interpreter Emulator
