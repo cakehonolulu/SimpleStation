@@ -4,18 +4,22 @@
 
 <h2 align="center">A simple, multiplatform, Sony Playstation 1 (PSX) emulator written in C23</h2>
 
-
-
-
-
 [![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
 
-<p align="center">
-  <img src="resources/current.png" alt="Current State" width="325px" height="275px"/>
-</p>
+
+<table>
+<thead>
+  <tr>
+    <td><h3>Linux (Ubuntu)</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/lin.png" alt="Image" width="200" height="161"></td>
+    <td><h3>Windows 11</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/win.png" alt="Image" width="204" height="161"></td>
+    <td><h3>macOS 12 Monterey</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/mac.png" alt="Image" width="200" height="164"></td>
+    <td><h3>Raspberry Pi 4B</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/rpi.png" alt="Image" width="200" height="158"></td>
+  </tr>
+</thead>
+</table>
+![image](https://user-images.githubusercontent.com/30508313/209736282-5b2cde1d-43ab-4453-bbbe-0d3c4d9505d9.png)
 
 
-![]()
 
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
