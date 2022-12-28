@@ -42,4 +42,10 @@ endif()
 
 
 add_executable(simplestation ${SRC_FILES})
-target_link_libraries(simplestation glfw ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SDL2_LIBRARIES})
+target_link_libraries(simplestation glfw ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES})
+
+if (APPLE)
+  target_link_libraries(simplestation "-framework OpenGL" GLEW::GLEW)
+else(NOT APPLE)
+  target_link_libraries(simplestation ${GLEW_LIBRARIES})
+endif()
