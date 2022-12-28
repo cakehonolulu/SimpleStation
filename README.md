@@ -17,7 +17,6 @@
   </tr>
 </thead>
 </table>
-![image](https://user-images.githubusercontent.com/30508313/209736282-5b2cde1d-43ab-4453-bbbe-0d3c4d9505d9.png)
 
 
 
