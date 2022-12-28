@@ -4,7 +4,9 @@
 #include <cpu/bios.h>
 #include <gpu/gpu.h>
 #include <ui/termcolour.h>
+#if defined (__unix__)
 #include <endian.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 
