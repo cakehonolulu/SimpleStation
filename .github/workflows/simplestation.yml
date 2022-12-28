@@ -78,7 +78,7 @@ jobs:
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 15
-        sudo apt-get -y install libsdl2-2.0-0 libsdl2-dev libsdl2-gfx-1.0-0 libsdl2-gfx-dev libglew-dev xorg-dev libxcb1-dev libglfw3 libglfw3-dev
+        sudo apt -y install libsdl2-2.0-0 libsdl2-dev libsdl2-gfx-1.0-0 libsdl2-gfx-dev libglew-dev xorg-dev libxcb1-dev libglfw3 libglfw3-dev cmake
         
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
@@ -94,7 +94,8 @@ jobs:
     - id: build_status
       run: |
        echo "Run, Build Application using script"º
-       make CODEQL=1
+       cmake .
+       make
        if test -f "simplestation"; then
            echo "Build succeeded!"
            echo "BUILD_STATUS=passing" >> $GITHUB_OUTPUT
