@@ -291,6 +291,14 @@ typedef struct m_gpu
 
 } m_psx_gpu_t;
 
+typedef struct {
+	uint32_t m_status;
+	uint32_t m_command;
+	uint32_t m_fifo;
+	uint32_t m_req;
+
+} m_psx_cdrom_t;
+
 /* Structures */
 typedef struct
 {
@@ -311,12 +319,15 @@ typedef struct
 
 	m_psx_gpu_image_buffer_t *m_gpu_image_buffer;
 
+	m_psx_cdrom_t *m_cdrom;
+
 	bool m_memory_state;
 	bool m_dma_state;
 	bool m_interrupts_state;
 	bool m_cpu_state;
 	bool m_gpu_state;
 	bool m_gpu_command_buffer_state;
+	bool m_cdrom_state;
 
 	uint32_t m_breakpoint;
 	uint32_t m_wp;

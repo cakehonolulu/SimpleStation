@@ -4,6 +4,7 @@
 #include <cpu/interrupts.h>
 #include <gpu/gpu.h>
 #include <gpu/command_buffer.h>
+#include <cdrom/cdrom.h>
 #include <memory/memory.h>
 #include <ui/termcolour.h>
 #include <SDL2/SDL.h>
@@ -134,49 +135,56 @@ int main(int argc, char **argv)
 						{
 							if (m_gpu_init(&m_simplestation) == 0)
 							{
-								glfwInit();
-								double lastTime = glfwGetTime();
-								int nbFrames = 0;
-
-								while (true)
+								if (m_cdrom_init(&m_simplestation) == 0)
 								{
-									for (int i = 0; i < 400000; i++)
+									glfwInit();
+									
+									double lastTime = glfwGetTime();
+									int nbFrames = 0;
+
+									while (true)
 									{
-										// Fetch, decode, execute
-										m_cpu_fde(&m_simplestation);
-									}
-
-    								display(&m_simplestation);
-
-									double currentTime = glfwGetTime();
-								    double delta = currentTime - lastTime;
-								    nbFrames++;
-
-									if ( delta >= 1.0 )
-									{
-										double frametime = 1000.0/(double)nbFrames;
-
-										double fps = (double) nbFrames / delta;
-
-										char buffer[1024];
-										snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | MS/F: %.4F | FPS: %.2F", frametime, fps);
-
-										m_window_changetitle(buffer);
-
-										nbFrames = 0;
-										lastTime = currentTime;
-    								}
-
-									while( SDL_PollEvent( &m_event ) )
-									{
-										if( m_event.type == SDL_QUIT )
+										for (int i = 0; i < 400000; i++)
 										{
-											// Quit the program
-											m_simplestation_exit(&m_simplestation, 1);
+											// Fetch, decode, execute
+											m_cpu_fde(&m_simplestation);
+										}
+
+										display(&m_simplestation);
+
+										double currentTime = glfwGetTime();
+										double delta = currentTime - lastTime;
+										nbFrames++;
+
+										if ( delta >= 1.0 )
+										{
+											double frametime = 1000.0/(double)nbFrames;
+
+											double fps = (double) nbFrames / delta;
+
+											char buffer[1024];
+											snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | MS/F: %.4F | FPS: %.2F", frametime, fps);
+
+											m_window_changetitle(buffer);
+
+											nbFrames = 0;
+											lastTime = currentTime;
+										}
+
+										while( SDL_PollEvent( &m_event ) )
+										{
+											if( m_event.type == SDL_QUIT )
+											{
+												// Quit the program
+												m_simplestation_exit(&m_simplestation, 1);
+											}
 										}
 									}
-									
-
+								}
+								else
+								{
+									// If CDROM couldn't be initialized, exit out
+									m_simplestation_exit(&m_simplestation, 1);
 								}
 							}
 							else
@@ -234,6 +242,11 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 
 	stbi_write_bmp( "vram.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 #endif
+
+	if (m_simplestation->m_cdrom_state)
+	{
+		m_cdrom_exit(m_simplestation);
+	}
 
 	if (m_simplestation->m_dma_state)
 	{
