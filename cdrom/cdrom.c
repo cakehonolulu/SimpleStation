@@ -26,3 +26,29 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
         free(m_simplestation->m_cdrom);
     }
 }
+
+void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    switch (m_offset)
+    {
+        default:
+            printf(RED "[CDROM] write: Unhandled CDROM Write (Offset: %d, Value: 0x%08X)\n" NORMAL, m_offset, m_value);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
+}
+
+uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
+{
+    uint32_t m_value = 0;
+
+    switch (m_offset)
+    {
+        default:
+            printf(RED "[CDROM] read: Unhandled CDROM Read (Offset: %d)\n" NORMAL, m_offset);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
+    }
+
+    return m_value;
+}

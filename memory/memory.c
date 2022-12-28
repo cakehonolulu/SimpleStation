@@ -3,6 +3,7 @@
 #include <cpu/interrupts.h>
 #include <cpu/bios.h>
 #include <gpu/gpu.h>
+#include <cdrom/cdrom.h>
 #include <ui/termcolour.h>
 #if defined (__unix__)
 #include <endian.h>
@@ -257,6 +258,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 			break;
 
+		// CDROM Read
+		case 0x1F801800 ... 0x1F801803:
+			m_return = m_cdrom_read(m_address & 0x0000000F, m_simplestation);
+			break;
+
 		case 0x1F801C00 ... 0x1F801FFF:
 			// SPU Dummy Read
 #ifdef DEBUG_MEMORY
@@ -390,6 +396,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Dummy Timer Registers memory write! Ignoring...\n" NORMAL);
 #endif
+			break;
+
+		// CDROM Write
+		case 0x1F801800 ... 0x1F801803:
+			m_cdrom_write(m_address & 0x0000000F, m_value, m_simplestation);
 			break;
 
 		case 0x1F801C00 ... 0x1F801FFF:
