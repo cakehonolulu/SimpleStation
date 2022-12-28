@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 
 	printf("SimpleStation - Multiplatform PSX Emulator\n");
 
-#if defined (__unix__) || defined (__APPLE__)
+#if defined (__unix__) || defined (__APPLE__) || defined (__MINGW32__) || defined (__MINGW64__) 
 	// Check if arguments were passed
 	if (argc < 2)
 	{	
