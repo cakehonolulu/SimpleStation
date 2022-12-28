@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef PREC23
+#if !(__STDC_VERSION__ > 201710L)
 #include <stdbool.h>
 #endif
 

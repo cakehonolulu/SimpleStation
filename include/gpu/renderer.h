@@ -6,7 +6,7 @@
 
 #include <GL/glew.h>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #define VERTEX_BUFFER_LEN 64 * 1024
 

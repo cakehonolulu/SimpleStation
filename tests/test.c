@@ -1,3 +1,5 @@
+#ifdef TEST_MODE
+
 #include <simplestation.h>
 #include <cpu/cpu.h>
 #include <cpu/bios.h>
@@ -219,3 +221,5 @@ void m_memory_write_test(m_simplestation_state *m_simplestation)
 	printf("Value: 0x%08X\n", m_memory_read(0x1FFFFC, dword, m_simplestation));
 
 }
+
+#endif
