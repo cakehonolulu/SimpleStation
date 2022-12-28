@@ -97,12 +97,12 @@ jobs:
        make CODEQL=1
        if test -f "simplestation"; then
            echo "Build succeeded!"
-           echo "{BUILD_STATUS}={"passing"}" >> $GITHUB_OUTPUT
-           echo "{BUILD_STATUS_COLOUR}={"green"}" >> $GITHUB_OUTPUT
+           echo "BUILD_STATUS=passing" >> $GITHUB_OUTPUT
+           echo "BUILD_STATUS_COLOUR=green" >> $GITHUB_OUTPUT
        else
            echo "Build failed!"
-           echo "{BUILD_STATUS}={"failing"}" >> $GITHUB_OUTPUT
-           echo "{BUILD_STATUS_COLOUR}={"red"}" >> $GITHUB_OUTPUT
+           echo "BUILD_STATUS=failing" >> $GITHUB_OUTPUT
+           echo "BUILD_STATUS_COLOUR=red" >> $GITHUB_OUTPUT
        fi
        
     - name: Build badge
