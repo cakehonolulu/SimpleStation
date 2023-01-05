@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 	{
 		m_simplestation.m_breakpoint = 0;
 		m_simplestation.m_debugger = false;
+		m_simplestation.m_sideload = false;
 
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
@@ -101,6 +102,7 @@ int main(int argc, char **argv)
 					strcpy(m_simplestation.exename, argv[m_args + 1]);
 					printf("PSX-EXE Name: %s\n", m_simplestation.exename);
 					m_args++;
+					m_simplestation.m_sideload = true;
 				}
 				else
 				{

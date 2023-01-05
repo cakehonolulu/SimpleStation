@@ -171,13 +171,14 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	}
 #endif
 
-#ifdef DEBUG_EXE
-	if (PC == 0x80030000)
-	{
-		PC = m_simplestation->exe->initial_pc;
-		NXT_PC = PC + 4;
+	if (m_simplestation->m_sideload == true)
+	{	
+		if (PC == 0x80030000)
+		{
+			PC = m_simplestation->exe->initial_pc;
+			NXT_PC = PC + 4;
+		}
 	}
-#endif
 
 	PC = NXT_PC;
 

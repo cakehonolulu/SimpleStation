@@ -58,9 +58,12 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 
 					if (m_dma_init(m_simplestation) == 0)
 					{
-#ifdef DEBUG_EXE
-						m_simplestation->exe = ram_LoadEXE(m_simplestation, NULL);
-#endif		
+
+						if (m_simplestation->m_sideload == true)
+						{
+							m_simplestation->exe = ram_LoadEXE(m_simplestation, NULL);
+						}
+
 						m_simplestation->m_memory_state = ON;
 					}
 					else
