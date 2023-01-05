@@ -334,6 +334,7 @@ typedef struct
 	m_psx_cdrom_t *m_cdrom;
 
 	ExeFile *exe;
+	uint8_t *exename;
 
 	bool m_memory_state;
 	bool m_dma_state;

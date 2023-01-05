@@ -601,7 +601,7 @@ uint32_t mask_region(uint32_t address) {
 
 
 ExeFile *ram_LoadEXE(m_simplestation_state *m_simplestation, char *path) {
-	FILE *file = fopen("psxtest_cpu.exe", "rb");
+	FILE *file = fopen(m_simplestation->exename, "rb");
 	char buffer[0x10];
 	if (file == NULL) {
 		printf("Failed to load EXE, file not found.\n");

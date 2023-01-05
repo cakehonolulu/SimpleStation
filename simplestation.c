@@ -93,6 +93,20 @@ int main(int argc, char **argv)
 					printf("You must specify breakpoint!\n");
 				}
 			}
+			else if (!strcmp(argv[m_args], "-exe"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					m_simplestation.exename = malloc(strlen(argv[m_args + 1])* sizeof(uint8_t));
+					strcpy(m_simplestation.exename, argv[m_args + 1]);
+					printf("PSX-EXE Name: %s\n", m_simplestation.exename);
+					m_args++;
+				}
+				else
+				{
+					printf("You must specify a PSX-EXE filename!\n");
+				}
+			}
 			else if (!strcmp(argv[m_args], "-debugger"))
 			{
 				m_simplestation.m_debugger = true;
