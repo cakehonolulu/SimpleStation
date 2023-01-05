@@ -299,6 +299,18 @@ typedef struct {
 
 } m_psx_cdrom_t;
 
+typedef struct {
+	uint32_t initial_pc;
+	uint32_t initial_gp;
+	uint32_t ram_destination;
+	uint32_t file_size;
+	uint32_t fill_start_address;
+	uint32_t fill_size;
+	uint32_t initial_spfp_base;
+	uint32_t initial_spfp_off;
+	uint32_t marker;
+} ExeFile;
+
 /* Structures */
 typedef struct
 {
@@ -320,6 +332,8 @@ typedef struct
 	m_psx_gpu_image_buffer_t *m_gpu_image_buffer;
 
 	m_psx_cdrom_t *m_cdrom;
+
+	ExeFile *exe;
 
 	bool m_memory_state;
 	bool m_dma_state;
