@@ -17,13 +17,17 @@ flat out uint frag_texture_depth;
 flat out uint frag_blend_mode;
 flat out uint frag_texture_draw;
 
+uniform ivec2 offset;
+
 void main() {
   // NOTE: mapping VRAM to OpenGL, (0;1023, 0;511) -> (-1;1, -1;1)
 
-  float xpos = (float(vertex_position.x) / 640.0 * 2.0) - 1.0;
+  ivec2 position = vertex_position + offset;
+
+  float xpos = (float(position.x) / 640.0 * 2.0) - 1.0;
 
   // NOTE: VRAM top-left based, OpenGL bottom-left
-  float ypos = (float(vertex_position.y) / 480.0 * (-2.0) + 1.0);
+  float ypos = (float(position.y) / 480.0 * (-2.0) + 1.0);
 
   gl_Position = vec4(xpos, ypos, 0.0, 1.0);
 

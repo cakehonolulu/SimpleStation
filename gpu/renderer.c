@@ -24,6 +24,8 @@ uint32_t count_vertices = 0;
 
 GLuint texture;
 
+GLint uniform_offset;
+
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
 	GLint status = 0;
@@ -90,6 +92,11 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	// Attatch the compiled shaders
 	glAttachShader(program, vertex_shader);
 	glAttachShader(program, fragment_shader);
+
+	uniform_offset = glGetUniformLocation(program,
+                                     "offset");
+
+	glUniform2i(uniform_offset, 0, 0);
 
 	// Linke the program...
 	glLinkProgram(program);

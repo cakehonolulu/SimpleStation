@@ -126,7 +126,7 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
             case 0x01:
                 m_gpu_clear_cache(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
-
+            
             case 0x28:
                 m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -600,13 +600,17 @@ void m_gpu_set_draw_area_bottom_right(uint32_t m_value, m_simplestation_state *m
     m_simplestation->m_gpu->m_drawing_area_left = ((uint16_t) (m_value & 0x3FF));
 }
 
+extern GLint uniform_offset;
+
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    draw(m_simplestation);
+    
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));
 
-    m_simplestation->m_gpu->m_drawing_x_offset = ((int16_t) (m_x << 5)) >> 5;
-    m_simplestation->m_gpu->m_drawing_y_offset = ((int16_t) (m_y << 5)) >> 5;
+
+    glUniform2i(uniform_offset, (GLint) (((int16_t) (m_x << 5)) >> 5), (GLint) (((int16_t) (m_y << 5)) >> 5));
 }
 
 void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)
