@@ -176,11 +176,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	{
 		PC = m_simplestation->exe->initial_pc;
 		NXT_PC = PC + 4;
-		REGS[28] = m_simplestation->exe->initial_gp;
-		REGS[29] = m_simplestation->exe->initial_spfp_base;
-		REGS[30] = m_simplestation->exe->initial_spfp_base;
-		REGS[29] = m_simplestation->exe->initial_spfp_base + m_simplestation->exe->initial_spfp_off;
-		REGS[30] = m_simplestation->exe->initial_spfp_base + m_simplestation->exe->initial_spfp_off;
 	}
 #endif
 
