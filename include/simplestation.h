@@ -336,6 +336,7 @@ typedef struct
 	ExeFile *exe;
 	uint8_t *exename;
 	bool m_sideload;
+	bool m_tty;
 
 	bool m_memory_state;
 	bool m_dma_state;

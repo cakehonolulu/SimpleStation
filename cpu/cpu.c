@@ -151,25 +151,26 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	}
 #endif
 
-#ifdef DEBUG_TTY
-	// Check if next PC value equals 0xB0
-	if (NXT_PC == 0xB0)
+	if (m_simplestation->m_tty == true)
 	{
-		// Read Current PC
-		uint32_t m_is_addiu = m_memory_read(PC, dword, m_simplestation);
-		
-		// Check if opcode is ADDIU (0x09) 
-		if (((uint32_t) (m_is_addiu >> 26) & 63) == 0x09)
+		// Check if next PC value equals 0xB0
+		if (NXT_PC == 0xB0)
 		{
-			// Check if it's signed immediate value equals 0x3D
-			if (((uint32_t) ((int16_t) (m_is_addiu & 0xFFFF))) == 0x3D)
+			// Read Current PC
+			uint32_t m_is_addiu = m_memory_read(PC, dword, m_simplestation);
+			
+			// Check if opcode is ADDIU (0x09) 
+			if (((uint32_t) (m_is_addiu >> 26) & 63) == 0x09)
 			{
-				// Character to print is at the LSB of the A0 reguster
-				printf("%c", (char) REGS[4]);
+				// Check if it's signed immediate value equals 0x3D
+				if (((uint32_t) ((int16_t) (m_is_addiu & 0xFFFF))) == 0x3D)
+				{
+					// Character to print is at the LSB of the A0 reguster
+					printf("%c", (char) REGS[4]);
+				}
 			}
 		}
 	}
-#endif
 
 	if (m_simplestation->m_sideload == true)
 	{	
