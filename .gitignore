@@ -10,6 +10,9 @@ simplestation
 # Binary Files
 *.bin
 
+# STBI
+stb_image_write.h
+
 # VSCodium Files
 .vscode/
 
