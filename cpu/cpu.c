@@ -176,7 +176,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	{	
 		if (PC == 0x80030000)
 		{
-			PC = m_simplestation->exe->initial_pc;
+			PC = m_simplestation->exe->initial_pc - 4;
 			NXT_PC = PC + 4;
 		}
 	}
