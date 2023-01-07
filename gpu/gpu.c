@@ -126,6 +126,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
             case 0x01:
                 m_gpu_clear_cache(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
+
+            case 0x02:
+                m_gpu_fill_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
             
             case 0x28:
                 m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
@@ -200,6 +204,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x01:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 1;
+                break;
+
+            case 0x02:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 3;
                 break;
 
             case 0x28:
@@ -351,6 +359,47 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
     (void) m_simplestation;
 
     return;
+}
+
+void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
+    uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
+	uint16_t r = (colour24 & 0xFF) >> 3;
+	uint16_t g = ((colour24 >> 8) & 0xFF) >> 3;
+	uint16_t b = ((colour24 >> 16) & 0xFF) >> 3;
+	uint16_t colour15 = r | (g << 5) | (b << 10); // should this be RGB, or BGR...
+
+	uint16_t left = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0x3F0;
+	uint16_t top = (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16) & 0x1FF;
+	uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0x7FF;
+	uint16_t height = (m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16) & 0x1FF;
+
+	if (width == 0x400)
+	{
+		width = 0;
+	}
+	else
+	{
+		width = ((width + 0xF) & 0x3F0); // round up to multiples of 0x10
+	}
+
+	// these should wrap, but instead I'm just clamping them to the edges
+	if (left + width > 0x400)
+	{
+		width = 0x400 - left;
+	}
+	if (top + height > 0x200)
+	{
+		height = 0x200 - top;
+	}
+
+	for (uint16_t line = top; line < top + height; line++)
+	{
+		for (uint16_t x = left; x < left + width; x++)
+		{
+			m_simplestation->m_gpu_image_buffer->buffer[(line * 2048) + (x * 2)] = colour15 & 0xFF;
+			m_simplestation->m_gpu_image_buffer->buffer[(line * 2048) + (x * 2) + 1] = colour15 >> 8;
+		}
+	}
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
