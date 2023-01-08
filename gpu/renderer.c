@@ -17,14 +17,40 @@ GLuint vertex_shader = 0;
 // GLSL Fragment Shader
 GLuint fragment_shader = 0;
 
+// GLSL Vertex Shader
+GLuint fb_vertex_shader = 0;
+
+// GLSL Fragment Shader
+GLuint fb_fragment_shader = 0;
+
 // GLSL Program
 GLuint program = 0;
+
+// GLSL Program
+GLuint fb_program = 0;
 
 uint32_t count_vertices = 0;
 
 GLuint texture;
 
 GLint uniform_offset;
+
+unsigned int m_fbo;
+
+unsigned int vram_fb_texture;
+
+float rectangleVertices[] =
+{
+	// Coords    // texCoords
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	-1.0f, -1.0f,  0.0f, 0.0f,
+	-1.0f,  1.0f,  0.0f, 1.0f,
+
+	 1.0f,  1.0f,  1.0f, 1.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	-1.0f,  1.0f,  0.0f, 1.0f
+};
+unsigned int rectVAO, rectVBO;
 
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
@@ -39,24 +65,6 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 							  640, 480, SDL_WINDOW_OPENGL);
 						  // 1024, 512
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -79,8 +87,6 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-	glDisable(GL_DEPTH_TEST);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, 640, 480);
 
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
@@ -127,6 +133,71 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	// ...and run it!
 	glUseProgram(program);
+
+
+	glGenFramebuffers(1, &m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	glGenTextures(1, &vram_fb_texture);
+	glBindTexture(GL_TEXTURE_2D, vram_fb_texture);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vram_fb_texture, 0);
+
+	int fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
+	{
+		printf("[OPENGL] Framebuffer could not be created (%d)! Exiting...\n", fboStatus);
+		exit(1);
+	}
+	
+	glGenVertexArrays(1, &rectVAO);
+	glGenBuffers(1, &rectVBO);
+	glBindVertexArray(rectVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), &rectangleVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	fb_vertex_shader = renderer_LoadShader("fb_vertex.glsl", GL_VERTEX_SHADER);
+	fb_fragment_shader = renderer_LoadShader("fb_fragment.glsl", GL_FRAGMENT_SHADER);
+
+	// Create program
+	fb_program = glCreateProgram();
+
+	// Attatch the compiled shaders
+	glAttachShader(fb_program, fb_vertex_shader);
+	glAttachShader(fb_program, fb_fragment_shader);
+
+	// Link the program...
+	glLinkProgram(fb_program);
+
+	status = GL_FALSE;
+	glGetProgramiv(fb_program, GL_LINK_STATUS, &status);
+
+	if(status != GL_TRUE)
+	{
+    	printf("OpenGL program linking failed!\n");
+    	glDeleteProgram(fb_program);
+    	return -1;
+	}
+
+	// ...and run it!
+	glUseProgram(fb_program);
+
+	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void m_renderer_buffers_init()
@@ -228,15 +299,32 @@ static GLuint find_program_attrib(GLuint program, const char *attr) {
 
 void m_texture_upload(m_simplestation_state *m_simplestation)
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glUseProgram(program);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
 }
 
 void draw(m_simplestation_state *m_simplestation) {
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glUseProgram(program);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(fb_program);
+	glBindVertexArray(rectVAO);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glBindTexture(GL_TEXTURE_2D, vram_fb_texture);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void display(m_simplestation_state *m_simplestation) {
