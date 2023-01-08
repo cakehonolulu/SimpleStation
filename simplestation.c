@@ -162,37 +162,42 @@ int main(int argc, char **argv)
 								{
 									glfwInit();
 									
-									double lastTime = glfwGetTime();
-									int nbFrames = 0;
+									static double limitFPS = 1.0f / 60.0f;
+
+								    double lastTime = glfwGetTime(), timer = lastTime;
+								    double deltaTime = 0, nowTime = 0;
+								    int updates = 0;
 
 									while (true)
-									{
-										for (int i = 0; i < 400000; i++)
+									{			
+										nowTime = glfwGetTime();
+								        deltaTime += (nowTime - lastTime) / limitFPS;
+								        lastTime = nowTime;
+						
+										while (deltaTime >= 1.0)
 										{
-											// Fetch, decode, execute
-											m_cpu_fde(&m_simplestation);
+											// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
+											for (int i = 0; i < 565045; i++)
+											{
+												// Fetch, decode, execute
+												m_cpu_fde(&m_simplestation);
+											}
+											
+											updates++;
+											deltaTime--;
 										}
-
+										
 										display(&m_simplestation);
 
-										double currentTime = glfwGetTime();
-										double delta = currentTime - lastTime;
-										nbFrames++;
-
-										if ( delta >= 1.0 )
-										{
-											double frametime = 1000.0/(double)nbFrames;
-
-											double fps = (double) nbFrames / delta;
-
+										if (glfwGetTime() - timer > 1.0) {
+								            timer ++;
 											char buffer[1024];
-											snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | MS/F: %.4F | FPS: %.2F", frametime, fps);
+											snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | FPS: %d | MS/F: %.2f", updates, pow(updates / 1000.0f, -1.0));
 
 											m_window_changetitle(buffer);
 
-											nbFrames = 0;
-											lastTime = currentTime;
-										}
+								            updates = 0;
+								        }
 
 										while( SDL_PollEvent( &m_event ) )
 										{
@@ -202,6 +207,7 @@ int main(int argc, char **argv)
 												m_simplestation_exit(&m_simplestation, 1);
 											}
 										}
+
 									}
 								}
 								else
