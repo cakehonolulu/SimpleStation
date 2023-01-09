@@ -22,6 +22,11 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -DDUMP_VRAM")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DDUMP_VRAM")
 endif()
 
+if (ASAN)
+add_compile_options(-fsanitize=address -g)
+add_link_options(-fsanitize=address)
+endif()
+
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
