@@ -7,6 +7,7 @@ flat in uvec2 frag_clut;
 flat in uint frag_texture_depth;
 flat in uint frag_blend_mode;
 flat in uint frag_texture_draw;
+flat in int draw_vram;
 
 out vec4 frag_color;
 
@@ -66,7 +67,12 @@ vec4 sample_texel(vec2 tc)
 
 
 void main() {
-	
+	if(draw_vram == 1) {
+        ivec2 coords = ivec2(frag_texture_coord * vec2(1024.0, 512.0)); 
+        frag_color = texelFetch(vram_texture, coords, 0);
+        return;
+	}
+        
 	// Texture drawing
 	if (frag_texture_draw == 1U)
 	{
@@ -77,5 +83,7 @@ void main() {
 		// Triangle with Goraud Shading
 		frag_color = vec4(color, 1.0);
 	}
+    
+
 
 }

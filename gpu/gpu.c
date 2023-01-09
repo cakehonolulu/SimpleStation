@@ -400,6 +400,48 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
 			m_simplestation->m_gpu_image_buffer->buffer[(line * 2048) + (x * 2) + 1] = colour15 >> 8;
 		}
 	}
+
+    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+
+    Vertex v1, v2, v3, v4;
+
+    Position topLeft = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+
+    Position size = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
+    v1.position = topLeft;
+    v1.colour = col;
+    v1.drawTexture = 0;
+
+    Position newPos;
+
+    newPos.x = topLeft.x + size.x;
+    newPos.y = topLeft.y;
+
+    v2.position = newPos;
+    v2.colour = col;
+    v2.drawTexture = 0;
+
+    newPos.x = topLeft.x;
+    newPos.y = topLeft.y +  + size.y;
+
+    v3.position = newPos;
+    v3.colour = col;
+    v3.drawTexture = 0;
+
+    newPos.x = topLeft.x + size.x;
+    newPos.y = topLeft.y +  + size.y;
+
+    v4.position = newPos;
+    v4.colour = col;
+    v4.drawTexture = 0;
+
+    put_quad(v1, v2, v3, v4);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -653,8 +695,6 @@ extern GLint uniform_offset;
 
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    draw(m_simplestation);
-    
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));
 

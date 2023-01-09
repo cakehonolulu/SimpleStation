@@ -35,6 +35,8 @@ GLuint texture;
 
 GLint uniform_offset;
 
+GLint display_vram;
+
 unsigned int m_fbo;
 
 unsigned int vram_fb_texture;
@@ -106,6 +108,11 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	// Linke the program...
 	glLinkProgram(program);
+
+	display_vram = glGetUniformLocation(program,
+                                     "disp_vram_frame");
+
+	glUniform1i(display_vram, 0);
 
 	status = GL_FALSE;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
@@ -315,6 +322,7 @@ void draw(m_simplestation_state *m_simplestation) {
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 	glBindTexture(GL_TEXTURE_2D, texture);
+	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
@@ -328,8 +336,13 @@ void draw(m_simplestation_state *m_simplestation) {
 }
 
 void display(m_simplestation_state *m_simplestation) {
-  draw(m_simplestation);
-  SDL_GL_SwapWindow(m_window);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glUseProgram(program);
+
+	glUniform1i(display_vram, 1);
+	
+	draw(m_simplestation);
+	SDL_GL_SwapWindow(m_window);
 }
 
 void m_window_changetitle(char *buffer)
