@@ -9,37 +9,53 @@ GLuint m_vao;
 // OpenGL's VBO (Vertex Buffer Object)
 GLuint m_vbo;
 
+// Custom Vertex Array containing draw attributes
 Vertex *m_vertex_buffer = NULL;
 
-// GLSL Vertex Shader
-GLuint vertex_shader = 0;
+/* OpenGL Framebuffers */
 
-// GLSL Fragment Shader
-GLuint fragment_shader = 0;
+// Original, OpenGL-provided framebuffer (Visible)
+GLint m_original_fbo;
 
-// GLSL Vertex Shader
-GLuint fb_vertex_shader = 0;
+// Custom off-screen framebuffer
+GLuint m_fbo;
 
-// GLSL Fragment Shader
-GLuint fb_fragment_shader = 0;
+/* OpenGL Textures */
 
-// GLSL Program
+// Texture containing the off-screen framebuffer
+GLuint offscreen_vram_texture;
+
+// Texture for the default (Visible) framebuffer
+GLuint onscreen_final_texture;
+
+/* OpenGL Shader Programs */
+
+// GLSL Off-Screen Program
 GLuint program = 0;
 
-// GLSL Program
+// GLSL Visible Program
 GLuint fb_program = 0;
 
-uint32_t count_vertices = 0;
+// GLSL Off-Screen Vertex Shader
+GLuint vertex_shader = 0;
 
-GLuint texture;
+// GLSL Off-Screen Fragment Shader
+GLuint fragment_shader = 0;
+
+// GLSL (Visible) Vertex Shader
+GLuint fb_vertex_shader = 0;
+
+// GLSL (Visible) Fragment Shader
+GLuint fb_fragment_shader = 0;
+
+/* OpenGL Uniforms */
 
 GLint uniform_offset;
 
-unsigned int m_fbo;
+/* Auxiliary variables */
+uint32_t count_vertices = 0;
 
-unsigned int vram_fb_texture;
-
-float rectangleVertices[] =
+float output_window_vertices[] =
 {
 	// Coords    // texCoords
 	 1.0f, -1.0f,  1.0f, 0.0f,
@@ -50,11 +66,12 @@ float rectangleVertices[] =
 	 1.0f, -1.0f,  1.0f, 0.0f,
 	-1.0f,  1.0f,  0.0f, 1.0f
 };
-unsigned int rectVAO, rectVBO;
+unsigned int output_window_vao, output_window_vbo;
 
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
-	GLint status = 0;
+	GLint m_opengl_status = 0;
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		SDL_Log("Unable to initialize SDL2: %s", SDL_GetError());
@@ -87,8 +104,118 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-	glViewport(0, 0, 640, 480);
+	// Store the original (Visible) framebuffer into an easily-accessible variable
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_original_fbo);
 
+	m_renderer_setup_onscreen(m_simplestation);
+
+	m_renderer_setup_offscreen(m_simplestation);
+
+#ifdef DUMP_VRAM
+	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
+#endif
+}
+
+void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation)
+{
+	/* OpenGL On-Screen Framebuffer Configuration */
+
+	GLint m_opengl_status = 0;
+
+	/* Setup the on-screen VAO and VBO */
+
+	// First generate the Vertex Array...
+	glGenVertexArrays(1, &output_window_vao);
+
+	// ... then generate the Vertex Buffer.
+	glGenBuffers(1, &output_window_vbo);
+
+	// Bind to the new Vertex Array
+	glBindVertexArray(output_window_vao);
+
+	// Also bind to the Vertex Buffer...
+	glBindBuffer(GL_ARRAY_BUFFER, output_window_vbo);
+
+	// ...and tell the GPU which data to grab-off the memory
+	glBufferData(GL_ARRAY_BUFFER, sizeof(output_window_vertices), &output_window_vertices, GL_STATIC_DRAW);
+
+	// Specify the values for the VAO (2 triangles)
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	// Compile the default framebuffer's shaders
+	fb_vertex_shader = renderer_LoadShader("fb_vertex.glsl", GL_VERTEX_SHADER);
+	fb_fragment_shader = renderer_LoadShader("fb_fragment.glsl", GL_FRAGMENT_SHADER);
+
+	// Create the default framebuffer program
+	fb_program = glCreateProgram();
+
+	// Attatch the compiled shaders
+	glAttachShader(fb_program, fb_vertex_shader);
+	glAttachShader(fb_program, fb_fragment_shader);
+
+	// Link the program...
+	glLinkProgram(fb_program);
+
+	glGetProgramiv(fb_program, GL_LINK_STATUS, &m_opengl_status);
+
+	if(m_opengl_status != GL_TRUE)
+	{
+    	printf("OpenGL program linking failed!\n");
+    	glDeleteProgram(fb_program);
+    	exit(1);
+	}
+
+	// ...and run it!
+	glUseProgram(fb_program);
+
+	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
+}
+
+void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
+{
+	/* OpenGL Off-Screen Framebuffer Configuration */
+
+	GLint m_opengl_status = 0;
+
+	// Generate a new Framebuffer Object...
+	glGenFramebuffers(1, &m_fbo);
+
+	// ...and bind to it
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	// Generate a new texture that will contain the off-screen's pixel data...
+	glGenTextures(1, &onscreen_final_texture);
+
+	// ...bind to it...
+	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
+	
+	// ...allocate space for it...
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	// ...and set the appropiate parameters (To fill the screen and the texture filters)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	// The newly-created texture will point at the pixel data provided by the last-bound texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, onscreen_final_texture, 0);
+
+	// Unbind from the newly-created texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	// Check if the custom framebuffer was correctly created
+	m_opengl_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (m_opengl_status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		printf("[OPENGL] Framebuffer could not be created (%d)! Exiting...\n", m_opengl_status);
+		exit(1);
+	}
+	
 	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
 	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);
 
@@ -104,100 +231,30 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	glUniform2i(uniform_offset, 0, 0);
 
-	// Linke the program...
+	// Link the program...
 	glLinkProgram(program);
 
-	status = GL_FALSE;
-	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	glGetProgramiv(program, GL_LINK_STATUS, &m_opengl_status);
 
-	if(status != GL_TRUE)
+	if(m_opengl_status != GL_TRUE)
 	{
     	printf("OpenGL program linking failed!\n");
     	glDeleteProgram(program);
-    	return -1;
+    	exit(1);
 	}
 
 	// Initialize the buffers
 	m_renderer_buffers_init();
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	/*glGenTextures(1, &offscreen_vram_texture);
+	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-#ifdef DUMP_VRAM
-	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
-#endif
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
 
 	// ...and run it!
 	glUseProgram(program);
-
-
-	glGenFramebuffers(1, &m_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-	glGenTextures(1, &vram_fb_texture);
-	glBindTexture(GL_TEXTURE_2D, vram_fb_texture);
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vram_fb_texture, 0);
-
-	int fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
-	{
-		printf("[OPENGL] Framebuffer could not be created (%d)! Exiting...\n", fboStatus);
-		exit(1);
-	}
-	
-	glGenVertexArrays(1, &rectVAO);
-	glGenBuffers(1, &rectVBO);
-	glBindVertexArray(rectVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), &rectangleVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-	fb_vertex_shader = renderer_LoadShader("fb_vertex.glsl", GL_VERTEX_SHADER);
-	fb_fragment_shader = renderer_LoadShader("fb_fragment.glsl", GL_FRAGMENT_SHADER);
-
-	// Create program
-	fb_program = glCreateProgram();
-
-	// Attatch the compiled shaders
-	glAttachShader(fb_program, fb_vertex_shader);
-	glAttachShader(fb_program, fb_fragment_shader);
-
-	// Link the program...
-	glLinkProgram(fb_program);
-
-	status = GL_FALSE;
-	glGetProgramiv(fb_program, GL_LINK_STATUS, &status);
-
-	if(status != GL_TRUE)
-	{
-    	printf("OpenGL program linking failed!\n");
-    	glDeleteProgram(fb_program);
-    	return -1;
-	}
-
-	// ...and run it!
-	glUseProgram(fb_program);
-
-	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
 void m_renderer_buffers_init()
@@ -288,24 +345,14 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 	return shader;
 }
 
-static GLuint find_program_attrib(GLuint program, const char *attr) {
-  GLuint attr_index = glGetAttribLocation(program, attr);
-
-  if(attr_index < 0) {
-    printf("Attribute '%s' not found in program\n", attr);
-  }
-
-  return attr_index;
-}
-
 void m_texture_upload(m_simplestation_state *m_simplestation)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	/*glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glUseProgram(program);
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);*/
 }
 
 void draw(m_simplestation_state *m_simplestation) {
@@ -315,16 +362,16 @@ void draw(m_simplestation_state *m_simplestation) {
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+	/*glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);*/
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_original_fbo);
 	glUseProgram(fb_program);
-	glBindVertexArray(rectVAO);
+	glBindVertexArray(output_window_vao);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glBindTexture(GL_TEXTURE_2D, vram_fb_texture);
+	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

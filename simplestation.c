@@ -262,8 +262,8 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(m_simplestation->m_gpu_image_buffer->buffer), f);
 	fclose(f);
 	
-	extern GLint texture;
-	glBindTexture(GL_TEXTURE_2D, texture);
+	extern GLint offscreen_vram_texture;
+	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
 	GLint width, height, level = 0;
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
