@@ -396,8 +396,8 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
 	{
 		for (uint16_t x = left; x < left + width; x++)
 		{
-			m_simplestation->m_gpu_image_buffer->buffer[(line * 2048) + (x * 2)] = colour15 & 0xFF;
-			m_simplestation->m_gpu_image_buffer->buffer[(line * 2048) + (x * 2) + 1] = colour15 >> 8;
+			m_simplestation->m_gpu_image_buffer->buffer[(line * 1024) + x] = colour15 & 0xFF;
+			m_simplestation->m_gpu_image_buffer->buffer[(line * 1024) + x + 1] = colour15 >> 8;
 		}
 	}
 
