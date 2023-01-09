@@ -291,6 +291,7 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 		exit(1);
 	}
 
+	free(data);
 	return shader;
 }
 
