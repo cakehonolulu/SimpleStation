@@ -16,12 +16,8 @@ flat out uvec2 frag_clut;
 flat out uint frag_texture_depth;
 flat out uint frag_blend_mode;
 flat out uint frag_texture_draw;
-flat out int draw_vram;
 
 uniform ivec2 offset;
-
-
-uniform int disp_vram_frame;
 
 void main() {
   // NOTE: mapping VRAM to OpenGL, (0;1023, 0;511) -> (-1;1, -1;1)
@@ -33,33 +29,7 @@ void main() {
   // NOTE: VRAM top-left based, OpenGL bottom-left
   float ypos = (float(position.y - 0.5) / 480.0 * (-2.0) + 1.0);
 
-  if (disp_vram_frame == 1)
-  {
-    const vec4 positions[4] = vec4[](
-      vec4(-1.0, 1.0, 1.0, 1.0),    // Top-left
-      vec4(1.0, 1.0, 1.0, 1.0),     // Top-right
-      vec4(-1.0, -1.0, 1.0, 1.0),   // Bottom-left
-      vec4(1.0, -1.0, 1.0, 1.0)     // Bottom-right
-    );
- 
-    const vec2 texcoords[4] = vec2[](     //Inverted in Y because PS1 Y coords are inverted
-      vec2(0.0, 0.0),   // Top-left
-      vec2(1.0, 0.0),   // Top-right
-      vec2(0.0, 1.0),   // Bottom-left
-      vec2(1.0, 1.0)    // Bottom-right
-    );
-    
-    gl_Position = positions[gl_VertexID];
-    frag_texture_coord = texcoords[gl_VertexID];
-    draw_vram = 1;
-    return;
-  }
-  else
-  {
-    gl_Position = vec4(xpos, ypos, 0.0, 1.0);
-    draw_vram = 0;
-  }
-  
+  gl_Position = vec4(xpos, ypos, 0.0, 1.0);
 
   color = vec3(float(vertex_color.r) / 255.0,
 	       float(vertex_color.g) / 255.0,
