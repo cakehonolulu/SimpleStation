@@ -80,7 +80,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  640, 480, SDL_WINDOW_OPENGL);
+							  1024, 512, SDL_WINDOW_OPENGL);
 						  // 1024, 512
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -121,6 +121,8 @@ void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation)
 	/* OpenGL On-Screen Framebuffer Configuration */
 
 	GLint m_opengl_status = 0;
+
+	glViewport(0,0,640,480);
 
 	/* Setup the on-screen VAO and VBO */
 
@@ -179,6 +181,8 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	/* OpenGL Off-Screen Framebuffer Configuration */
 
 	GLint m_opengl_status = 0;
+
+	glViewport(0,0,1024,512);
 
 	// Generate a new Framebuffer Object...
 	glGenFramebuffers(1, &m_fbo);
@@ -246,12 +250,15 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	// Initialize the buffers
 	m_renderer_buffers_init();
 
-	/*glGenTextures(1, &offscreen_vram_texture);
+	glGenTextures(1, &offscreen_vram_texture);
 	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// ...and run it!
 	glUseProgram(program);
@@ -347,12 +354,12 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 
 void m_texture_upload(m_simplestation_state *m_simplestation)
 {
-	/*glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glUseProgram(program);
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);*/
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
 }
 
 void draw(m_simplestation_state *m_simplestation) {
@@ -361,14 +368,18 @@ void draw(m_simplestation_state *m_simplestation) {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
-	/*glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);*/
+	
+	glViewport(0,0,640,480);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_original_fbo);
 	glUseProgram(fb_program);
+	glViewport(0,0,1024,512);
 	glBindVertexArray(output_window_vao);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
