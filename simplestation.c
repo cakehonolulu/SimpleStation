@@ -262,28 +262,28 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(m_simplestation->m_gpu_image_buffer->buffer), f);
 	fclose(f);
 	
-	extern GLint sample_vram, offscreen_vram_texture, onscreen_final_texture;
-	glBindTexture(GL_TEXTURE_2D, sample_vram);
+	extern GLint m_psx_gpu_vram, m_psx_vram_texel, m_window_texture;
+	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
 	GLint width, height, level = 0;
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
 	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
 
-	stbi_write_bmp( "sample_vram.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
+	stbi_write_bmp( "vram.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 
-	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
 	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
 
-	stbi_write_bmp( "offscreen_vram_texture.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
+	stbi_write_bmp( "vram_sample.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 
-	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
+	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
 	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
 
-	stbi_write_bmp( "onscreen_final_texture.bmp", 640, 480, 3, m_simplestation->m_vram_data );
+	stbi_write_bmp( "window_texture.bmp", 640, 480, 3, m_simplestation->m_vram_data );
 #endif
 
 	if (m_simplestation->m_cdrom_state)

@@ -186,7 +186,7 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
     }
 }
 
-extern GLuint offscreen_vram_texture;
+extern GLuint m_psx_vram_texel;
 uint32_t m_current_idx = 0;
 
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -294,7 +294,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
-                glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+                glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &m_simplestation->m_gpu_image_buffer->buffer[0]);
                 glBindTexture(GL_TEXTURE_2D, 0);
                 m_sync_vram(m_simplestation);
