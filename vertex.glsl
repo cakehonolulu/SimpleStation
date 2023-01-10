@@ -27,8 +27,7 @@ void main() {
   float xpos = (float(position.x + 0.5) / 640.0 * 2.0) - 1.0;
 
   // NOTE: VRAM top-left based, OpenGL bottom-left
-    // -ypos == HACK
-  float ypos = -(float(position.y - 0.5) / 480.0 * (-2.0) + 1.0);
+  float ypos = (float(position.y - 0.5) / 480.0 * (-2.0) + 1.0);
 
   gl_Position = vec4(xpos, ypos, 0.0, 1.0);
 
