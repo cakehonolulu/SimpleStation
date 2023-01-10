@@ -187,8 +187,6 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
 }
 
 extern GLuint offscreen_vram_texture;
-extern GLuint onscreen_final_texture;
-
 uint32_t m_current_idx = 0;
 
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -298,6 +296,8 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             {
                 glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
 				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &m_simplestation->m_gpu_image_buffer->buffer[0]);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                m_sync_vram(m_simplestation);
                 for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu_image_buffer->buffer[i] = 0;
                 m_current_idx = 0;
                 m_simplestation->m_gpu->m_gp0_mode = command;
@@ -376,6 +376,8 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
     (void) m_simplestation;
+
+    m_sync_vram(m_simplestation);
 
     return;
 }
