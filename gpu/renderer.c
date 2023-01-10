@@ -80,7 +80,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 
 	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  1024, 512, SDL_WINDOW_OPENGL);
+							  640, 480, SDL_WINDOW_OPENGL);
 						  // 1024, 512
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -121,8 +121,6 @@ void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation)
 	/* OpenGL On-Screen Framebuffer Configuration */
 
 	GLint m_opengl_status = 0;
-
-	glViewport(0,0,640,480);
 
 	/* Setup the on-screen VAO and VBO */
 
@@ -181,8 +179,6 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	/* OpenGL Off-Screen Framebuffer Configuration */
 
 	GLint m_opengl_status = 0;
-
-	glViewport(0,0,1024,512);
 
 	// Generate a new Framebuffer Object...
 	glGenFramebuffers(1, &m_fbo);
@@ -363,25 +359,47 @@ void m_texture_upload(m_simplestation_state *m_simplestation)
 }
 
 void draw(m_simplestation_state *m_simplestation) {
+	/* Off-screen Framebuffer */
+
+	// Bind to FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	// Set the window viewport
+	glViewport(0, 0, 640, 480);
+
+	// Use off-screen shaders
 	glUseProgram(program);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// Bind to off-screen VAO
 	glBindVertexArray(m_vao);
+
+	// Bind to off-screen VVBO
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
-	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 	
-	glViewport(0,0,640,480);
+	// Off-screen shaders sample-off the off-screen VRAM Texture
+	glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+
+	// Draw the scene
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	count_vertices = 0;
 
+	/* On-screen Framebuffer */
+
+	// Bind to FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, m_original_fbo);
+	
+	// Use on-screen shaders
 	glUseProgram(fb_program);
-	glViewport(0,0,1024,512);
+
+	// Bind to on-screen VAO
 	glBindVertexArray(output_window_vao);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// Bind to on-screen VBO
+	glBindBuffer(GL_ARRAY_BUFFER, output_window_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(output_window_vertices), &output_window_vertices, GL_STATIC_DRAW);
+
+	// Draw data-off the custom Framebuffer's Texture (GL_COLOR_ATTACHMENT0)
 	glBindTexture(GL_TEXTURE_2D, onscreen_final_texture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
