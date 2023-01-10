@@ -186,6 +186,11 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
     }
 }
 
+extern GLuint offscreen_vram_texture;
+extern GLuint onscreen_final_texture;
+
+uint32_t m_current_idx = 0;
+
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_gpu->m_gp0_instruction = (m_value >> 24) & 0xFF;
@@ -278,12 +283,26 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             break;
 
         case image_load:
-            imageBuffer_Store(m_simplestation, m_value);
+            uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
+			uint16_t height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
+			if (width == 0) width = 1024;
+			if (height == 0) height = 512;
+			width &= 0x3ff;
+			height &= 0x1ff;
+			int32_t x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
+			int32_t y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
+
+            m_simplestation->m_gpu_image_buffer->buffer[m_current_idx++] = m_value;
+            
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
-                m_texture_upload(m_simplestation);
+                glBindTexture(GL_TEXTURE_2D, offscreen_vram_texture);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &m_simplestation->m_gpu_image_buffer->buffer[0]);
+                for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu_image_buffer->buffer[i] = 0;
+                m_current_idx = 0;
                 m_simplestation->m_gpu->m_gp0_mode = command;
             }
+
             break;
 
         default:
