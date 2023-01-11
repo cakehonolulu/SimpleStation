@@ -387,82 +387,11 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
 	uint16_t r = (colour24 & 0xFF) >> 3;
 	uint16_t g = ((colour24 >> 8) & 0xFF) >> 3;
 	uint16_t b = ((colour24 >> 16) & 0xFF) >> 3;
-	uint16_t colour15 = r | (g << 5) | (b << 10); // should this be RGB, or BGR...
+	uint16_t colour15 = r | (g << 5) | (b << 10);
 
-	uint16_t left = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0x3F0;
-	uint16_t top = (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16) & 0x1FF;
-	uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0x7FF;
-	uint16_t height = (m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16) & 0x1FF;
+    glClearColor(r, g, b, 1.f);
 
-	if (width == 0x400)
-	{
-		width = 0;
-	}
-	else
-	{
-		width = ((width + 0xF) & 0x3F0); // round up to multiples of 0x10
-	}
-
-	// these should wrap, but instead I'm just clamping them to the edges
-	if (left + width > 0x400)
-	{
-		width = 0x400 - left;
-	}
-	if (top + height > 0x200)
-	{
-		height = 0x200 - top;
-	}
-
-	for (uint16_t line = top; line < top + height; line++)
-	{
-		for (uint16_t x = left; x < left + width; x++)
-		{
-			m_simplestation->m_gpu_image_buffer->buffer[(line * 1024) + x] = colour15 & 0xFF;
-			m_simplestation->m_gpu_image_buffer->buffer[(line * 1024) + x + 1] = colour15 >> 8;
-		}
-	}
-
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
-    Vertex v1, v2, v3, v4;
-
-    Position topLeft = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-
-    Position size = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
-    memset(&v4, 0, sizeof(Vertex));
-    
-    v1.position = topLeft;
-    v1.colour = col;
-    v1.drawTexture = 0;
-
-    Position newPos;
-
-    newPos.x = topLeft.x + size.x;
-    newPos.y = topLeft.y;
-
-    v2.position = newPos;
-    v2.colour = col;
-    v2.drawTexture = 0;
-
-    newPos.x = topLeft.x;
-    newPos.y = topLeft.y +  + size.y;
-
-    v3.position = newPos;
-    v3.colour = col;
-    v3.drawTexture = 0;
-
-    newPos.x = topLeft.x + size.x;
-    newPos.y = topLeft.y +  + size.y;
-
-    v4.position = newPos;
-    v4.colour = col;
-    v4.drawTexture = 0;
-
-    put_quad(v1, v2, v3, v4);
+    draw(m_simplestation, true);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -716,7 +645,7 @@ extern GLint uniform_offset;
 
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    draw(m_simplestation);
+    draw(m_simplestation, false);
     
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));

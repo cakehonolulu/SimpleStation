@@ -360,7 +360,7 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 }
 
 
-void draw(m_simplestation_state *m_simplestation) {
+void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	/* Off-screen Framebuffer */
 
 	// Bind to FBO
@@ -377,6 +377,11 @@ void draw(m_simplestation_state *m_simplestation) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+
+	if (clear_colour)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 
 	glViewport(0, 0, 1024, 512);
 	
@@ -431,7 +436,7 @@ void m_sync_vram(m_simplestation_state *m_simplestation)
 
 
 void display(m_simplestation_state *m_simplestation) {
-  draw(m_simplestation);
+  draw(m_simplestation, false);
   SDL_GL_SwapWindow(m_window);
 }
 
