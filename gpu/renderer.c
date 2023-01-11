@@ -262,8 +262,8 @@ void m_renderer_setup_offscreen()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 	// ...and set the appropiate parameters (To fill the screen and the texture filters)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -361,6 +361,23 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 	return shader;
 }
 
+int display_area_x = 0, display_area_y = 0, display_area_width = 0, display_area_height = 0;
+
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
+void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
+{
+	display_area_x = m_simplestation->m_gpu->m_drawing_area_left;
+    display_area_width = max(m_simplestation->m_gpu->m_drawing_area_right - display_area_x + 1, 0);
+    display_area_y = m_simplestation->m_gpu->m_drawing_area_top;
+    display_area_height = max(m_simplestation->m_gpu->m_drawing_area_bottom - m_simplestation->m_gpu->m_drawing_area_top + 1, 0);
+
+
+	printf("Display area:\nx -> %d; y -> %d; width -> %d; height -> %d\n\n", display_area_x,display_area_y, display_area_width,display_area_height);
+}
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	(void) m_simplestation;
@@ -395,11 +412,10 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	// Draw the scene
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 
-	glViewport(0, 0, 640, 480);
-	
 	// Copy the display area from the VRAM off to the on-screen texture
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 640, 480, 0);
+	
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,  display_area_x,display_area_y, display_area_width,display_area_height, 0);
 
 	// Clear the vertex count
 	count_vertices = 0;
@@ -424,6 +440,8 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 
 	// Draw data-off the custom Framebuffer's Texture (GL_COLOR_ATTACHMENT0)
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
+
+	glViewport(0, 0, 640, 480);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

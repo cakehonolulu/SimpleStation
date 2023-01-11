@@ -382,6 +382,8 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
     return;
 }
 
+extern int display_area_x, display_area_y, display_area_width, display_area_height;
+
 void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
     (void) m_value;
 
@@ -392,7 +394,13 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
 
     glClearColor(r, g, b, 1.f);
 
-    draw(m_simplestation, true);
+
+    display_area_x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
+    display_area_y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
+    display_area_width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
+    display_area_height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
+
+    //draw(m_simplestation, true);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -629,14 +637,18 @@ void m_gpu_set_texture_window(uint32_t m_value, m_simplestation_state *m_simples
 
 void m_gpu_set_draw_area_top_left(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_simplestation->m_gpu->m_drawing_area_bottom = ((uint16_t) ((m_value >> 10) & 0x3FF));
-    m_simplestation->m_gpu->m_drawing_area_right = ((uint16_t) (m_value & 0x3FF));
+    uint32_t m_val = m_simplestation->m_gpu_command_buffer->m_buffer[0];
+    m_simplestation->m_gpu->m_drawing_area_left = m_val & 0x3FF;
+    m_simplestation->m_gpu->m_drawing_area_top = ((m_val >> 10) & 0x1FF);
+    m_renderer_update_display_area(m_simplestation);
 }
 
 void m_gpu_set_draw_area_bottom_right(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_simplestation->m_gpu->m_drawing_area_top = ((uint16_t) ((m_value >> 10) & 0x3FF));
-    m_simplestation->m_gpu->m_drawing_area_left = ((uint16_t) (m_value & 0x3FF));
+    uint32_t m_val = m_simplestation->m_gpu_command_buffer->m_buffer[0];
+    m_simplestation->m_gpu->m_drawing_area_right = m_val & 0x3FF;
+    m_simplestation->m_gpu->m_drawing_area_bottom = ((m_val >> 10) & 0x1FF);
+    m_renderer_update_display_area(m_simplestation);
 }
 
 extern GLint uniform_offset;
