@@ -71,8 +71,6 @@ unsigned int output_window_vao, output_window_vbo;
 
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
-	GLint m_opengl_status = 0;
-
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		SDL_Log("Unable to initialize SDL2: %s", SDL_GetError());
@@ -108,16 +106,18 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	// Store the original (Visible) framebuffer into an easily-accessible variable
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_original_fbo);
 
-	m_renderer_setup_onscreen(m_simplestation);
+	m_renderer_setup_onscreen();
 
-	m_renderer_setup_offscreen(m_simplestation);
+	m_renderer_setup_offscreen();
 
 #ifdef DUMP_VRAM
 	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
 #endif
+
+	return 0;
 }
 
-void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation)
+void m_renderer_setup_onscreen()
 {
 	/* OpenGL On-Screen Framebuffer Configuration */
 
@@ -175,7 +175,7 @@ void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation)
 	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
 }
 
-void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
+void m_renderer_setup_offscreen()
 {
 	/* OpenGL Off-Screen Framebuffer Configuration */
 
@@ -325,8 +325,10 @@ uint64_t readFile(char *filePath, char **contents) {
         fseek(file, 0, SEEK_SET);
         *contents = malloc(sizeof(char) * length + 1);
         if (*contents != NULL) {
-            fread(*contents, 1, length, file);
-			(*contents)[length] = '\0';
+            if (fread(*contents, 1, length, file) == length)
+			{
+				(*contents)[length] = '\0';
+			}
         }
         fclose(file);
     }
@@ -361,6 +363,8 @@ GLuint renderer_LoadShader(char *path, GLenum type) {
 
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
+	(void) m_simplestation;
+
 	/* Off-screen Framebuffer */
 
 	// Bind to FBO
@@ -425,6 +429,8 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 
 void m_sync_vram(m_simplestation_state *m_simplestation)
 {
+	(void) m_simplestation;
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glViewport(0, 0, 640, 480);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
@@ -524,7 +530,8 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	
 	m_vertex_buffer[count_vertices] = v3;
 	count_vertices++;
-	
+
+	return 0;	
 }
 
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {

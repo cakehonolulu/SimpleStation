@@ -219,7 +219,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
     uint32_t m_address;
     uint32_t m_current_address;
     uint32_t m_size;
-    uint32_t m_source;
+    uint32_t m_source = 0;
 
     if (m_simplestation->m_memory->m_dma->m_dma_channels[m_id].m_step == increment)
     {

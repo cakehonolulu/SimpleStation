@@ -45,18 +45,23 @@ uint8_t m_bios_load(m_simplestation_state *m_simplestation, const char *m_bios_n
 						if (m_simplestation->m_memory->m_mem_bios != NULL)
 						{
 							// Load the file into host memory
-							(void) fread(m_simplestation->m_memory->m_mem_bios, sizeof(int8_t), m_bios_size, m_bios);
-
-							// Check if file was loaded correctly into memory
-							if (!ferror(m_bios))
+							if (fread(m_simplestation->m_memory->m_mem_bios, sizeof(int8_t), m_bios_size, m_bios) == (size_t) m_bios_size)
 							{
-								printf("BIOS Size: %zu bytes\n", (size_t) m_bios_size);
+								// Check if file was loaded correctly into memory
+								if (!ferror(m_bios))
+								{
+									printf("BIOS Size: %zu bytes\n", (size_t) m_bios_size);
 
-								m_status = 0;
+									m_status = 0;
+								}
+								else
+								{
+									printf("Error loading file into memory!\nExiting...\n");
+								}
 							}
 							else
 							{
-								printf("Error loading file into memory!\nExiting...\n");
+								printf("Unknown error loading the file...!\nExiting...\n");
 							}
 						}
 						else

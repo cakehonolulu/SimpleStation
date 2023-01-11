@@ -383,11 +383,12 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
 }
 
 void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
+    (void) m_value;
+
     uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
 	uint16_t r = (colour24 & 0xFF) >> 3;
 	uint16_t g = ((colour24 >> 8) & 0xFF) >> 3;
 	uint16_t b = ((colour24 >> 16) & 0xFF) >> 3;
-	uint16_t colour15 = r | (g << 5) | (b << 10);
 
     glClearColor(r, g, b, 1.f);
 
@@ -519,8 +520,6 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     (void) m_value;
     (void) m_simplestation;
 
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
     Vertex v1, v2, v3, v4;
 
     memset(&v1, 0, sizeof(Vertex));
@@ -550,14 +549,9 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
 
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    uint32_t m_position = m_simplestation->m_gpu_command_buffer->m_buffer[1];
+    (void) m_value;
 
     uint32_t m_resolution = m_simplestation->m_gpu_command_buffer->m_buffer[2];
-
-	uint16_t m_x = (uint16_t)m_position;
-	uint16_t m_y = (uint16_t)(m_position >> 16);
-
-
 
     uint16_t m_width = m_resolution & 0xFFFF;
 
@@ -571,19 +565,23 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     if (m_simplestation->m_gpu->m_gp0_words_remaining > 0)
     {
-        imageBuffer_Reset(m_simplestation, m_x, m_y, m_width, m_height);
+        //imageBuffer_Reset(m_simplestation, m_x, m_y, m_width, m_height);
     }
 }
 
 void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    (void) m_value;
+
+#ifndef DEBUG_GP0
+    (void) m_simplestation;
+#else
     uint32_t m_resolution = m_simplestation->m_gpu_command_buffer->m_buffer[2];
 
     uint16_t m_width = m_resolution & 0xFFFF;
 
     uint16_t m_height = m_resolution >> 16;
 
-#ifdef DEBUG_GP0
     printf(MAGENTA "[GP0] image_store: Unhandled image store size: %d, %d\n" NORMAL, m_height, m_width);
 #endif
 }
@@ -664,6 +662,8 @@ void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation
 
 void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    (void) m_value;
+
     m_simplestation->m_gpu->m_page_base_x = 0;
 	m_simplestation->m_gpu->m_page_base_y = 0;
 	m_simplestation->m_gpu->m_semitransparency = 0;
@@ -702,6 +702,8 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
 
 void m_gpu_reset_command_buffer(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    (void) m_value;
+
     m_gpu_command_buffer_clear(m_simplestation);
     m_simplestation->m_gpu->m_gp0_words_remaining = 0;
     m_simplestation->m_gpu->m_gp0_mode = command;
@@ -709,6 +711,8 @@ void m_gpu_reset_command_buffer(uint32_t m_value, m_simplestation_state *m_simpl
 
 void m_gpu_acknowledge_interrupt(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+    (void) m_value;
+    
     m_simplestation->m_gpu->m_interrupt = false;
 }
 

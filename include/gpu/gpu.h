@@ -27,6 +27,9 @@ void m_gpu_exit(m_simplestation_state *m_simplestation);
 // 0x01
 void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0x02
+void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0x28
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 

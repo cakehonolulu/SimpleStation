@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 				if (argv[m_args + 1] != NULL)
 				{
 					m_simplestation.exename = malloc(strlen(argv[m_args + 1]) * sizeof(uint8_t) + 1);
-					strcpy(m_simplestation.exename, argv[m_args + 1]);
+					strcpy((char *) m_simplestation.exename, argv[m_args + 1]);
 					printf("PSX-EXE Name: %s\n", m_simplestation.exename);
 					m_args++;
 					m_simplestation.m_sideload = true;
