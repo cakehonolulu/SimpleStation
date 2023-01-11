@@ -13,6 +13,9 @@ simplestation
 # STBI
 stb_image_write.h
 
+# Image files
+*.bmp
+
 # VSCodium Files
 .vscode/
 

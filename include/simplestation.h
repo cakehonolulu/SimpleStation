@@ -229,7 +229,7 @@ typedef struct {
 	uint16_t w, h;
 	uint32_t index;
 	// Buffer used for temp storing of single images
-	uint16_t buffer[IMAGEBUFFER_MAX];
+	uint32_t buffer[(1024 * 512)];
 	uint32_t image_index;
 
 } m_psx_gpu_image_buffer_t;

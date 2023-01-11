@@ -92,11 +92,11 @@ void m_texture_upload(m_simplestation_state *m_simplestation);
 
 void renderer_LoadImage(m_simplestation_state *m_simplestation);
 
-void draw(m_simplestation_state *m_simplestation);
+void draw(m_simplestation_state *m_simplestation, bool clear_colour);
 
 void m_renderer_setup_onscreen(m_simplestation_state *m_simplestation);
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation);
-
+void m_sync_vram(m_simplestation_state *m_simplestation);
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
 GLuint renderer_LoadShader(char *path, GLenum type);
