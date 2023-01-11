@@ -24,12 +24,17 @@ void main() {
 
   ivec2 position = vertex_position + offset;
 
-  float xpos = (float(position.x + 0.5) / 640.0 * 2.0) - 1.0;
+  float x = float(position.x);
+  float y = float(position.y);
 
-  // NOTE: VRAM top-left based, OpenGL bottom-left
-  float ypos = (float(position.y - 0.5) / 480.0 * (-2.0) + 1.0);
+  float xx = (x + offset.x) / 512.0;
+  float yy = (y + offset.y) / 256;
+  // Normalize to [-1, 1]
+  xx -= 1.0;
+  yy -= 1.0;
 
-  gl_Position = vec4(xpos, ypos, 0.0, 1.0);
+
+  gl_Position = vec4(xx, yy, 0.0, 1.0);
 
   color = vec3(float(vertex_color.r) / 255.0,
 	       float(vertex_color.g) / 255.0,
