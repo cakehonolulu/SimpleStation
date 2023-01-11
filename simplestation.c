@@ -284,6 +284,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
 
 	stbi_write_bmp( "window_texture.bmp", 640, 480, 3, m_simplestation->m_vram_data );
+
 #endif
 
 	if (m_simplestation->m_cdrom_state)

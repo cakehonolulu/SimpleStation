@@ -29,6 +29,9 @@ GLuint m_psx_vram_texel;
 GLuint m_window_texture;
 
 GLuint m_psx_gpu_vram;
+
+GLuint m_temp;
+
 /* OpenGL Shader Programs */
 
 // GLSL Off-Screen Program
@@ -267,6 +270,20 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+	glGenTextures(1, &m_temp);
+
+	// ...bind to it...
+	glBindTexture(GL_TEXTURE_2D, m_temp);
+	
+	// ...allocate space for it...
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	// ...and set the appropiate parameters (To fill the screen and the texture filters)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 	// ...and run it!
 	glUseProgram(program);
 }
@@ -377,22 +394,25 @@ void draw(m_simplestation_state *m_simplestation) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 	
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
+	
 	// Off-screen shaders sample-off the off-screen VRAM Texture
 	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-	
+
+
 	// Draw the scene
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
-
-	// Copy the display area from the VRAM off to the on-screen texture
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 640, 480, 0);
 
 	// Clear the vertex count
 	count_vertices = 0;
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	// Bind GL_COLOR_ATTACHMENT0 w/the on-screen final texture
+	glBindTexture(GL_TEXTURE_2D, m_window_texture);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 640, 480, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_window_texture, 0);
+
+	//glBindTexture(GL_TEXTURE_2D, 0);
 
 	/* On-screen Framebuffer */
 

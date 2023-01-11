@@ -519,6 +519,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     memset(&v4, 0, sizeof(Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.position.y = 480 - v1.position.y;
     v1.colour = col;
     v1.texPage = texPage;
     v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
@@ -528,6 +529,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v1.drawTexture = 1;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.position.y = 480 - v2.position.y;
     v2.colour = col;
     v2.texPage = texPage;
     v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
@@ -537,6 +539,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v2.drawTexture = 1;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.position.y = 480 - v3.position.y;
     v3.colour = col;
     v3.texPage = texPage;
     v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
@@ -546,6 +549,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v3.drawTexture = 1;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v4.position.y = 480 - v4.position.y;
     v4.colour = col;
     v4.texPage = texPage;
     v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
@@ -569,14 +573,17 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     memset(&v3, 0, sizeof(Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.position.y = 480 - v1.position.y;
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
     v1.drawTexture = 0;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.position.y = 480 - v2.position.y;
     v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
     v2.drawTexture = 0;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.position.y = 480 - v3.position.y;
     v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
     v3.drawTexture = 0;
 
