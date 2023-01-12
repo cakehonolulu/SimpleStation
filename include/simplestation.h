@@ -299,9 +299,6 @@ typedef struct {
 
 } m_psx_cdrom_t;
 
-static const char* sceID = "SCE EXE";
-static const char* psxID = "PS-X EXE";
-
 typedef struct {
 	uint8_t  id[8];
 	uint32_t textOffset;
