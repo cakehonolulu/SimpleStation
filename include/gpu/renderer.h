@@ -75,6 +75,23 @@ typedef struct
 } Vertex;
 #pragma pack(pop)
 
+
+typedef struct
+{
+	GLshort width;
+	GLshort height;
+} RectWidthHeight;
+
+typedef struct
+{
+	Position position;
+	Colour colour;
+	RectWidthHeight widthHeight;
+	TexCoord texCoord;
+	ClutAttr clut;
+	GLubyte blendMode;
+} Rectangle;
+
 Position pos_from_gp0(uint32_t val);
 Colour color_from_gp0(uint32_t val);
 Colour color(GLubyte r, GLubyte g, GLubyte b);
@@ -102,3 +119,4 @@ void m_renderer_buffers_init();
 GLuint renderer_LoadShader(char *path, GLenum type);
 int put_triangle(Vertex v1, Vertex v2, Vertex v3);
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4);
+int put_rect(Rectangle r0, m_simplestation_state *m_simplestation);
