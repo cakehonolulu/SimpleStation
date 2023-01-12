@@ -278,12 +278,14 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 
 	stbi_write_bmp( "vram_sample.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 
+	extern int res_w, res_h;
+
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level, GL_TEXTURE_HEIGHT, &height);
 	glGetTexImage(GL_TEXTURE_2D, level, GL_RGB, GL_UNSIGNED_BYTE, m_simplestation->m_vram_data);
 
-	stbi_write_bmp( "window_texture.bmp", 640, 480, 3, m_simplestation->m_vram_data );
+	stbi_write_bmp( "window_texture.bmp", res_w, res_h, 3, m_simplestation->m_vram_data );
 #endif
 
 	if (m_simplestation->m_cdrom_state)
