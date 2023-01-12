@@ -10,15 +10,13 @@
 <table>
 <thead>
   <tr>
-    <td><h3>Linux (Ubuntu)</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/lin.png" alt="Image" width="200" height="161"></td>
-    <td><h3>Windows 11</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/win.png" alt="Image" width="204" height="161"></td>
-    <td><h3>macOS 12</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/mac.png" alt="Image" width="200" height="164"></td>
-    <td><h3>Raspberry Pi 4B</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/rpi.png" alt="Image" width="200" height="158"></td>
+    <td><h3>Bootup</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" alt="Image" width="200" height="161"></td>
+    <td><h3>Amidog CPU Tests</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" alt="Image" width="204" height="161"></td>
+    <td><h3>Triangle demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" alt="Image" width="200" height="161"></td>
+    <td><h3>Quads demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" alt="Image" width="200" height="161"></td>
   </tr>
 </thead>
 </table>
-
-
 
 ## ✨ Features
 * Built using [C23](https://en.cppreference.com/w/c/23) features
