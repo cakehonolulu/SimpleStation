@@ -1660,7 +1660,7 @@ void m_xori(m_simplestation_state *m_simplestation)
 	printf("xori $%s, $%s, 0x%X\n", m_cpu_regnames[REGIDX_T], m_cpu_regnames[REGIDX_S], IMMDT);
 #endif
 
-	REGS[REGIDX_T] = REGS[REGIDX_S] ^ SIMMDT;
+	REGS[REGIDX_T] = REGS[REGIDX_S] ^ IMMDT;
 }
 
 /*
