@@ -26,7 +26,7 @@ void m_memory_exit(m_simplestation_state *m_simplestation);
 uint32_t m_memory_read_handle(uint32_t m_memory_address, int8_t *m_memory_source, m_memory_size m_size, m_simplestation_state *m_simplestation);
 void m_memory_write_handle(uint32_t m_memory_address, uint32_t m_value, int8_t *m_memory_source, m_memory_size m_size, m_simplestation_state *m_simplestation);
 
-ExeFile *ram_LoadEXE(m_simplestation_state *m_simplestation);
+void* loadFile( const char* filename );
 
 /* Macros */
 #define READ32_BIOS(m_addr) m_memory_read(m_addr, dword)

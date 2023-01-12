@@ -58,11 +58,6 @@ uint8_t m_memory_init(m_simplestation_state *m_simplestation)
 
 					if (m_dma_init(m_simplestation) == 0)
 					{
-						if (m_simplestation->m_sideload == true)
-						{
-							m_simplestation->exe = ram_LoadEXE(m_simplestation);
-						}
-
 						m_simplestation->m_memory_state = ON;
 					}
 					else
@@ -594,95 +589,12 @@ uint32_t utils_LoadLittleEndianInt(uint8_t *data, uint32_t offset) {
 	return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
 }
 
-
-// Get memory region, 512MB chunks
-uint32_t mask_region(uint32_t address) {
-	return address & m_memory_map[address >> 29];
-}
-
-
-
-ExeFile *ram_LoadEXE(m_simplestation_state *m_simplestation) {
-	FILE *file = fopen((char *) m_simplestation->exename, "rb");
-	char buffer[0x10];
-	if (file == NULL) {
-		printf("Failed to load EXE, file not found.\n");
-		exit(1);
-	}
-
-	// Check header
-	if (fread(buffer, 1, 0x10, file) == 0x10)
-	{
-		if (strncmp(buffer, "PS-X EXE", 0x10) != 0) {
-			printf("Failed to load EXE, invalid header.\n");
-			fclose(file);
-			exit(1);
-		}
-
-		ExeFile *exe = malloc(sizeof(ExeFile));
-
-		// Initial SP
-		if(fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-		{
-			exe->initial_pc = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-			// Initial GP
-			if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-			{
-				exe->initial_gp = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-				// Destination in RAM
-				if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-				{
-					exe->ram_destination = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-					// Filesize
-					if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-					{
-						exe->file_size = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-						// Unused
-						fseek(file, 8, SEEK_SET);
-
-						// Memfill start address
-						if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-						{
-							exe->fill_start_address = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-							// Memfill size
-							if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-							{
-								exe->fill_size = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-								// Initial SP & FP base
-								if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-								{
-									exe->initial_spfp_base = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-									// SP FP off
-									if (fread(buffer, 1, sizeof(uint32_t), file) == sizeof(uint32_t))
-									{
-										exe->initial_spfp_off = utils_LoadLittleEndianInt((uint8_t*)buffer, 0);
-
-										// Marker unchecked, TODO?
-
-										fseek(file, 0x800, SEEK_SET);
-
-										if (fread(m_simplestation->m_memory->m_mem_ram + mask_region(exe->ram_destination), 1, exe->file_size, file) == exe->file_size)
-										{
-											printf("Loaded EXE PC: 0x%X, RAM: 0x%X\n", mask_region(exe->initial_pc), mask_region(exe->ram_destination));
-											return exe;
-										}
-									}
-								}
-							}
-						}
-						
-					}
-				}
-			}
-		}
-	}
-
-	return NULL;
+void* loadFile( const char* filename ) {
+	FILE* f = fopen( filename, "rb" );
+	fseek( f, 0, SEEK_END );
+	size_t fsize = ftell( f );
+	rewind( f );
+	void* data = malloc( fsize );
+	fread( data, fsize, 1, f );
+	return data;
 }

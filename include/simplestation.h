@@ -299,17 +299,61 @@ typedef struct {
 
 } m_psx_cdrom_t;
 
+static const char* sceID = "SCE EXE";
+static const char* psxID = "PS-X EXE";
+
 typedef struct {
-	uint32_t initial_pc;
-	uint32_t initial_gp;
-	uint32_t ram_destination;
-	uint32_t file_size;
-	uint32_t fill_start_address;
-	uint32_t fill_size;
-	uint32_t initial_spfp_base;
-	uint32_t initial_spfp_off;
-	uint32_t marker;
-} ExeFile;
+	uint8_t  id[8];
+	uint32_t textOffset;
+	uint32_t dataOffset;
+	uint32_t pc;
+	uint32_t gp;
+	uint32_t textAddr;
+	uint32_t textSize;
+	uint32_t dataAddr;
+	uint32_t dataSize;
+	uint32_t bssAddr;
+	uint32_t bssSize;
+	uint32_t stackAddr;
+	uint32_t stackSize;
+	uint32_t savedSP;
+	uint32_t savedFP;
+	uint32_t savedGP;
+	uint32_t savedRA;
+	uint32_t savedS0;
+} SCEheader_t;
+
+typedef struct {
+	uint8_t  id[8];
+	uint32_t textOffset;
+	uint32_t pc;
+	uint32_t textAddr;
+	uint32_t textSize;
+	uint32_t stackAddr;
+	uint32_t stackSize;
+	uint32_t savedSP;
+	uint32_t savedFP;
+	uint32_t savedGP;
+	uint32_t savedRA;
+	uint32_t savedS0;
+} PSXheader_t;
+
+typedef struct {
+	uint8_t id[8];
+	uint8_t pad1[8];
+	uint32_t pc;
+	uint32_t gp;
+	uint32_t dst;
+	uint32_t size;
+	uint32_t pad2[2];
+	uint32_t memfillAddr;
+	uint32_t memfillSize;
+	uint32_t sp;
+	uint32_t spOffset;
+	uint8_t pad3[20];
+	uint8_t SCEI[1972];
+	uint8_t data[];
+} EXEheader_t;
 
 /* Structures */
 typedef struct

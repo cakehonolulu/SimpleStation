@@ -174,10 +174,22 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 
 	if (m_simplestation->m_sideload == true)
 	{	
-		if (PC == 0x80030000)
+		if (PC == 0xBFC06FF0)
 		{
-			PC = m_simplestation->exe->initial_pc - 4;
+			EXEheader_t* exe = loadFile( m_simplestation->exename );
+			
+			m_simplestation->m_cpu->m_opcode = 0;
+			m_simplestation->m_cpu->m_next_opcode = 0;
+
+			PC = exe->pc - 4;
 			NXT_PC = PC + 4;
+			REGS[28] = exe->gp;
+			REGS[29] = exe->sp + exe->spOffset;
+			REGS[30] = REGS[29];
+			
+			for( int i = 0; i < exe->size; i++ ) {
+				m_memory_write( exe->dst + i, exe->data[i] , byte , m_simplestation);
+			}
 		}
 	}
 
