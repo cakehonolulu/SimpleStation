@@ -111,9 +111,22 @@ uint32_t m_gpu_get_into_status(m_simplestation_state *m_simplestation)
     return (((uint32_t) m_simplestation->m_gpu->m_horizontal_resolution) << 16);
 }
 
-uint8_t m_gpu_set_horizontal_res(uint8_t m_hoz_res1, uint8_t m_hoz_res2)
+horizontalRes m_gpu_set_horizontal_res(uint8_t fields)
 {
-    return ((m_hoz_res2 & 1) | ((m_hoz_res1 & 3) << 1));
+	if (fields & 1)
+	{
+		return XRes368;
+	}
+	else
+	{
+		switch ((fields >> 1) & 0x3)
+		{
+			case 0: return XRes256;
+			case 1: return XRes320;
+			case 2: return XRes512;
+			case 3: return XRes640;
+		}
+	}
 }
 
 void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
@@ -445,7 +458,7 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     v4.colour = col;
     v4.drawTexture = 0;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4, m_simplestation);
 }
 
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -504,7 +517,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v4.blendMode = blend;
     v4.drawTexture = 1;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4, m_simplestation);
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -530,7 +543,7 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
     v3.drawTexture = 0;
 
-    put_triangle(v1, v2, v3);
+    put_triangle(v1, v2, v3, m_simplestation);
     
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
 }
@@ -563,7 +576,7 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
     v4.drawTexture = 0;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4, m_simplestation);
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
@@ -730,8 +743,8 @@ void m_gpu_reset(uint32_t m_value, m_simplestation_state *m_simplestation)
     m_simplestation->m_gpu->m_display_disabled = true;
 	m_simplestation->m_gpu->m_display_vram_x_start = 0;
 	m_simplestation->m_gpu->m_display_vram_y_start = 0;
-    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(0, 0);
-    m_simplestation->m_gpu->m_vertical_resolution = y240lines;
+    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(0);
+    m_simplestation->m_gpu->m_vertical_resolution = VRes240;
     m_simplestation->m_gpu->m_video_mode = ntsc;
     m_simplestation->m_gpu->m_interlaced = false;
 	m_simplestation->m_gpu->m_display_horizontal_start = 0x200;
@@ -796,8 +809,8 @@ void m_gpu_set_display_vram_start(uint32_t m_value, m_simplestation_state *m_sim
 
 void m_gpu_set_display_horizontal_range(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_simplestation->m_gpu->m_display_horizontal_start = ((uint16_t) (m_value & 0xFFF));
-    m_simplestation->m_gpu->m_display_horizontal_end = ((uint16_t) ((m_value >> 12) & 0xFFF));
+    m_simplestation->m_gpu->m_display_horizontal_start = ((uint16_t) (m_value & 0x3FF));
+    m_simplestation->m_gpu->m_display_horizontal_end = ((uint16_t) ((m_value >> 10) & 0x3FF));
 }
 
 void m_gpu_set_display_vertical_range(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -808,17 +821,14 @@ void m_gpu_set_display_vertical_range(uint32_t m_value, m_simplestation_state *m
 
 void m_gpu_set_display_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(
-            ((uint8_t) (m_value & 3)), ((uint8_t) ((m_value >> 6) & 1)));
+    //printf("Current hres: %d ; vres: %d\n", m_simplestation->m_gpu->m_horizontal_resolution, m_simplestation->m_gpu->m_vertical_resolution);
     
-    if ((m_value & 0x4) != 0)
-    {
-        m_simplestation->m_gpu->m_vertical_resolution = y240lines;
-    }
-    else
-    {
-        m_simplestation->m_gpu->m_vertical_resolution = y480lines;
-    }
+    m_simplestation->m_gpu->m_horizontal_resolution = m_gpu_set_horizontal_res(
+           (((m_value & 3) << 1) | ((m_value >> 6) & 1)));
+    
+    m_simplestation->m_gpu->m_vertical_resolution = (verticalRes) (m_value & 0x4);;
+
+    //printf("New hres: %d ; vres: %d\n", m_simplestation->m_gpu->m_horizontal_resolution, m_simplestation->m_gpu->m_vertical_resolution);
 
     if ((m_value & 0x8) != 0)
     {

@@ -215,6 +215,21 @@ typedef enum
 	image_load
 } gp0_mode;
 
+typedef enum
+{
+	XRes256,
+	XRes320,
+	XRes512,
+	XRes640,
+	XRes368
+} horizontalRes;
+
+typedef enum
+{
+	VRes240 = false,
+	VRes480 = true
+} verticalRes;
+
 typedef struct
 {
 	uint32_t m_buffer[12];
@@ -247,8 +262,8 @@ typedef struct m_gpu
     bool m_preserve_masked_pixels;
     field m_field;
     bool m_texture_disable;
-    uint8_t m_horizontal_resolution;
-    vertical_res m_vertical_resolution;
+    horizontalRes m_horizontal_resolution;
+    verticalRes m_vertical_resolution;
     video_mode m_video_mode;
     display_depth m_display_depth;
     bool m_interlaced;

@@ -368,19 +368,62 @@ int display_area_x = 0, display_area_y = 0, display_area_width = 0, display_area
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
 
+int res_w, res_h;
+
 void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
 {
 	display_area_x = m_simplestation->m_gpu->m_drawing_area_left;
     display_area_width = max(m_simplestation->m_gpu->m_drawing_area_right - display_area_x + 1, 0);
     display_area_y = m_simplestation->m_gpu->m_drawing_area_top;
     display_area_height = max(m_simplestation->m_gpu->m_drawing_area_bottom - m_simplestation->m_gpu->m_drawing_area_top + 1, 0);
+	
+	//printf("Display area:\nx -> %d; y -> %d; width -> %d; height -> %d\n", display_area_x,display_area_y, display_area_width,display_area_height);
 
 
-	//printf("Display area:\nx -> %d; y -> %d; width -> %d; height -> %d\n\n", display_area_x,display_area_y, display_area_width,display_area_height);
+	//printf("Resolution: ");
+	
+	if (m_simplestation->m_gpu->m_horizontal_resolution == XRes256)
+	{
+		res_w = 256;
+		//printf("256 by ");
+	}
+	else if (m_simplestation->m_gpu->m_horizontal_resolution == XRes320)
+	{
+		res_w = 320;
+		//printf("320 by ");
+	}
+	else if (m_simplestation->m_gpu->m_horizontal_resolution == XRes512)
+	{
+		res_w = 512;
+		//printf("512 by ");
+	}
+	else if (m_simplestation->m_gpu->m_horizontal_resolution == XRes640)
+	{
+		res_w = 640;
+		//printf("640 by ");
+	}
+	else if (m_simplestation->m_gpu->m_horizontal_resolution == XRes368)
+	{
+		res_w = 368;
+		//printf("368 by ");
+	}
+
+	if (!m_simplestation->m_gpu->m_vertical_resolution)
+	{
+		res_h = 240;
+		//printf("240\n");
+	}
+	else if (m_simplestation->m_gpu->m_vertical_resolution)
+	{
+		res_h = 480;
+		//printf("480\n");
+	}
+
+	//printf("hline_start: %d ; hline_end: %d\n", m_simplestation->m_gpu->m_display_horizontal_start, m_simplestation->m_gpu->m_display_horizontal_end);
+	//printf("vline_start: %d ; vline_end: %d\n\n", m_simplestation->m_gpu->m_display_line_start, m_simplestation->m_gpu->m_display_line_end);
 }
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
-	(void) m_simplestation;
 
 	/* Off-screen Framebuffer */
 
@@ -404,6 +447,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
+	// Set viewport to accomodate VRAM
 	glViewport(0, 0, 1024, 512);
 	
 	// Off-screen shaders sample-off the off-screen VRAM Texture
@@ -414,8 +458,11 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 
 	// Copy the display area from the VRAM off to the on-screen texture
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
+
+	glViewport(0, 0, res_w, res_h);
 	
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,  display_area_x,display_area_y, display_area_width,display_area_height, 0);
+	// Copy the texture to the window
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, res_w, res_h, 0);
 
 	// Clear the vertex count
 	count_vertices = 0;
@@ -441,7 +488,9 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	// Draw data-off the custom Framebuffer's Texture (GL_COLOR_ATTACHMENT0)
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 
+	// Set viewport back to window size
 	glViewport(0, 0, 640, 480);
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -533,11 +582,11 @@ Colour color(GLubyte r, GLubyte g, GLubyte b) {
 	return colorr;
 }
 
-int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
+int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		//printf("Vertex attribute buffers full, forcing_draw\n");
-		draw(NULL, false);
+		draw(m_simplestation, false);
 	}
 
 	m_vertex_buffer[count_vertices] = v1;
@@ -552,9 +601,9 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	return 0;	
 }
 
-int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
-	put_triangle(v1, v2, v3);
-	put_triangle(v2, v3, v4);
+int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *m_simplestation) {
+	put_triangle(v1, v2, v3, m_simplestation);
+	put_triangle(v2, v3, v4, m_simplestation);
 	return 0;
 }
 
@@ -564,5 +613,5 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 	Vertex v2 = { { r0.position.x + r0.widthHeight.width, r0.position.y }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
 	Vertex v3 = { { r0.position.x, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
 	Vertex v4 = { { r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
-	put_quad(v1, v2, v3, v4);
+	put_quad(v1, v2, v3, v4, m_simplestation);
 }
