@@ -10,35 +10,43 @@
 <table>
 <thead>
   <tr>
-    <td><h3>Bootup</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" alt="Image" width="200" height="161"></td>
-    <td><h3>Amidog CPU Tests</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" alt="Image" width="204" height="161"></td>
-    <td><h3>Triangle demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" alt="Image" width="200" height="161"></td>
-    <td><h3>Quads demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" alt="Image" width="200" height="161"></td>
+    <td><h3>Bootup</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" alt="Image"></td>
+    <td><h3>Amidog CPU Tests</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" alt="Image"></td>
+    <td><h3>Quads Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" alt="Image"></td>
+    <td><h3>Goraud Triangle Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" alt="Image"></td>
   </tr>
 </thead>
 </table>
 
 ## ✨ Features
-* Built using [C23](https://en.cppreference.com/w/c/23) features
-* LLE Interpreter Emulator
-* Upstream compiler support (clang-16 & gcc-12)
+* Targetting [C23](https://en.cppreference.com/w/c/23) features (Fallbacks present if not available)
+* LLE Interpreter
+* Multiplatform (Tested on Linux, Windows and macOS)
+* Multiarchitecture (As long as it's little-endian, tested on Raspberry Pi 4B)
 
-## 🖥️ Specs
-#### Main CPU (MIPS R3051; an R3000A-compatible 32-bit RISC CPU)
-- [✅] 69 out of 69 instructions implemented (100%)
-    - Extended and Branch Opcodes
-    - MIPS Coprocessor 0 (28 out of 28 instructions implemented)
-    - MIPS Instruction Pipeline Emulation
-- [ ] Sony Coprocessor 2 (GTE, Geometry Transformation Engine) _in-the-works_
-#### MIPS R3000 Disassembler
-* Currently works on PSX's BIOS
-#### Memory Bus
-* Byte, Word, Double Word MMU Read/Write Handling
-* Unaligned memory access handling
-* Memory loads pipeline emulation
-#### DMA Bus
-* DMA subsystem _in the works_
+## 🖥️ Current state
+#### CPU Subsystem (LSI CoreWare CW33300 MIPS R3051; PSX's R3000A-compatible (MIPS I) 32-bit RISC CPU)
+- [✅] All opcodes implemented (100%)
+    - Regular, e(X)tended, Jump and Branch Opcodes
+    - MIPS Coprocessor 0 Opcodes
+    - MIPS 5-stage Instruction Pipeline Emulation
+    - Readable-format disassembler with debugger and breakpoint support
+- [❌] No cache emulation (_Yet!_)
+- [🛠️] Sony's Coprocessor 2 (GTE, Geometry Transformation Engine)
+    - _in-the-works_
 
+#### GPU Subsystem
+  - [🛠️] GPU Rasterizer Unit
+    - _in-the-works_
+
+#### DMA Subsystem
+  - [🛠️] DMA Unit
+    - _in-the-works_
+
+#### CDROM Subsystem
+  - [🛠️] CDROM Unit
+    - _in-the-works_
+    
 ## 👷🏼‍♂️ Roadmap
 * MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
 
@@ -46,3 +54,4 @@
 * Integrated Device Technology, Inc. (1996). _IDT MIPS Microprocessor Family Software Reference Manual_. Wayback Machine. [https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf](https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf)
 * Flandrin, L. (2016, 20 October). _Playstation Emulation Guide_. svkt.org. [https://svkt.org/~simias/guide.pdf](https://svkt.org/~simias/guide.pdf)
 * PlayStation Specifications - psx-spx. (2022). PSX SPX Consoledev. [https://psx-spx.consoledev.net/](https://psx-spx.consoledev.net/)
+* Copetti, R. (2022, December 24). PlayStation Architecture. The Copetti Site. [https://www.copetti.org/writings/consoles/playstation/]
