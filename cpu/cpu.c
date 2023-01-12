@@ -183,9 +183,9 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 
 			PC = exe->pc - 4;
 			NXT_PC = PC + 4;
-			REGS[28] = exe->gp;
-			REGS[29] = exe->sp + exe->spOffset;
-			REGS[30] = REGS[29];
+			//REGS[28] = exe->gp;
+			//REGS[29] = exe->sp + exe->spOffset;
+			//REGS[30] = REGS[29];
 			
 			for( int i = 0; i < exe->size; i++ ) {
 				m_memory_write( exe->dst + i, exe->data[i] , byte , m_simplestation);
