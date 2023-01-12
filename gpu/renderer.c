@@ -536,7 +536,7 @@ Colour color(GLubyte r, GLubyte g, GLubyte b) {
 int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
-		printf("Vertex attribute buffers full, forcing_draw\n");
+		//printf("Vertex attribute buffers full, forcing_draw\n");
 		draw(NULL, false);
 	}
 
