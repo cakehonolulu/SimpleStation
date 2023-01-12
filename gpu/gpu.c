@@ -147,6 +147,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x68:
+                m_gpu_drawmonochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0xA0:
                 m_gpu_image_draw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -227,6 +231,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x38:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 8;
+                break;
+
+            case 0x68:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 2;
                 break;
 
             case 0xA0:
@@ -351,6 +359,10 @@ void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation)
 
         case 0x08:
             m_gpu_set_display_mode(m_value, m_simplestation);
+            break;
+
+        case 0x10:
+            // TODO
             break;
 
         default:
@@ -553,6 +565,23 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
 
     put_quad(v1, v2, v3, v4);
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
+}
+
+void m_gpu_drawmonochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    Rectangle r0;
+    RectWidthHeight r0_wh;
+
+    memset(&r0, 0, sizeof(Rectangle));
+
+    r0_wh.width = 1;
+    r0_wh.height = 1;
+
+    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+	r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+	r0.widthHeight = r0_wh;
+
+    put_rect(r0, m_simplestation);
 }
 
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
