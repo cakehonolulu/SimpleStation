@@ -1083,8 +1083,8 @@ void m_lb(m_simplestation_state *m_simplestation)
 	printf("lb $%s, %d($%s)\n", m_cpu_regnames[REGIDX_T], SIMMDT, m_cpu_regnames[REGIDX_S]);
 #endif
 
-	uint8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
-	m_cpu_load_delay_enqueue_byte(REGIDX_T, value, m_simplestation);
+	int8_t value = m_memory_read((REGS[REGIDX_S] + SIMMDT), byte, m_simplestation);
+	m_cpu_load_delay_enqueue_dword(REGIDX_T, ((uint32_t) ((int8_t) value)), m_simplestation);
 }
 
 /*
