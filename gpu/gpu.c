@@ -425,7 +425,7 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
     display_area_width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
     display_area_height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
 
-    //draw(m_simplestation, true);
+    draw(m_simplestation, true);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
