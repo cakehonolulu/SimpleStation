@@ -376,7 +376,7 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
     display_area_height = max(m_simplestation->m_gpu->m_drawing_area_bottom - m_simplestation->m_gpu->m_drawing_area_top + 1, 0);
 
 
-	printf("Display area:\nx -> %d; y -> %d; width -> %d; height -> %d\n\n", display_area_x,display_area_y, display_area_width,display_area_height);
+	//printf("Display area:\nx -> %d; y -> %d; width -> %d; height -> %d\n\n", display_area_x,display_area_y, display_area_width,display_area_height);
 }
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
