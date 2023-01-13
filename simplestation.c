@@ -176,18 +176,21 @@ int main(int argc, char **argv)
 						
 										while (deltaTime >= 1.0)
 										{
-											// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
-											for (int i = 0; i < 565045; i++)
+											for (int i = 0; i < 365045; i++)
 											{
 												// Fetch, decode, execute
 												m_cpu_fde(&m_simplestation);
 											}
+											
+											// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
+											m_interrupts_request(VBLANK, &m_simplestation);
 											
 											updates++;
 											deltaTime--;
 										}
 										
 										display(&m_simplestation);
+
 
 										if (glfwGetTime() - timer > 1.0) {
 								            timer ++;

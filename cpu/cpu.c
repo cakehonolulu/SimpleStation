@@ -227,25 +227,33 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		}
 	}
 
-	// Check if the instruction is implemented
-	if (m_psx_instrs[INSTRUCTION].m_funct)
+	if ((COP0_CAUSE & (1 << 10)) && (COP0_SR & (1 << 10)) && (COP0_SR & 1))
 	{
-		// Set $zr register to 0
-		REGS[0] = 0;
-
-		// Execute the instruction
-		((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
-
-		if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register)
-		{
-			m_cpu_delay_slot_handler(m_simplestation);
-		}
+		m_exc_types m_exc = interrupt;
+		m_exception(m_exc, m_simplestation);
 	}
 	else
 	{
-		printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
-		m_exc_types m_exc = illegal;
-		m_exception(m_exc, m_simplestation);
+		// Check if the instruction is implemented
+		if (m_psx_instrs[INSTRUCTION].m_funct)
+		{
+			// Set $zr register to 0
+			REGS[0] = 0;
+
+			// Execute the instruction
+			((void (*) (m_simplestation_state *m_simplestation))m_psx_instrs[INSTRUCTION].m_funct)(m_simplestation);
+
+			if (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register)
+			{
+				m_cpu_delay_slot_handler(m_simplestation);
+			}
+		}
+		else
+		{
+			printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
+			m_exc_types m_exc = illegal;
+			m_exception(m_exc, m_simplestation);
+		}
 	}
 }
 

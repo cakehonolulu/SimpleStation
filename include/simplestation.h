@@ -419,6 +419,7 @@ typedef struct
 
 // Exception types
 typedef enum {
+	interrupt = 0x0,
 	load_error = 0x4,
 	store_error = 0x5,
 	syscall = 0x8,
@@ -427,6 +428,21 @@ typedef enum {
 	coprocessor = 0xB,
 	overflow = 0xC
 } m_exc_types;
+
+// Interrupt types
+typedef enum {
+	VBLANK = 0,
+	GPU = 1,
+	CDROM = 2,
+	DMA = 3,
+	TMR0 = 4,
+	TMR1 = 5,
+	TMR2 = 6,
+	CONTROLLERMEMCARD = 7,
+	SIO = 8,
+	SPU = 9,
+	LIGHTPEN = 10
+} m_int_types;
 
 /* Functions */
 uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_is_fatal);

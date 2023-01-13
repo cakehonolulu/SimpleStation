@@ -203,18 +203,8 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 			break;
 
-		case 0x1F801070:
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] read: Interrupt Stat Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat);
-#endif
-			m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
-			break;
-		
-		case 0x1F801074:
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] read: Interrupt Mask Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_mask);
-#endif
-			m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+		case 0x1F801070 ... 0x1F801078:
+			m_return = m_interrupts_read(m_address & 0xF, m_simplestation);
 			break;
 		
 		case 0x1F801080 ... 0x1F8010FF:
@@ -373,17 +363,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			m_return = m_simplestation->m_memory->m_memory_ram_config_reg;
 			break;
 
-		case 0x1F801070:
-#ifdef DEBUG_MEMORY
-			printf(YELLOW "[MEM] write: Interrupt Stat Register (Current Value: 0x%0X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_cpu_ints->m_interrupt_stat, m_value);
-#endif
-			m_simplestation->m_cpu_ints->m_interrupt_stat = m_value;
-			m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
-			break;
-
-		case 0x1F801074:
-			m_simplestation->m_cpu_ints->m_interrupt_mask = m_value;
-			m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+		case 0x1F801070 ... 0x1F801078:
+			m_interrupts_write(m_address & 0xF, m_value, m_simplestation);
 			break;
 
 		case 0x1F801080 ... 0x1F8010FF:
@@ -432,10 +413,6 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
 #endif
-			break;
-
-		case 0x1FC00000 ... 0x1FC7FFFF:
-			m_return = m_interrupts_write(m_address, m_value, m_simplestation);
 			break;
 
 		case 0xFFFE0130:

@@ -1,4 +1,5 @@
 #include <cpu/interrupts.h>
+#include <cpu/cpu.h>
 #include <stdlib.h>
 
 uint8_t m_interrupts_init(m_simplestation_state *m_simplestation)
@@ -23,21 +24,61 @@ uint8_t m_interrupts_init(m_simplestation_state *m_simplestation)
 	return m_return;
 }
 
-uint32_t m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation_state *m_simplestation)
+void m_interrupts_check(m_simplestation_state *m_simplestation)
 {
-	uint32_t m_reg = m_int_addr & 0xF;
+	// Set bit 10 of the cause register to request an interrupt
+	COP0_CAUSE &= ~(1 << 10);
+	COP0_CAUSE |= ((uint32_t) ((m_simplestation->m_cpu_ints->m_interrupt_stat & m_simplestation->m_cpu_ints->m_interrupt_mask) != 0)) << 10;
+}
 
-	if (!m_reg)
+void m_interrupts_request(m_int_types m_int, m_simplestation_state *m_simplestation)
+{
+	m_simplestation->m_cpu_ints->m_interrupt_stat |= 1 << (uint32_t) m_int;
+	m_interrupts_check(m_simplestation);
+}
+
+void m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation_state *m_simplestation)
+{
+	switch (m_int_addr)
 	{
-		return m_simplestation->m_cpu_ints->m_interrupt_stat &= m_int_val & 0x7FF;
-	}
-	else if (m_reg == 4)
-	{
-		return m_simplestation->m_cpu_ints->m_interrupt_mask = m_int_val & 0x7FF;
+		case 0:
+			m_simplestation->m_cpu_ints->m_interrupt_stat &= m_int_val;
+			break;
+
+		case 4:
+			m_simplestation->m_cpu_ints->m_interrupt_mask = m_int_val;
+			break;
+	
+		default:
+			printf(RED "[INT] write: Unhandled Interrupts Write (Offset: %d, Value: 0x%08X)\n" NORMAL, m_int_addr, m_int_val);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
 	}
 
-	 printf(RED "[INT] write: Abnormal path in emulator code, continuing might break things; exiting...\n" NORMAL);
-	 return m_simplestation_exit(m_simplestation, 1);
+	m_interrupts_check(m_simplestation);
+}
+
+uint32_t m_interrupts_read(uint32_t m_int_addr, m_simplestation_state *m_simplestation)
+{
+	uint32_t m_return;
+
+	switch (m_int_addr)
+	{
+		case 0:
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_stat;
+			break;
+
+		case 4:
+			m_return = m_simplestation->m_cpu_ints->m_interrupt_mask;
+			break;
+	
+		default:
+			printf(RED "[INT] read: Unhandled Interrupts Read (Offset: %d)\n" NORMAL, m_int_addr);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
+
+	return m_return;
 }
 
 void m_interrupts_exit(m_simplestation_state *m_simplestation)
