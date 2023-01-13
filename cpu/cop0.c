@@ -111,6 +111,6 @@ void m_rfe(m_simplestation_state *m_simplestation)
 	}
 
 	uint32_t mode = COP0_SR & 0x3f;
-	COP0_SR &= ~0x3f;
+	COP0_SR &= ~0xf;
 	COP0_SR |= mode >> 2;
 }

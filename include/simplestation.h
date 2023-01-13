@@ -38,6 +38,8 @@ typedef struct m_mips_r3000a_delay_slot {
 // Struct containing main CPU state
 typedef struct m_corewave_cw33300
 {
+	uint32_t m_pc_cur;
+
 	// Program Counter Register
 	uint32_t m_pc;
 
@@ -69,6 +71,7 @@ typedef struct m_corewave_cw33300
     m_mips_r3000a_delay_slot_t m_cpu_delayed_memory_load;
 
 	bool m_branch;
+	bool m_delay;
 	uint32_t m_pre_ds_pc;
 
 } m_mips_r3000a_t;

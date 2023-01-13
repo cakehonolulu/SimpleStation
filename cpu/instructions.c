@@ -128,26 +128,29 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 	}
 
 	// BEV bit in COP0's SR register decides where
-	uint32_t m_dst = (((COP0_REGS[12] & 0x400000)) ? 0xBFC00180 : 0x80000080);
+	uint32_t m_dst = (((COP0_REGS[12] &  (1 << 22)) != 0) ? 0xBFC00180 : 0x80000080);
 
 	uint8_t m_mode = COP0_SR & 0x3F;
 	COP0_SR &= ~0x3F;
 
 	COP0_SR |= ((m_mode << 2) & 0x3F);
 
+	COP0_CAUSE &= ~0x7C;
 	COP0_CAUSE = (((uint32_t) m_exception) << 2);
 
-	COP0_EPC = PC - 4;
-
-	/* FIXME: Next 2 lines are suboptimal */
-	NXT_PC = m_dst;
-	m_simplestation->m_cpu->m_next_opcode = m_memory_read((NXT_PC), dword, m_simplestation);
-
-	if (m_simplestation->m_cpu->m_branch)
+	if (m_simplestation->m_cpu->m_delay)
 	{
-		COP0_EPC -= 4;
-		COP0_CAUSE |= (1 << 31);
-    }
+		COP0_EPC = m_simplestation->m_cpu->m_pc_cur - 4;
+		COP0_CAUSE |= 1 << 31;
+	}
+	else
+	{
+		COP0_EPC = m_simplestation->m_cpu->m_pc_cur;
+		COP0_CAUSE &= ~(1 << 31);
+	}
+
+	PC = m_dst;
+	NXT_PC = PC + 4;
 }
 
 /*
@@ -329,10 +332,9 @@ void m_jalr(m_simplestation_state *m_simplestation)
 	}
 #endif
 
-	REGS[REGIDX_D] = PC + 4;
-	NXT_PC = REGS[REGIDX_S];
-	m_simplestation->m_cpu->m_branch = true;
-}
+	REGS[REGIDX_D] = NXT_PC;
+
+	m_jr(m_simplestation);}
 
 /*
 	SYSCALL (MIPS I)
@@ -849,10 +851,9 @@ void m_jal(m_simplestation_state *m_simplestation)
 	printf("jal 0x%x\n", ((PC & 0xF0000000) | (JIMMDT * 4)));
 #endif
 
-	REGS[31] = PC + 4;
+	REGS[31] = NXT_PC;
 
-	NXT_PC = ((PC & 0xF0000000) | (JIMMDT * 4));
-	m_simplestation->m_cpu->m_branch = true;
+	m_j(m_simplestation);
 }
 
 /*

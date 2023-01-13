@@ -49,6 +49,7 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 			// Point Program Counter to the initial BIOS address
 			PC = 0;
 			NXT_PC = 0xBFC00000;
+			m_simplestation->m_cpu->m_pc_cur = 0;
 
 			// High register to 0
 			HI = 0;
@@ -58,9 +59,6 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 
 			// Set current opcode to 0
 			m_simplestation->m_cpu->m_opcode = 0;
-
-			// Set next opcode in the pipeline to 0
-			m_simplestation->m_cpu->m_next_opcode = 0;
 
 			// Set all registers to 0
 			for (uint8_t m_regs = 0; m_regs < M_R3000_REGISTERS; m_regs++)
@@ -72,6 +70,7 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 			m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
 
 			m_simplestation->m_cpu->m_branch = false;
+			m_simplestation->m_cpu->m_delay = false;
 			m_simplestation->m_cpu->m_pre_ds_pc = 0;
 
 			m_simplestation->m_cond = false;
@@ -138,8 +137,6 @@ void m_cpu_exit(m_simplestation_state *m_simplestation)
 
 void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
-	m_simplestation->m_cpu->m_opcode = m_simplestation->m_cpu->m_next_opcode;
-
 #ifdef DEBUG_INSTRUCTIONS
 	if (NXT_PC > (PC + 4))
 	{
@@ -179,7 +176,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 			EXEheader_t* exe = loadFile( m_simplestation->exename );
 			
 			m_simplestation->m_cpu->m_opcode = 0;
-			m_simplestation->m_cpu->m_next_opcode = 0;
 
 			PC = exe->pc - 4;
 			NXT_PC = PC + 4;
@@ -193,8 +189,18 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		}
 	}
 
-	PC = NXT_PC;
 
+	/* Fetch cycle */
+	m_simplestation->m_cpu->m_opcode = m_memory_read((PC), dword, m_simplestation);
+
+#ifdef DEBUG_INSTRUCTIONS
+	printf("Opcode: 0x%08X\nNext Opcode: 0x%08X\n", m_simplestation->m_cpu->m_opcode, m_simplestation->m_cpu->m_next_opcode);
+#endif
+
+	m_simplestation->m_cpu->m_pc_cur = PC;
+
+	PC = NXT_PC;
+	
 	if ((PC % 4) != 0)
 	{
 		m_exc_types m_exc = load_error;
@@ -202,20 +208,11 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-	/* Fetch cycle */
-	m_simplestation->m_cpu->m_next_opcode = m_memory_read((PC), dword, m_simplestation);
-
-#ifdef DEBUG_INSTRUCTIONS
-	printf("Opcode: 0x%08X\nNext Opcode: 0x%08X\n", m_simplestation->m_cpu->m_opcode, m_simplestation->m_cpu->m_next_opcode);
-#endif
-
 	// Increment Program Counter by 4
 	NXT_PC += 4;
 
-	if (m_simplestation->m_cpu->m_branch)
-	{
-		m_simplestation->m_cpu->m_branch = false;
-	}
+	m_simplestation->m_cpu->m_delay = m_simplestation->m_cpu->m_branch;
+	m_simplestation->m_cpu->m_branch = false;
 
 	if ((PC - 4) == m_simplestation->m_breakpoint)
 	{
@@ -299,8 +296,21 @@ void m_cpu_branch(int32_t m_offset, m_simplestation_state *m_simplestation)
 
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation)
 {
-    REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
-	
+	switch (m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size)
+	{
+		case byte:
+			REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = (uint8_t) m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
+			break;
+
+		case word:
+			REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = (uint16_t) m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
+			break;
+
+		case dword:
+			REGS[m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register] = (uint32_t) m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value;
+			break;
+	}
+
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_value = 0;
     m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_register = 0;
 	m_simplestation->m_cpu->m_cpu_delayed_memory_load.m_size = byte;
