@@ -38,6 +38,18 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_status_register.prmempt = 1;
 	m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
 	m_simplestation->m_cdrom->m_status_register.rslrrdy = 1;
+	m_simplestation->m_cdrom->m_queued_responses = -1;
+}
+
+void m_cdrom_step(m_simplestation_state *m_simplestation)
+{
+	if (m_simplestation->m_cdrom->m_queued_responses >= 0)
+	{
+		m_simplestation->m_cpu_ints->m_interrupt_stat |= 0x04;
+		m_simplestation->m_cdrom->m_interrupt_flag_register = m_simplestation->m_cdrom->m_queued_responses;
+		m_exception(0x00 , m_simplestation);
+		m_simplestation->m_cdrom->m_queued_responses = -1;
+	}
 }
 
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -148,6 +160,8 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 			m_cdrom_response_fifo_push(0x11, m_simplestation);
 			m_cdrom_response_fifo_push(0x18, m_simplestation);
 			m_cdrom_response_fifo_push(0xC0, m_simplestation);
+
+			m_simplestation->m_cdrom->m_queued_responses = 3;
 			break;
 
 		default:

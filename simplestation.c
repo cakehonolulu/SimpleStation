@@ -185,6 +185,8 @@ int main(int argc, char **argv)
 												// Fetch, decode, execute
 												m_cpu_fde(&m_simplestation);
 											}
+
+											m_cdrom_step(&m_simplestation);
 											
 											// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
 											m_interrupts_request(VBLANK, &m_simplestation);

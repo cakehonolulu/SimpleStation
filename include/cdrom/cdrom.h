@@ -17,6 +17,7 @@
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
 void m_cdrom_exit(m_simplestation_state *m_simplestation);
 void m_cdrom_setup(m_simplestation_state *m_simplestation);
+void m_cdrom_step(m_simplestation_state *m_simplestation);
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation);
 uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation);
 void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation);

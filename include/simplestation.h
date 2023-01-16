@@ -339,6 +339,8 @@ typedef struct {
 	uint8_t m_response_fifo[16];
 	uint8_t m_response_fifo_index;
 
+	int8_t m_queued_responses;
+
 } m_psx_cdrom_t;
 
 typedef struct {
