@@ -327,6 +327,7 @@ typedef struct {
 	} m_status_register;
 
 	uint8_t m_interrupt_flag_register;
+	uint8_t m_interrupt_enable_register;
 
 } m_psx_cdrom_t;
 
