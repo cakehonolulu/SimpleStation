@@ -14,6 +14,7 @@
     <td><h3>Amidog CPU Tests</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" alt="Image"></td>
     <td><h3>Quads Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" alt="Image"></td>
     <td><h3>Goraud Triangle Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" alt="Image"></td>
+    <td><h3>Current Menu</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" alt="Image"></td>
   </tr>
 </thead>
 </table>
