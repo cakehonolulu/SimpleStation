@@ -124,6 +124,11 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			m_value = m_simplestation->m_cdrom->m_status_register.raw;
 			break;
 
+		// Response FIFO Read
+		case 1:
+			m_value = m_cdrom_response_fifo_pop(m_simplestation);
+			break;
+
 		case 3:
 			m_value = m_simplestation->m_cdrom->m_interrupt_flag_register | 0xE0;
 			break;
