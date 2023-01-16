@@ -1,5 +1,6 @@
 #include <cdrom/cdrom.h>
 #include <cdrom/parameter_fifo.h>
+#include <cdrom/response_fifo.h>
 #include <cpu/cpu.h>
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
@@ -14,6 +15,7 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
 		m_cdrom_setup(m_simplestation);
 		m_cdrom_parameter_fifo_init(m_simplestation);
+		m_cdrom_response_fifo_init(m_simplestation);
     }
     else
     {
@@ -140,7 +142,12 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 	{
 		// INT3(yy,mm,dd,ver)
 		case 0x20:
-			
+			// PSX (PU-7) board, to try match SCPH1001
+			// TODO: Return different response based on BIOS checksum?
+			m_cdrom_response_fifo_push(0x94, m_simplestation);
+			m_cdrom_response_fifo_push(0x11, m_simplestation);
+			m_cdrom_response_fifo_push(0x18, m_simplestation);
+			m_cdrom_response_fifo_push(0xC0, m_simplestation);
 			break;
 
 		default:
