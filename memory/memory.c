@@ -196,6 +196,24 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			m_return = m_memory_read_handle(m_address & 0xF, m_simplestation->m_memory->m_mem_memctl1, m_size, m_simplestation);
 			break;
 
+		case 0x1F801040:
+			// TODO: Properly handle this, don't hardcode
+			printf(YELLOW "[MEM] read: JOY_RX_DATA read, ignoring...\n" NORMAL);
+			m_return = 0xFF;
+			break;
+
+		case 0x1F801044:
+			// TODO: Properly handle this, don't hardcode
+			printf(YELLOW "[MEM] read: JOY_STAT read, ignoring...\n" NORMAL);
+			m_return = 0x7;
+			break;
+
+		case 0x1F80104A:
+			// TODO: Properly handle this, don't hardcode
+			printf(YELLOW "[MEM] read: JOY_CTRL read, ignoring...\n" NORMAL);
+			m_return = 0x0;
+			break;
+
 		case 0x1F801060:
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: RAM_SIZE Register (Current Value: 0x%0X)\n" NORMAL, m_simplestation->m_memory->m_memory_ram_config_reg);
@@ -353,6 +371,10 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 
 		case 0x1F800400 ... 0x1F80103F:
 			m_memory_write_handle(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1, m_size, m_simplestation);
+			break;
+
+		case 0x1F801040:
+			printf(YELLOW "[MEM] write: JOY_RX_DATA write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
 			break;
 
 		case 0x1F801048:
