@@ -230,11 +230,19 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
 			break;
 
-		case 0x1F801100 ... 0x1F80112F:
+		case 0x1F801100 ... 0x1F801130:
 			// Timer Registers Dummy Read
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Dummy Timer Registers memory read! Ignoring...\n" NORMAL);
 #endif
+			if (m_address == 0x1F801120)
+			{
+				m_return = 0x000016B0;
+			}
+			else
+			{
+				m_return = 0;
+			}
 			break;
 
 		case 0x1F801810 ... 0x1f801817:
