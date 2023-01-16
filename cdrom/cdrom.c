@@ -124,6 +124,10 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			m_value = m_simplestation->m_cdrom->m_status_register.raw;
 			break;
 
+		case 3:
+			m_value = m_simplestation->m_cdrom->m_interrupt_flag_register | 0xE0;
+			break;
+
         default:
             printf(RED "[CDROM] read: Unhandled CDROM Read (Offset: %d)\n" NORMAL, m_offset);
             m_simplestation_exit(m_simplestation, 1);
