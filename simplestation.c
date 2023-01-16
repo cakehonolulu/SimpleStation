@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 		m_simplestation.m_debugger = false;
 		m_simplestation.m_sideload = false;
 		m_simplestation.m_tty = false;
+		m_simplestation.m_vramview = false;
 
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
@@ -114,13 +115,16 @@ int main(int argc, char **argv)
 			{
 				m_simplestation.m_tty = true;
 				printf("Enabled tty output...!\n");
-				m_args++;
+			}
+			else if (!strcmp(argv[m_args], "-vramview"))
+			{
+				m_simplestation.m_vramview = true;
+				printf("Enabled VRAM output...!\n");
 			}
 			else if (!strcmp(argv[m_args], "-debugger"))
 			{
 				m_simplestation.m_debugger = true;
 				printf("Enabled debugger...!\n");
-				m_args++;
 			}
 			else
 			{

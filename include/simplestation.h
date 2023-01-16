@@ -409,6 +409,8 @@ typedef struct
 	bool m_sideload;
 	bool m_tty;
 
+	bool m_vramview;
+
 	bool m_memory_state;
 	bool m_dma_state;
 	bool m_interrupts_state;

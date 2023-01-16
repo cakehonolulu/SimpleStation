@@ -77,11 +77,17 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
         return EXIT_FAILURE;
 	}
 
-
-	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	if (m_simplestation->m_vramview)
+	{
+		m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+							  1024, 512, SDL_WINDOW_OPENGL);
+	}
+	else
+	{
+		m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 							  640, 480, SDL_WINDOW_OPENGL);
-						  // 1024, 512
-
+	}
+	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -108,7 +114,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	m_renderer_setup_onscreen();
 
-	m_renderer_setup_offscreen();
+	m_renderer_setup_offscreen(m_simplestation);
 
 #ifdef DUMP_VRAM
 	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
@@ -175,7 +181,7 @@ void m_renderer_setup_onscreen()
 	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
 }
 
-void m_renderer_setup_offscreen()
+void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 {
 	/* OpenGL Off-Screen Framebuffer Configuration */
 
@@ -257,9 +263,17 @@ void m_renderer_setup_offscreen()
 
 	// ...bind to it...
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-	
+
 	// ...allocate space for it...
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	if (m_simplestation->m_vramview)
+	{
+	
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	}
 
 	// ...and set the appropiate parameters (To fill the screen and the texture filters)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -456,14 +470,25 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	// Draw the scene
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 
+
 	// Copy the display area from the VRAM off to the on-screen texture
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 
-	glViewport(0, 0, res_w, res_h);
+	if (!m_simplestation->m_vramview)
+	{
+		glViewport(0, 0, res_w, res_h);
+		
+		// Copy the texture to the window
+		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, res_w, res_h, 0);
+	}
+	else
+	{
+		glViewport(0, 0, 1024, 512);
+		
+		// Copy the texture to the window
+		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
+	}
 	
-	// Copy the texture to the window
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, res_w, res_h, 0);
-
 	// Clear the vertex count
 	count_vertices = 0;
 
@@ -489,7 +514,14 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 
 	// Set viewport back to window size
-	glViewport(0, 0, 640, 480);
+	if (!m_simplestation->m_vramview)
+	{
+		glViewport(0, 0, 640, 480);
+	}
+	else
+	{
+		glViewport(0, 0, 1024, 512);
+	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
