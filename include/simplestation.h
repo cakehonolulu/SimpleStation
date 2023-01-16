@@ -310,10 +310,23 @@ typedef struct m_gpu
 } m_psx_gpu_t;
 
 typedef struct {
-	uint32_t m_status;
-	uint32_t m_command;
-	uint32_t m_fifo;
-	uint32_t m_req;
+	uint8_t m_port;
+
+	union
+	{
+		struct
+		{
+			uint8_t index : 2;
+			uint8_t adpbusy : 1;
+			uint8_t prmempt : 1;
+			uint8_t prmwrdy : 1;
+			uint8_t rslrrdy : 1;
+			uint8_t drqsts : 1;
+			uint8_t busysts : 1;
+		};
+
+		uint8_t raw;
+	} m_status_register;
 
 } m_psx_cdrom_t;
 

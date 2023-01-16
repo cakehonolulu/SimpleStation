@@ -1,3 +1,5 @@
+#pragma once
+
 #include <simplestation.h>
 #include <ui/termcolour.h>
 #include <stdlib.h>
