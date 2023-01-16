@@ -47,6 +47,18 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 			m_simplestation->m_cdrom->m_status_register.index = m_value;
 			break;
 
+		// Command Register Write
+		case 1:
+			switch(m_value)
+			{
+				default:
+					printf(RED "[CDROM] write: Unhandled CDROM Command: 0x%02X\n" NORMAL, m_value);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
+			break;
+
+		// Status's Index-determined write
 		case 2:
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
