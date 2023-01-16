@@ -288,7 +288,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 	stbi_write_bmp( "vram_sample.bmp", 1024, 512, 3, m_simplestation->m_vram_data );
 
 	// No need to save window contents if vram view is toggled (Just save the vram tex.)
-	if (!m_simplestation.m_vramview)
+	if (!m_simplestation->m_vramview)
 	{
 		extern int res_w, res_h;
 
