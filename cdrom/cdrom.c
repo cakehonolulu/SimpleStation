@@ -123,8 +123,23 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 {
 	switch(m_cmd)
 	{
+		case CDROM_TEST_CMD:
+			m_cdrom_exec_test_subcmd(m_cdrom_parameter_fifo_pop(m_simplestation), m_simplestation);
+			break;
+
 		default:
 			printf(RED "[CDROM] write: Unhandled CDROM Command: 0x%02X\n" NORMAL, m_cmd);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
+}
+
+void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simplestation)
+{
+	switch (m_subcmd)
+	{
+		default:
+			printf(RED "[CDROM] write: Unhandled CDROM TEST Sub-command: 0x%02X\n" NORMAL, m_subcmd);
 			m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
