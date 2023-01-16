@@ -32,9 +32,14 @@ uint8_t m_cdrom_parameter_fifo_pop(m_simplestation_state *m_simplestation)
     uint8_t m_parameter = 0;
 
     // Only pop parameters if the current FIFO index's not 0
-    if (m_simplestation->m_cdrom->m_parameter_fifo_index)
+    if (m_simplestation->m_cdrom->m_parameter_fifo_index && m_simplestation->m_cdrom->m_parameter_fifo_index < 16)
     {
         m_parameter = m_simplestation->m_cdrom->m_parameter_fifo[--m_simplestation->m_cdrom->m_parameter_fifo_index];
+    }
+    else
+    {
+        printf(RED "[CDROM] parameter_fifo_push: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
+        m_simplestation_exit(m_simplestation, 1);
     }
 
     // (Un)Set the Parameter FIFO's PRMEMPT bit based on the current index's value
