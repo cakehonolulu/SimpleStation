@@ -267,7 +267,6 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	// ...allocate space for it...
 	if (m_simplestation->m_vramview)
 	{
-	
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	}
 	else
