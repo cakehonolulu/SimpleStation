@@ -45,8 +45,11 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
 // 0x38
 void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 
+// 0x65
+void m_gpu_draw_texture_raw_variable_size_rect(uint32_t m_value, m_simplestation_state *m_simplestation);
+
 // 0x68
-void m_gpu_drawmonochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation);
+void m_gpu_draw_monochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation);
 
 // 0xA0
 void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation);

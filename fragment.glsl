@@ -12,6 +12,10 @@ out vec4 frag_color;
 
 uniform sampler2D vram_texture;
 
+#define NO_TEXTURE      0U
+#define RAW_TEXTURE     1U
+#define TEXTURE_BLEND   2U
+
 vec4 vram_read(uint x, uint y)
 {
     return texelFetch(vram_texture, ivec2(int(x), int(y)), 0);
@@ -37,21 +41,30 @@ vec4 sample_texel(vec2 tc)
 {
     vec4 pixel = vec4(1.0, 0.0, 0.0, 1.0);
     float stride_divisor = 16.0;
+
     if (frag_texture_depth == 0u)
     {
         stride_divisor /= 4.0;
         int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
         int tc_y = int(frag_texture_page.y) + int(tc.y);
 
-        // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
-        uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
+        if (frag_blend_mode == TEXTURE_BLEND)
+        {
+            // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
+            uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
 
-        // We now fetch each pixel (located in the clut) in the texel in
-        // 4bit chunks, based on the current texture co-ordinate's x value.
-        // Therefore, for each fragment on screen, we read out 4-pixels worth
-        // of data from VRAM (or so I think..) based on this texcoord x-value.
-        uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
-        pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
+            // We now fetch each pixel (located in the clut) in the texel in
+            // 4bit chunks, based on the current texture co-ordinate's x value.
+            // Therefore, for each fragment on screen, we read out 4-pixels worth
+            // of data from VRAM (or so I think..) based on this texcoord x-value.
+            uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
+            pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
+        }
+        else if (frag_blend_mode == RAW_TEXTURE)
+        {
+            pixel = vram_read(uint(tc_x), uint(tc_y));
+        }
+
     }
 
     // According to No$cash, a texel of 0x0000 is transparent.
@@ -70,8 +83,8 @@ void main() {
 	// Texture drawing
 	if (frag_texture_draw == 1U)
 	{
-		frag_color = sample_texel(frag_texture_coord);	
-	}
+        frag_color = sample_texel(frag_texture_coord);
+    }
 	else
 	{
 		// Triangle with Goraud Shading

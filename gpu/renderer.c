@@ -604,6 +604,14 @@ TextureColourDepth tcd_from_val(textureColourDepthValue value)
 	return tcd;
 }
 
+RectWidthHeight rwh_from_gp0(uint32_t value)
+{
+	RectWidthHeight rwh;
+	rwh.width = (GLshort)(value & 0xFFFF);
+	rwh.height = (GLshort)(value >> 16);
+	return rwh;
+}
+
 Colour color(GLubyte r, GLubyte g, GLubyte b) {
 	Colour colorr;
 

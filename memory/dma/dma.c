@@ -246,8 +246,11 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 
                 switch(m_id)
                 {
-                    case 6:
+                    case gpu:
+                        m_source = m_gpu_get_read(m_simplestation);
+                        break;
 
+                    case otc:
                         switch(m_size)
                         {
                             case 1:
@@ -261,7 +264,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         break;
 
                     default:
-                        printf(RED "[DMA] run_block: Unimplemented channel block copy to RAM\n" NORMAL);
+                        printf(RED "[DMA] run_block: Unimplemented channel block copy to RAM (id: %d)\n" NORMAL, m_id);
                         m_simplestation_exit(m_simplestation, 1);
                         break;
                 }

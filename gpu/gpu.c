@@ -153,7 +153,7 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 break;
 
             case 0x2D:
-                m_gpu_draw_texture_blend_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                m_gpu_draw_texture_raw_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x30:
@@ -164,8 +164,12 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x65:
+                m_gpu_draw_texture_raw_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x68:
-                m_gpu_drawmonochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                m_gpu_draw_monochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0xA0:
@@ -252,6 +256,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x38:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 8;
+                break;
+
+            case 0x65:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 4;
                 break;
 
             case 0x68:
@@ -480,7 +488,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 
 	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
 
-	GLubyte blend = (GLubyte) RawTexture;
+	GLubyte blend = (GLubyte) BlendTexture;
 
     Vertex v1, v2, v3, v4;
 
@@ -530,7 +538,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 
 void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    (void) m_value;
+        (void) m_value;
 
     Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
@@ -539,7 +547,7 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
 
 	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
 
-	GLubyte blend = (GLubyte) BlendTexture;
+	GLubyte blend = (GLubyte) RawTexture;
 
     Vertex v1, v2, v3, v4;
 
@@ -555,7 +563,7 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
     v1.clut = clut;
     v1.texDepth = texDepth;
     v1.blendMode = blend;
-    v1.drawTexture = 1;
+    //v1.drawTexture = 1;
 
     v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     v2.colour = col;
@@ -564,7 +572,7 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
     v2.clut = clut;
     v2.texDepth = texDepth;
     v2.blendMode = blend;
-    v2.drawTexture = 1;
+    //v2.drawTexture = 1;
 
     v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v3.colour = col;
@@ -573,7 +581,7 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
     v3.clut = clut;
     v3.texDepth = texDepth;
     v3.blendMode = blend;
-    v3.drawTexture = 1;
+    //v3.drawTexture = 1;
 
     v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
     v4.colour = col;
@@ -582,7 +590,7 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
     v4.clut = clut;
     v4.texDepth = texDepth;
     v4.blendMode = blend;
-    v4.drawTexture = 1;
+    //v4.drawTexture = 1;
 
     put_quad(v1, v2, v3, v4, m_simplestation);
 }
@@ -647,7 +655,23 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
-void m_gpu_drawmonochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation)
+void m_gpu_draw_texture_raw_variable_size_rect(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    Rectangle r0;
+
+    memset(&r0, 0, sizeof(Rectangle));
+
+    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    r0.widthHeight = rwh_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+
+    r0.blendMode = (GLubyte) RawTexture;
+
+	put_rect(r0, m_simplestation);
+}
+
+void m_gpu_draw_monochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     Rectangle r0;
     RectWidthHeight r0_wh;
