@@ -310,8 +310,6 @@ typedef struct m_gpu
 } m_psx_gpu_t;
 
 typedef struct {
-	uint8_t m_port;
-
 	union
 	{
 		struct
@@ -327,6 +325,8 @@ typedef struct {
 
 		uint8_t raw;
 	} m_status_register;
+
+	uint8_t m_interrupt_flag_register;
 
 } m_psx_cdrom_t;
 
