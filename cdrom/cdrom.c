@@ -1,4 +1,5 @@
 #include <cdrom/cdrom.h>
+#include <cdrom/parameter_fifo.h>
 #include <cpu/cpu.h>
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
@@ -12,6 +13,7 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
         m_simplestation->m_cdrom_state = ON;
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
 		m_cdrom_setup(m_simplestation);
+		m_cdrom_parameter_fifo_init(m_simplestation);
     }
     else
     {
@@ -48,6 +50,12 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 		case 2:
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
+				// Parameter FIFO Param Write
+				case 0:
+					m_cdrom_parameter_fifo_push(m_value, m_simplestation);
+					break;
+				
+				// Interrupt Enable Register Write
 				case 1:
 					m_simplestation->m_cdrom->m_interrupt_enable_register = m_value;
 					break;

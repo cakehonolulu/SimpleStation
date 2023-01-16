@@ -329,6 +329,12 @@ typedef struct {
 	uint8_t m_interrupt_flag_register;
 	uint8_t m_interrupt_enable_register;
 
+	// FIFOs
+
+	// Parameter FIFO
+	uint8_t m_parameter_fifo[16];
+	uint8_t m_parameter_fifo_index;
+
 } m_psx_cdrom_t;
 
 typedef struct {
