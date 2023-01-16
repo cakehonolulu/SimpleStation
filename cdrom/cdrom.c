@@ -31,6 +31,11 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 {
     switch (m_offset)
     {
+		// Index/Status Register
+		case 0:
+			m_simplestation->m_cdrom->m_status_register.raw = m_value;
+			break;
+
         default:
             printf(RED "[CDROM] write: Unhandled CDROM Write (Offset: %d, Value: 0x%08X)\n" NORMAL, m_offset, m_value);
             m_simplestation_exit(m_simplestation, 1);
