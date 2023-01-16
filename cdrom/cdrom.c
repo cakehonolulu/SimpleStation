@@ -138,6 +138,11 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 {
 	switch (m_subcmd)
 	{
+		// INT3(yy,mm,dd,ver)
+		case 0x20:
+			
+			break;
+
 		default:
 			printf(RED "[CDROM] write: Unhandled CDROM TEST Sub-command: 0x%02X\n" NORMAL, m_subcmd);
 			m_simplestation_exit(m_simplestation, 1);

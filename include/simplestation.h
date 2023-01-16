@@ -335,6 +335,10 @@ typedef struct {
 	uint8_t m_parameter_fifo[16];
 	uint8_t m_parameter_fifo_index;
 
+	// Response FIFO
+	uint8_t m_response_fifo[16];
+	uint8_t m_response_fifo_index;
+
 } m_psx_cdrom_t;
 
 typedef struct {
