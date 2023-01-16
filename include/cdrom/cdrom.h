@@ -11,6 +11,7 @@
 #define CDROM_REQUEST_REG		0x03
 
 /* CDROM Commands */
+#define CDROM_GETSTAT_CMD       0x01
 #define CDROM_TEST_CMD          0x19
 
 /* Function Definitions */

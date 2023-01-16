@@ -146,6 +146,18 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 {
 	switch(m_cmd)
 	{
+		case CDROM_GETSTAT_CMD:
+			/*
+				HACK:
+				
+				Returning CDROM STAT w/bit 4 ('ShellOpen') set, enables the
+				'no-disk' mode for the shell (Informs the shell that the CDROM 'tray'
+				is currently opened == !disk == jump to shell).
+			*/
+			m_cdrom_response_fifo_push(0b00010000, m_simplestation);
+			m_simplestation->m_cdrom->m_queued_responses = 3;
+			break;
+
 		case CDROM_TEST_CMD:
 			m_cdrom_exec_test_subcmd(m_cdrom_parameter_fifo_pop(m_simplestation), m_simplestation);
 			break;
