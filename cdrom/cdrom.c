@@ -165,10 +165,10 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 		case 0x20:
 			// PSX (PU-7) board, to try match SCPH1001
 			// TODO: Return different response based on BIOS checksum?
+			m_cdrom_response_fifo_push(0xC0, m_simplestation);
 			m_cdrom_response_fifo_push(0x94, m_simplestation);
 			m_cdrom_response_fifo_push(0x11, m_simplestation);
 			m_cdrom_response_fifo_push(0x18, m_simplestation);
-			m_cdrom_response_fifo_push(0xC0, m_simplestation);
 
 			m_simplestation->m_cdrom->m_queued_responses = 3;
 			break;
