@@ -355,6 +355,18 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			m_memory_write_handle(m_address & 0xF, m_value, m_simplestation->m_memory->m_mem_memctl1, m_size, m_simplestation);
 			break;
 
+		case 0x1F801048:
+			printf(YELLOW "[MEM] write: JOY_MODE write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+			break;
+
+		case 0x1F80104A:
+			printf(YELLOW "[MEM] write: JOY_CTRL write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+			break;
+
+		case 0x1F80104E:
+			printf(YELLOW "[MEM] write: JOY_BAUD write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+			break;
+			
 		case 0x1F801060:
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: RAM_SIZE Register (Current Value: 0x%X, New Value: 0x%X)\n" NORMAL, m_simplestation->m_memory->m_memory_cache_control_reg, m_value);
