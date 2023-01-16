@@ -1,4 +1,5 @@
 #include <cdrom/cdrom.h>
+#include <cpu/cpu.h>
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
@@ -10,6 +11,7 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
     {
         m_simplestation->m_cdrom_state = ON;
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
+		m_cdrom_setup(m_simplestation);
     }
     else
     {
@@ -27,13 +29,20 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
     }
 }
 
+void m_cdrom_setup(m_simplestation_state *m_simplestation)
+{
+	m_simplestation->m_cdrom->m_status_register.prmempt = 1;
+	m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
+	m_simplestation->m_cdrom->m_status_register.rslrrdy = 1;
+}
+
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     switch (m_offset)
     {
 		// Index/Status Register
 		case 0:
-			m_simplestation->m_cdrom->m_status_register.raw = m_value;
+			m_simplestation->m_cdrom->m_status_register.index = m_value;
 			break;
 
 		case 2:
