@@ -90,6 +90,7 @@ typedef struct
 	TexCoord texCoord;
 	ClutAttr clut;
 	GLubyte blendMode;
+	GLubyte drawTexture;
 } Rectangle;
 
 Position pos_from_gp0(uint32_t val);
