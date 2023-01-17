@@ -438,7 +438,7 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
 	//printf("vline_start: %d ; vline_end: %d\n\n", m_simplestation->m_gpu->m_display_line_start, m_simplestation->m_gpu->m_display_line_end);
 }
 
-void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
+void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part) {
 
 	/* Off-screen Framebuffer */
 
@@ -471,7 +471,6 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	// Draw the scene
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 
-
 	// Copy the display area from the VRAM off to the on-screen texture
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
 
@@ -491,7 +490,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	}
 	
 	// Clear the vertex count
-	count_vertices = 0;
+	if (!part) count_vertices = 0;
 
 	// Bind GL_COLOR_ATTACHMENT0 w/the on-screen final texture
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_window_texture, 0);
@@ -540,9 +539,8 @@ void m_sync_vram(m_simplestation_state *m_simplestation)
 	glViewport(0, 0, 1024, 512);
 }
 
-
 void display(m_simplestation_state *m_simplestation) {
-  draw(m_simplestation, false);
+  draw(m_simplestation, false, false);
   SDL_GL_SwapWindow(m_window);
 }
 
@@ -627,7 +625,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simpl
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		//printf("Vertex attribute buffers full, forcing_draw\n");
-		draw(m_simplestation, false);
+		draw(m_simplestation, false, false);
 	}
 
 	m_vertex_buffer[count_vertices] = v1;
@@ -650,9 +648,44 @@ int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *
 
 int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 {
-	Vertex v1 = { r0.position, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, r0.texCoord, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
-	Vertex v2 = { { r0.position.x + r0.widthHeight.width, r0.position.y }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
-	Vertex v3 = { { r0.position.x, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
-	Vertex v4 = { { r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
+	Vertex v1 = {
+		r0.position,
+		r0.colour, 
+		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		r0.texCoord,
+		r0.clut,
+		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
+		r0.blendMode,
+		r0.drawTexture };
+
+	Vertex v2 = {
+		{ r0.position.x + r0.widthHeight.width, r0.position.y },
+		r0.colour,
+		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y },
+		r0.clut,
+		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
+		r0.blendMode,
+		r0.drawTexture };
+
+	Vertex v3 = {
+		{ r0.position.x, r0.position.y + r0.widthHeight.height },
+		r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) },
+		r0.clut,
+		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
+		r0.blendMode,
+		r0.drawTexture };
+
+	Vertex v4 = {
+		{ r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height },
+		r0.colour,
+		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) },
+		r0.clut,
+		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
+		r0.blendMode,
+		r0.drawTexture };
+
 	put_quad(v1, v2, v3, v4, m_simplestation);
 }

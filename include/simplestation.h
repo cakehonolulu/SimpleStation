@@ -209,13 +209,14 @@ typedef enum
     off = 0,
     fifo = 1,
     cpu_to_gp0 = 2,
-    vram_to_cpu = 3
+    video_to_cpu = 3
 } dma_direction;
 
 typedef enum
 {
 	command,
-	cpu_to_vram
+	cpu_to_vram,
+	vram_to_cpu
 } gp0_mode;
 
 typedef enum
@@ -248,6 +249,7 @@ typedef struct {
 	uint32_t index;
 	// Buffer used for temp storing of single images
 	uint32_t buffer[(1024 * 512)];
+	uint32_t rbuffer[(1024 * 512)];
 	uint32_t image_index;
 
 } m_psx_gpu_image_buffer_t;
@@ -302,7 +304,7 @@ typedef struct m_gpu
 	uint32_t m_gp0_words_remaining;
 	uint32_t m_gp0_current_cmd;
 
-	gp0_mode m_gp0_mode;
+	gp0_mode m_gp0_write_mode;
 
 	uint32_t m_gp0_cmd_ins;
 	uint32_t m_gp0_instruction;

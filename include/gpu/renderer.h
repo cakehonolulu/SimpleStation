@@ -86,11 +86,13 @@ typedef struct
 {
 	Position position;
 	Colour colour;
-	RectWidthHeight widthHeight;
+	TexPage texPage;
 	TexCoord texCoord;
 	ClutAttr clut;
+	TextureColourDepth texDepth;
 	GLubyte blendMode;
 	GLubyte drawTexture;
+	RectWidthHeight widthHeight;
 } Rectangle;
 
 Position pos_from_gp0(uint32_t val);
@@ -111,7 +113,7 @@ void m_texture_upload(m_simplestation_state *m_simplestation);
 
 void renderer_LoadImage(m_simplestation_state *m_simplestation);
 
-void draw(m_simplestation_state *m_simplestation, bool clear_colour);
+void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part);
 
 void m_renderer_setup_onscreen();
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation);
