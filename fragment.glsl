@@ -64,12 +64,17 @@ vec4 sample_texel(vec2 tc)
         {
             pixel = vram_read(uint(tc_x), uint(tc_y));
         }
-
+    } else if (frag_texture_depth == 2u) {
+        stride_divisor /= 16.0;
+        int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
+        int tc_y = int(frag_texture_page.y) + int(tc.y);
+        
+        if (frag_blend_mode == RAW_TEXTURE)
+        {
+            pixel = vram_read(uint(tc_x), uint(tc_y));
+        }
     }
-
-    // According to No$cash, a texel of 0x0000 is transparent.
-    // As this is the case, any fragment we encounter that is pure black we
-    // discard from rendition.
+    
     if (pixel == vec4(0))
         discard;
 
