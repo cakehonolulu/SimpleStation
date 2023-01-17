@@ -116,8 +116,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 	m_renderer_setup_offscreen(m_simplestation);
 
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-    //glPixelStorei(GL_PACK_ALIGNMENT, 2);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 #ifdef DUMP_VRAM
 	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
