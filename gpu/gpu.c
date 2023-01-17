@@ -319,15 +319,15 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             }
             break;
 
-        case image_load:
+        case cpu_to_vram:
             uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
 			uint16_t height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
-			if (width == 0) width = 1024;
-			if (height == 0) height = 512;
-			width &= 0x3ff;
-			height &= 0x1ff;
-			int32_t x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
-			int32_t y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
+            
+            width = ((width - 1) & 0x3ff) + 1;
+            height = ((height - 1) & 0x1ff) + 1;
+
+			int32_t x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0x3ff;
+			int32_t y = (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16) & 0x1ff;;
 
             m_simplestation->m_gpu_image_buffer->buffer[m_current_idx++] = m_value;
             
@@ -700,11 +700,14 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     uint16_t m_height = m_resolution >> 16;
 
+    m_width = ((m_width - 1) & 0x3ff) + 1;
+    m_height = ((m_height - 1) & 0x1ff) + 1;
+
     uint32_t m_image_sz = ((m_height * m_width) + 1) & ~1;
 
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 
-    m_simplestation->m_gpu->m_gp0_mode = image_load;
+    m_simplestation->m_gpu->m_gp0_mode = cpu_to_vram;
 
     if (m_simplestation->m_gpu->m_gp0_words_remaining > 0)
     {

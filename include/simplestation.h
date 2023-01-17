@@ -215,7 +215,7 @@ typedef enum
 typedef enum
 {
 	command,
-	image_load
+	cpu_to_vram
 } gp0_mode;
 
 typedef enum
