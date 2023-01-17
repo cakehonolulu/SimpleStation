@@ -651,9 +651,9 @@ int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *
 
 int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 {
-	Vertex v1 = { r0.position, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, r0.texCoord, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
-	Vertex v2 = { { r0.position.x + r0.widthHeight.width, r0.position.y }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
-	Vertex v3 = { { r0.position.x, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
-	Vertex v4 = { { r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode };
+	Vertex v1 = { r0.position, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, r0.texCoord, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
+	Vertex v2 = { { r0.position.x + r0.widthHeight.width, r0.position.y }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
+	Vertex v3 = { { r0.position.x, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
+	Vertex v4 = { { r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height }, r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y }, { (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) }, r0.clut, tcd_from_val(m_simplestation->m_gpu->m_texture_depth), r0.blendMode, r0.drawTexture };
 	put_quad(v1, v2, v3, v4, m_simplestation);
 }
