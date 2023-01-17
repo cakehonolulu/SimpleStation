@@ -48,7 +48,9 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_dithering) << 9;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_draw_to_display) << 10;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_force_set_mask_bit) << 11;
-    m_status |= ((uint32_t) m_simplestation->m_gpu->m_preserve_masked_pixels) << 12;
+    // HACK
+    // PSX Shell doesn't crash anymore
+    //m_status |= ((uint32_t) m_simplestation->m_gpu->m_preserve_masked_pixels) << 12;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_field) << 13;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_texture_disable) << 15;
     m_status |= m_gpu_get_into_status(m_simplestation);
