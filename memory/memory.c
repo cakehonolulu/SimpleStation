@@ -198,19 +198,25 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 		case 0x1F801040:
 			// TODO: Properly handle this, don't hardcode
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: JOY_RX_DATA read, ignoring...\n" NORMAL);
+#endif
 			m_return = 0xFF;
 			break;
 
 		case 0x1F801044:
 			// TODO: Properly handle this, don't hardcode
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: JOY_STAT read, ignoring...\n" NORMAL);
+#endif
 			m_return = 0x7;
 			break;
 
 		case 0x1F80104A:
 			// TODO: Properly handle this, don't hardcode
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: JOY_CTRL read, ignoring...\n" NORMAL);
+#endif
 			m_return = 0x0;
 			break;
 
@@ -382,19 +388,27 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F801040:
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: JOY_RX_DATA write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+#endif
 			break;
 
 		case 0x1F801048:
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: JOY_MODE write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+#endif
 			break;
 
 		case 0x1F80104A:
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: JOY_CTRL write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+#endif
 			break;
 
 		case 0x1F80104E:
+#ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: JOY_BAUD write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
+#endif
 			break;
 			
 		case 0x1F801060:
