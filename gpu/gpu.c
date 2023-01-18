@@ -689,11 +689,11 @@ void m_gpu_draw_texture_raw_variable_size_rect(uint32_t m_value, m_simplestation
 
     r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-    r0.widthHeight = rwh_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
     r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-
+    r0.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
     r0.blendMode = (GLubyte) RawTexture;
     r0.drawTexture = 1;
+    r0.widthHeight = rwh_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
 
 	put_rect(r0, m_simplestation);
 }
