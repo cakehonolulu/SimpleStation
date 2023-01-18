@@ -458,19 +458,23 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
     (void) m_value;
 
     uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
-	uint16_t r = (colour24 & 0xFF) >> 3;
-	uint16_t g = ((colour24 >> 8) & 0xFF) >> 3;
-	uint16_t b = ((colour24 >> 16) & 0xFF) >> 3;
+	float r = (colour24 & 0xFF) / 255.0f;
+	float g = ((colour24 >> 8) & 0xFF) / 255.0f;
+	float b = ((colour24 >> 16) & 0xFF) / 255.0f;
 
     glClearColor(r, g, b, 0.f);
 
+    glEnable(GL_SCISSOR_TEST);
 
     display_area_x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
     display_area_y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
     display_area_width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
     display_area_height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
 
+    glScissor(display_area_x, display_area_y, display_area_width, display_area_height);
     draw(m_simplestation, true, false);
+
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
