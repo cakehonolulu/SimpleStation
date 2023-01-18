@@ -651,7 +651,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 	Vertex v1 = {
 		r0.position,
 		r0.colour, 
-		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
 		r0.texCoord,
 		r0.clut,
 		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
@@ -661,7 +661,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 	Vertex v2 = {
 		{ r0.position.x + r0.widthHeight.width, r0.position.y },
 		r0.colour,
-		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
 		{ (GLubyte)(r0.texCoord.x + (GLubyte)(r0.widthHeight.width)), r0.texCoord.y },
 		r0.clut,
 		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
@@ -670,7 +670,8 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 
 	Vertex v3 = {
 		{ r0.position.x, r0.position.y + r0.widthHeight.height },
-		r0.colour, { m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		r0.colour,
+		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
 		{ r0.texCoord.x, (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) },
 		r0.clut,
 		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
@@ -680,7 +681,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 	Vertex v4 = {
 		{ r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height },
 		r0.colour,
-		{ m_simplestation->m_gpu->m_page_base_x, m_simplestation->m_gpu->m_page_base_y },
+		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
 		{ (GLubyte)(r0.texCoord.x + (GLubyte)r0.widthHeight.width), (GLubyte)(r0.texCoord.y + (GLubyte)r0.widthHeight.height) },
 		r0.clut,
 		tcd_from_val(m_simplestation->m_gpu->m_texture_depth),
