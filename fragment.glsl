@@ -48,23 +48,31 @@ vec4 sample_texel(vec2 tc)
         int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
         int tc_y = int(frag_texture_page.y) + int(tc.y);
 
-        if (frag_blend_mode == TEXTURE_BLEND)
-        {
-            // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
-            uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
+        // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
+        uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
 
-            // We now fetch each pixel (located in the clut) in the texel in
-            // 4bit chunks, based on the current texture co-ordinate's x value.
-            // Therefore, for each fragment on screen, we read out 4-pixels worth
-            // of data from VRAM (or so I think..) based on this texcoord x-value.
-            uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
+        // We now fetch each pixel (located in the clut) in the texel in
+        // 4bit chunks, based on the current texture co-ordinate's x value.
+        // Therefore, for each fragment on screen, we read out 4-pixels worth
+        // of data from VRAM (or so I think..) based on this texcoord x-value.
+        uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
+        pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
+    }
+    else if (frag_texture_depth == 1u)
+    {
+        int tc_x = int(frag_texture_page.x) + int(tc.x / 2);
+        int tc_y = int(frag_texture_page.y) + int(tc.y);
+        
+        if (frag_blend_mode == RAW_TEXTURE)
+        {
+            uint texel = unpack_texel(texelFetch(vram_texture, ivec2(ivec2(tc.x / 2, tc.y) + ivec2(frag_texture_page)), 0));
+
+            uint clut_index = ((texel >> ((uint(tc.x) % 2u) * 8u)) & 0xFFu);
             pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
         }
-        else if (frag_blend_mode == RAW_TEXTURE)
-        {
-            pixel = vram_read(uint(tc_x), uint(tc_y));
-        }
-    } else if (frag_texture_depth == 2u) {
+    }
+    else if (frag_texture_depth == 2u)
+    {
         stride_divisor /= 16.0;
         int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
         int tc_y = int(frag_texture_page.y) + int(tc.y);
