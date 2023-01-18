@@ -779,11 +779,11 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    m_simplestation->m_gpu->m_page_base_x = ((uint8_t) (m_value & 0xF));
-    m_simplestation->m_gpu->m_page_base_y = ((uint8_t) ((m_value >> 4) & 1));
-    m_simplestation->m_gpu->m_semitransparency = ((uint8_t) ((m_value >> 5) & 3));
+    m_simplestation->m_gpu->m_page_base_x = ((uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xF));
+    m_simplestation->m_gpu->m_page_base_y = ((uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 4) & 1));
+    m_simplestation->m_gpu->m_semitransparency = ((uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 5) & 3));
 
-    switch ((m_value >> 7) & 3)
+    switch ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 7) & 3)
     {
         case 0:
             m_simplestation->m_gpu->m_texture_depth = t4bit;
@@ -803,11 +803,11 @@ void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestatio
             break;
     }
 
-    m_simplestation->m_gpu->m_dithering = (((m_value >> 9) & 1) != 0);
-    m_simplestation->m_gpu->m_draw_to_display = (((m_value >> 10) & 1) != 0);
-    m_simplestation->m_gpu->m_texture_disable = (((m_value >> 11) & 1) != 0);
-    m_simplestation->m_gpu->m_rectangle_texture_x_flip = (((m_value >> 12) & 1) != 0);
-    m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_value >> 13) & 1) != 0);
+    m_simplestation->m_gpu->m_dithering = (((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 9) & 1) != 0);
+    m_simplestation->m_gpu->m_draw_to_display = (((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 10) & 1) != 0);
+    m_simplestation->m_gpu->m_texture_disable = (((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 11) & 1) != 0);
+    m_simplestation->m_gpu->m_rectangle_texture_x_flip = (((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 12) & 1) != 0);
+    m_simplestation->m_gpu->m_rectangle_texture_y_flip = (((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 13) & 1) != 0);
 }
 
 void m_gpu_set_texture_window(uint32_t m_value, m_simplestation_state *m_simplestation)
