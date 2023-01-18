@@ -359,8 +359,6 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             
             m_simplestation->m_gpu_image_buffer->buffer[m_current_idx++] = m_value;
 
-            printf("word: 0x%X\n", m_value);
-            
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
                 glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
