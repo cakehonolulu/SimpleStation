@@ -115,6 +115,7 @@ void renderer_LoadImage(m_simplestation_state *m_simplestation);
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part);
 
+void m_renderer_update_display_area(m_simplestation_state *m_simplestation);
 void m_renderer_setup_onscreen();
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation);
 void m_sync_vram(m_simplestation_state *m_simplestation);

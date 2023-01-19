@@ -1,5 +1,6 @@
 #include <cdrom/parameter_fifo.h>
 #include <ui/termcolour.h>
+#include <stdio.h>
 
 void m_cdrom_parameter_fifo_init(m_simplestation_state *m_simplestation)
 {

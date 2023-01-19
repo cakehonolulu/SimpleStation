@@ -346,6 +346,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             break;
 
         case cpu_to_vram:
+	{
             uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
 			uint16_t height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
             
@@ -371,6 +372,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             }
 
             break;
+	}
 
         default:
             printf(YELLOW "[GP0] Unknown GP0 mode!\n" NORMAL);

@@ -2,6 +2,7 @@
 #include <cdrom/parameter_fifo.h>
 #include <cdrom/response_fifo.h>
 #include <cpu/cpu.h>
+#include <cpu/instructions.h>
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
