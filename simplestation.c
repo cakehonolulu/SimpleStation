@@ -268,7 +268,7 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 {
 #ifdef DUMP_VRAM
 	FILE *f = fopen("vram.bin", "wb");
-	fwrite(m_simplestation->m_gpu_image_buffer->buffer, sizeof(char), sizeof(m_simplestation->m_gpu_image_buffer->buffer), f);
+	fwrite(m_simplestation->m_gpu->write_buffer, sizeof(char), sizeof(m_simplestation->m_gpu->write_buffer), f);
 	fclose(f);
 	
 	extern GLint m_psx_gpu_vram, m_psx_vram_texel, m_window_texture;

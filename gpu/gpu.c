@@ -1,6 +1,5 @@
 #include <gpu/gpu.h>
 #include <gpu/command_buffer.h>
-#include <gpu/imagebuffer.h>
 #include <gpu/renderer.h>
 #include <ui/termcolour.h>
 #include <stdio.h>
@@ -25,7 +24,6 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
         else
         {
             m_renderer_init(m_simplestation);
-            imageBuffer_Create(m_simplestation);
             m_simplestation->m_gpu_command_buffer_state = ON;
         }
     }
@@ -110,7 +108,7 @@ void readDataMem(uint32_t* destination, int size, m_simplestation_state *m_simpl
     for (int i = 0; i < size; i++) {
         if (m_gp0_read_mode == vram_to_cpu) {
             if (m_vramReadBufferSize == 1) m_gp0_read_mode = command;
-            *destination++ = m_simplestation->m_gpu_image_buffer->rbuffer[m_vramReadBufferIndex++];
+            *destination++ = m_simplestation->m_gpu->read_buffer[m_vramReadBufferIndex++];
             m_vramReadBufferSize--;
         } else {
             // g_system->printf("Unimplemented GPUREAD read :(\n");
@@ -358,15 +356,15 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             //if (m_value = 0x00) m_value = 0x0F;
             
-            m_simplestation->m_gpu_image_buffer->buffer[m_current_idx++] = m_value;
+            m_simplestation->m_gpu->write_buffer[m_current_idx++] = m_value;
 
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
                 glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->buffer);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
                 glBindTexture(GL_TEXTURE_2D, 0);
                 m_sync_vram(m_simplestation);
-                for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu_image_buffer->buffer[i] = 0;
+                for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;
                 m_current_idx = 0;
                 m_simplestation->m_gpu->m_gp0_write_mode = command;
             }
@@ -449,7 +447,7 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
 
-    for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu_image_buffer->buffer[i] = 0;
+    for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;
 
     return;
 }
@@ -774,13 +772,13 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
 
-    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->rbuffer);
+    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
 
     glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu_image_buffer->rbuffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 }
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
