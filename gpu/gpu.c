@@ -52,7 +52,7 @@ uint32_t m_gpu_get_status(m_simplestation_state *m_simplestation)
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_field) << 13;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_texture_disable) << 15;
     m_status |= m_gpu_get_into_status(m_simplestation);
-    //m_status |= ((uint32_t) m_simplestation->m_gpu->m_vertical_resolution) << 19;
+    m_status |= ((uint32_t) m_simplestation->m_gpu->m_vertical_resolution) << 19;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_video_mode) << 20;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_display_depth) << 21;
     m_status |= ((uint32_t) m_simplestation->m_gpu->m_interlaced) << 22;
