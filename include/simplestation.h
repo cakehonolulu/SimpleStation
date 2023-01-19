@@ -294,6 +294,10 @@ typedef struct m_gpu
 	uint32_t m_gp0_current_cmd;
 
 	gp0_mode m_gp0_write_mode;
+	gp0_mode m_gp0_read_mode;
+
+	uint32_t m_vram_image_size;
+	uint32_t m_vram_image_index;
 
 	uint32_t m_gp0_cmd_ins;
 	uint32_t m_gp0_instruction;
