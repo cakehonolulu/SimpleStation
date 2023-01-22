@@ -27,3 +27,7 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
+
+# Whatever this is
+null.d
+
