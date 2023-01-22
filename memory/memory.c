@@ -4,6 +4,7 @@
 #include <cpu/bios.h>
 #include <gpu/gpu.h>
 #include <cdrom/cdrom.h>
+#include <spu/spu.h>
 #include <ui/termcolour.h>
 #if defined (__unix__)
 #include <endian.h>
@@ -290,6 +291,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
 #endif
+			m_return = m_spu_read(m_address, m_simplestation);
 			break;
 		
 		case 0x1F802000 ... 0x1F803FFF:
@@ -445,6 +447,8 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
 #endif
+			m_spu_write(m_address, m_value, m_simplestation);
+
 			break;
 
 		case 0x1F801810 ... 0x1F801817:
