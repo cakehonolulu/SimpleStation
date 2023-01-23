@@ -447,7 +447,7 @@ typedef enum {
 	interrupt = 0x0,
 	load_error = 0x4,
 	store_error = 0x5,
-	syscall = 0x8,
+	_syscall = 0x8,
 	breakpoint = 0x9,
 	illegal = 0xA,
 	coprocessor = 0xB,

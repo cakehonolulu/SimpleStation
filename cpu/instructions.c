@@ -365,7 +365,7 @@ void m_syscall(m_simplestation_state *m_simplestation)
 	printf("syscall\n");
 #endif
 
-	m_exc_types m_exc = syscall;
+	m_exc_types m_exc = _syscall;
 
 	m_exception(m_exc, m_simplestation);
 }
