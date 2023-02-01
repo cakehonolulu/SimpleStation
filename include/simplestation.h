@@ -8,6 +8,10 @@
 #include <stdbool.h>
 #endif
 
+#ifdef GDBSTUB_SUPPORT
+#include <extern/gdbstub/gdbstub.h> 
+#endif
+
 /* Defines */
 #define KiB 1024
 #define MiB (KiB * KiB)
@@ -395,6 +399,12 @@ typedef struct {
 	uint8_t data[];
 } EXEheader_t;
 
+typedef struct context
+{
+	uint32_t cycles;
+	bool stop;
+} context_t;
+
 /* Structures */
 typedef struct
 {
@@ -427,16 +437,21 @@ typedef struct
 	bool m_cpu_state;
 	bool m_gpu_state;
 	bool m_gpu_command_buffer_state;
-	bool m_cdrom_state;
+	bool m_cdrom_state;context_t ctx;
 
+	bool m_debugger;
+
+#ifdef GDBSTUB_SUPPORT
+	context_t m_gdbstub_context;
+    gdbstub_config_t m_gdbstub_config;
+	gdbstub_t *m_gdb;
+#endif
 	uint32_t m_breakpoint;
 	uint32_t m_wp;
 
 #ifdef DUMP_VRAM
 	uint8_t *m_vram_data;
 #endif
-
-	bool m_debugger;
 
 	bool m_cond;
 

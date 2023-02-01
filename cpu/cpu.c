@@ -214,6 +214,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cpu->m_delay = m_simplestation->m_cpu->m_branch;
 	m_simplestation->m_cpu->m_branch = false;
 
+#ifndef GDBSTUB_SUPPORT
 	if ((PC - 4) == m_simplestation->m_breakpoint)
 	{
 		if (m_simplestation->m_debugger)
@@ -226,6 +227,7 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 			m_simplestation_exit(m_simplestation, 1);
 		}
 	}
+#endif
 
 	if ((COP0_CAUSE & (1 << 10)) && (COP0_SR & (1 << 10)) && (COP0_SR & 1))
 	{

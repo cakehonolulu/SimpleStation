@@ -172,52 +172,97 @@ int main(int argc, char **argv)
 								    double deltaTime = 0, nowTime = 0;
 								    int updates = 0;
 
-									while (true)
-									{			
-										nowTime = glfwGetTime();
-								        deltaTime += (nowTime - lastTime) / limitFPS;
-								        lastTime = nowTime;
-						
-										while (deltaTime >= 1.0)
+
+#ifdef GDBSTUB_SUPPORT
+									if (m_simplestation.m_debugger)
+									{
+										m_cpu_fde(&m_simplestation);
+										m_init_gdbstub(&m_simplestation);
+
+										uint32_t m_cyc = 0;
+
+										while (true)
 										{
-											for (int i = 0; i < 365045; i++)
-											{
-												// Fetch, decode, execute
+											if (!m_simplestation.m_gdbstub_context.stop)
+											{	
 												m_cpu_fde(&m_simplestation);
+												m_cyc++;
+											
+												if (m_cyc >= 365045)
+												{
+													m_cdrom_step(&m_simplestation);
+													
+													// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
+													m_interrupts_request(VBLANK, &m_simplestation);
+													
+													display(&m_simplestation);
+													m_cyc = 0;
+												}
 											}
 
-											m_cdrom_step(&m_simplestation);
-											
-											// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
-											m_interrupts_request(VBLANK, &m_simplestation);
-											
-											updates++;
-											deltaTime--;
-										}
+											gdbstub_tick(m_simplestation.m_gdb);
 										
-										display(&m_simplestation);
-
-
-										if (glfwGetTime() - timer > 1.0) {
-								            timer ++;
-											char buffer[1024];
-											snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | FPS: %d | MS/F: %.2f", updates, pow(updates / 1000.0f, -1.0));
-
-											m_window_changetitle(buffer);
-
-								            updates = 0;
-								        }
-
-										while( SDL_PollEvent( &m_event ) )
-										{
-											if( m_event.type == SDL_QUIT )
+											while( SDL_PollEvent( &m_event ) )
 											{
-												// Quit the program
-												m_simplestation_exit(&m_simplestation, 1);
+												if( m_event.type == SDL_QUIT )
+												{
+													// Quit the program
+													m_simplestation_exit(&m_simplestation, 1);
+												}
 											}
 										}
-
 									}
+									else
+									{
+#endif
+										while (true)
+										{			
+											nowTime = glfwGetTime();
+											deltaTime += (nowTime - lastTime) / limitFPS;
+											lastTime = nowTime;
+							
+											while (deltaTime >= 1.0)
+											{
+												for (int i = 0; i < 365045; i++)
+												{
+													// Fetch, decode, execute
+													m_cpu_fde(&m_simplestation);
+												}
+
+												m_cdrom_step(&m_simplestation);
+												
+												// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
+												m_interrupts_request(VBLANK, &m_simplestation);
+												
+												updates++;
+												deltaTime--;
+											}
+											
+											display(&m_simplestation);
+
+
+											if (glfwGetTime() - timer > 1.0) {
+												timer ++;
+												char buffer[1024];
+												snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | FPS: %d | MS/F: %.2f", updates, pow(updates / 1000.0f, -1.0));
+
+												m_window_changetitle(buffer);
+
+												updates = 0;
+											}
+
+											while( SDL_PollEvent( &m_event ) )
+											{
+												if( m_event.type == SDL_QUIT )
+												{
+													// Quit the program
+													m_simplestation_exit(&m_simplestation, 1);
+												}
+											}
+										}
+#ifdef GDBSTUB_SUPPORT
+									}
+#endif
 								}
 								else
 								{
