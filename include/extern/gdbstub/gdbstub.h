@@ -337,7 +337,11 @@ void _gdbstub_recv(gdbstub_t * gdb)
                 gdb->packet_checksum = 0;
             }
             else if (c == 3) {
-                // TODO: investigate
+                // cakehonolulu: Deal with Ctrl+C
+                gdb->config.stop(gdb->config.user_data);
+
+                // Send SIGINT signal
+                _gdbstub_send(gdb, "S02", 3);
             }
             break;
         case GDB_STATE_IN_PACKET:
