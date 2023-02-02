@@ -201,15 +201,6 @@ int main(int argc, char **argv)
 											}
 
 											gdbstub_tick(m_simplestation.m_gdb);
-										
-											while( SDL_PollEvent( &m_event ) )
-											{
-												if( m_event.type == SDL_QUIT )
-												{
-													// Quit the program
-													m_simplestation_exit(&m_simplestation, 1);
-												}
-											}
 										}
 									}
 									else

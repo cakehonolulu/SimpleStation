@@ -286,8 +286,6 @@ void gdb_clear_breakpoint(context_t * ctx, uint32_t address)
 
 ssize_t gdb_get_memory(context_t * ctx, char * buffer, size_t buffer_length, uint32_t address, size_t length)
 {
-    printf("Getting memory %08X, %08lX\n", address, length);
-
 	// 32
 	if (length >= 4)
 	{
@@ -338,7 +336,6 @@ ssize_t gdb_get_register_value(context_t * ctx, char * buffer, size_t buffer_len
 
 ssize_t gdb_get_general_registers(context_t * ctx, char * buffer, size_t buffer_length)
 {
-    printf("Getting general registers\n");
     return snprintf(buffer, buffer_length, "00000000");
 }
 
