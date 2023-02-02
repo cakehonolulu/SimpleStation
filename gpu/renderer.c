@@ -69,7 +69,7 @@ float output_window_vertices[] =
 };
 unsigned int output_window_vao, output_window_vbo;
 
-uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
+uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{

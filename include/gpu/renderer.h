@@ -119,7 +119,7 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation);
 void m_renderer_setup_onscreen();
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation);
 void m_sync_vram(m_simplestation_state *m_simplestation);
-uint8_t m_renderer_init(m_simplestation_state *m_simplestation);
+uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
 GLuint renderer_LoadShader(char *path, GLenum type);
 int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation);
