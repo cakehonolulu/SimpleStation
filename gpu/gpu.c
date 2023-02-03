@@ -1,6 +1,6 @@
 #include <gpu/gpu.h>
 #include <gpu/command_buffer.h>
-#include <gpu/renderer.h>
+#include <renderer/renderer.h>
 #include <ui/termcolour.h>
 #include <stdio.h>
 

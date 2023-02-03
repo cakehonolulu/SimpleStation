@@ -1,12 +1,8 @@
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <simplestation.h>
-
-
 #include <GL/glew.h>
-
+#include <GL/gl.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <simplestation.h>
 
 #define VERTEX_BUFFER_LEN 64 * 1024
 
@@ -98,7 +94,7 @@ typedef struct
 Position pos_from_gp0(uint32_t val);
 Colour color_from_gp0(uint32_t val);
 Colour color(GLubyte r, GLubyte g, GLubyte b);
-void display(m_simplestation_state *m_simplestation);
+
 void m_window_changetitle(char *buffer);
 Position pos_from_gp0(uint32_t value);
 Colour col_from_gp0(uint32_t value);
@@ -108,6 +104,9 @@ ClutAttr clutattr_from_gp0(uint32_t value);
 TextureColourDepth tcd_from_gp0(uint32_t value);
 TextureColourDepth tcd_from_val(textureColourDepthValue value);
 RectWidthHeight rwh_from_gp0(uint32_t value);
+
+
+void display(m_simplestation_state *m_simplestation);
 
 void m_texture_upload(m_simplestation_state *m_simplestation);
 

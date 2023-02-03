@@ -30,6 +30,15 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -DGDBSTUB_SUPP
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DGDBSTUB_SUPPORT")
 endif()
 
+if (VULKAN_SUPPORT)
+find_package(Vulkan REQUIRED)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVULKAN_SUPPORT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DVULKAN_SUPPORT")
+set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -DVULKAN_SUPPORT")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -DVULKAN_SUPPORT")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DVULKAN_SUPPORT")
+endif()
+
 if (ASAN)
 add_compile_options(-fsanitize=address -g)
 add_link_options(-fsanitize=address)
@@ -71,7 +80,7 @@ endif()
 
 
 add_executable(simplestation ${SRC_FILES})
-target_link_libraries(simplestation glfw ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES})
+target_link_libraries(simplestation glfw ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES} ${VULKAN_LIBRARIES})
 
 if (APPLE)
   target_link_libraries(simplestation "-framework OpenGL" GLEW::GLEW)

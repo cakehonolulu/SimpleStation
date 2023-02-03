@@ -8,7 +8,7 @@
 #include <memory/memory.h>
 #include <ui/termcolour.h>
 #include <SDL2/SDL.h>
-#include <gpu/renderer.h>
+#include <renderer/renderer.h>
 
 
 #include <GLFW/glfw3.h>

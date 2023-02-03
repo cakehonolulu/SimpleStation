@@ -1,7 +1,5 @@
-#include <gpu/renderer.h>
-
-SDL_Window   *m_window;
-SDL_GLContext *m_gl_context;
+#include <renderer/opengl.h>
+#include <simplestation.h>
 
 // OpenGL's VAO (Vertex Array Object)
 GLuint m_vao;
@@ -67,6 +65,88 @@ float output_window_vertices[] =
 	 1.0f, -1.0f,  1.0f, 0.0f,
 	-1.0f,  1.0f,  0.0f, 1.0f
 };
+
+
+SDL_Window   *m_window;
+SDL_GLContext *m_gl_context;
+
+
+Position pos_from_gp0(uint32_t value)
+{
+	Position pos;
+	pos.x = (GLshort) (value & 0xFFFF);
+	pos.y = (GLshort) (value >> 16);
+	return pos;
+}
+
+Colour col_from_gp0(uint32_t value)
+{
+	Colour col;
+	col.r = (GLubyte) (value & 0xFF);
+	col.g = (GLubyte) ((value >> 8) & 0xFF);
+	col.b = (GLubyte) ((value >> 16) & 0xFF);
+	return col;
+}
+
+TexPage texpage_from_gp0(uint32_t value)
+{
+	TexPage texp;
+	texp.xBase = ((value >> 16) & 0xF) * 64;
+	texp.yBase = (((value >> 16) >> 4) & 1) * 256;
+	return texp;
+}
+
+TexCoord texcoord_from_gp0(uint32_t value)
+{
+	TexCoord texc;
+	texc.x = value & 0xFF;
+	texc.y = (value >> 8) & 0xFF;
+	return texc;
+}
+
+ClutAttr clutattr_from_gp0(uint32_t value)
+{
+	ClutAttr clut;
+	clut.x = ((value >> 16) & 0x3F) * 16;
+	clut.y = ((value >> 16) >> 6) & 0x1FF;
+	return clut;
+}
+
+TextureColourDepth tcd_from_gp0(uint32_t value)
+{
+	TextureColourDepth tcd;
+	tcd.depth = ((value >> 16) >> 7) & 0x3;
+	return tcd;
+}
+
+TextureColourDepth tcd_from_val(textureColourDepthValue value)
+{
+	TextureColourDepth tcd;
+	tcd.depth = (GLubyte) value;
+	return tcd;
+}
+
+RectWidthHeight rwh_from_gp0(uint32_t value)
+{
+	RectWidthHeight rwh;
+	rwh.width = (GLshort)(value & 0xFFFF);
+	rwh.height = (GLshort)(value >> 16);
+	return rwh;
+}
+
+Colour color(GLubyte r, GLubyte g, GLubyte b) {
+	Colour colorr;
+
+	colorr.r = r;
+	colorr.g = g;
+	colorr.b = b;
+	return colorr;
+}
+void m_window_changetitle(char *buffer)
+{
+	SDL_SetWindowTitle(m_window, buffer);
+}
+
 unsigned int output_window_vao, output_window_vbo;
 
 uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
@@ -544,82 +624,6 @@ void display(m_simplestation_state *m_simplestation) {
   SDL_GL_SwapWindow(m_window);
 }
 
-void m_window_changetitle(char *buffer)
-{
-	SDL_SetWindowTitle(m_window, buffer);
-}
-
-Position pos_from_gp0(uint32_t value)
-{
-	Position pos;
-	pos.x = (GLshort) (value & 0xFFFF);
-	pos.y = (GLshort) (value >> 16);
-	return pos;
-}
-
-Colour col_from_gp0(uint32_t value)
-{
-	Colour col;
-	col.r = (GLubyte) (value & 0xFF);
-	col.g = (GLubyte) ((value >> 8) & 0xFF);
-	col.b = (GLubyte) ((value >> 16) & 0xFF);
-	return col;
-}
-
-TexPage texpage_from_gp0(uint32_t value)
-{
-	TexPage texp;
-	texp.xBase = ((value >> 16) & 0xF) * 64;
-	texp.yBase = (((value >> 16) >> 4) & 1) * 256;
-	return texp;
-}
-
-TexCoord texcoord_from_gp0(uint32_t value)
-{
-	TexCoord texc;
-	texc.x = value & 0xFF;
-	texc.y = (value >> 8) & 0xFF;
-	return texc;
-}
-
-ClutAttr clutattr_from_gp0(uint32_t value)
-{
-	ClutAttr clut;
-	clut.x = ((value >> 16) & 0x3F) * 16;
-	clut.y = ((value >> 16) >> 6) & 0x1FF;
-	return clut;
-}
-
-TextureColourDepth tcd_from_gp0(uint32_t value)
-{
-	TextureColourDepth tcd;
-	tcd.depth = ((value >> 16) >> 7) & 0x3;
-	return tcd;
-}
-
-TextureColourDepth tcd_from_val(textureColourDepthValue value)
-{
-	TextureColourDepth tcd;
-	tcd.depth = (GLubyte) value;
-	return tcd;
-}
-
-RectWidthHeight rwh_from_gp0(uint32_t value)
-{
-	RectWidthHeight rwh;
-	rwh.width = (GLshort)(value & 0xFFFF);
-	rwh.height = (GLshort)(value >> 16);
-	return rwh;
-}
-
-Colour color(GLubyte r, GLubyte g, GLubyte b) {
-	Colour colorr;
-
-	colorr.r = r;
-	colorr.g = g;
-	colorr.b = b;
-	return colorr;
-}
 
 int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
@@ -690,3 +694,4 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 
 	put_quad(v1, v2, v3, v4, m_simplestation);
 }
+
