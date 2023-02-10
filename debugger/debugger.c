@@ -248,11 +248,13 @@ m_simplestation_state *m_simplestation_debug;
 
 void gdb_connected(context_t * ctx)
 {
+    (void) ctx;
     printf("Connected\n");
 }
 
 void gdb_disconnected(context_t * ctx)
 {
+    (void) ctx;
     printf("Disconnected\n");
 }
 
@@ -276,28 +278,31 @@ void gdb_step(context_t * ctx)
 
 void gdb_set_breakpoint(context_t * ctx, uint32_t address)
 {
+    (void) ctx;
     printf("Set breakpoint %08X\n", address);
 }
 
 void gdb_clear_breakpoint(context_t * ctx, uint32_t address)
 {
+    (void) ctx;
     printf("Clear breakpoint %08X\n", address);
 }
 
 ssize_t gdb_get_memory(context_t * ctx, char * buffer, size_t buffer_length, uint32_t address, size_t length)
 {
+    (void) ctx;
 	// 32
 	if (length >= 4)
 	{
-        return snprintf(buffer, buffer_length, "%08lx", __bswap_32(m_memory_read(address, dword, m_simplestation_debug)));
+        return snprintf(buffer, buffer_length, "%08x", __bswap_32(m_memory_read(address, dword, m_simplestation_debug)));
     }
 	else if(length == 2) // 16
 	{
-        return snprintf(buffer, buffer_length, "%04lx", __bswap_32(m_memory_read(address, word, m_simplestation_debug)));
+        return snprintf(buffer, buffer_length, "%04x", __bswap_32(m_memory_read(address, word, m_simplestation_debug)));
     }
 	else if(length == 1) // 8
 	{
-        return snprintf(buffer, buffer_length, "%02lx", __bswap_32(m_memory_read(address, byte, m_simplestation_debug)));
+        return snprintf(buffer, buffer_length, "%02x", __bswap_32(m_memory_read(address, byte, m_simplestation_debug)));
     }
 
     return snprintf(buffer, buffer_length, "00000000");
@@ -305,6 +310,7 @@ ssize_t gdb_get_memory(context_t * ctx, char * buffer, size_t buffer_length, uin
 
 ssize_t gdb_get_register_value(context_t * ctx, char * buffer, size_t buffer_length, int reg)
 {
+    (void) ctx;
 	// COP0 Status Register
 	if (reg == 33)
 	{
@@ -336,6 +342,7 @@ ssize_t gdb_get_register_value(context_t * ctx, char * buffer, size_t buffer_len
 
 ssize_t gdb_get_general_registers(context_t * ctx, char * buffer, size_t buffer_length)
 {
+    (void) ctx;
     return snprintf(buffer, buffer_length, "00000000");
 }
 
@@ -345,7 +352,7 @@ bool at_breakpoint()
     return false;
 }
 
-void m_init_gdbstub(m_simplestation_state *m_simplestation)
+int m_init_gdbstub(m_simplestation_state *m_simplestation)
 {
 	m_simplestation_debug = m_simplestation;
 	m_simplestation->m_gdbstub_context.cycles = 0;
@@ -374,5 +381,7 @@ void m_init_gdbstub(m_simplestation_state *m_simplestation)
         printf("failed to create gdbstub\n");
         return 1;
     }
+
+    return 0;
 }
 #endif

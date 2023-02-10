@@ -143,7 +143,7 @@ void _gdbstub_recv(gdbstub_t * gdb);
 
 void _gdbstub_send(gdbstub_t * gdb, const char * data, size_t data_length);
 
-void _gdbstub_send_paged(gdbstub_t * gdb, int offset, int length, const char * data, size_t data_length);
+void _gdbstub_send_paged(gdbstub_t * gdb, int offset, size_t length, const char * data, size_t data_length);
 
 void _gdbstub_process_packet(gdbstub_t * gdb);
 
@@ -287,7 +287,7 @@ void _gdbstub_send(gdbstub_t * gdb, const char * data, size_t data_length)
     }
 }
 
-void _gdbstub_send_paged(gdbstub_t * gdb, int offset, int length, const char * data, size_t data_length)
+void _gdbstub_send_paged(gdbstub_t * gdb, int offset, size_t length, const char * data, size_t data_length)
 {
     if (length > GDBSTUB_PACKET_LENGTH - 6) {
         length = GDBSTUB_PACKET_LENGTH - 6;
