@@ -2,6 +2,7 @@
 #define MEMORY_H
 
 #include <simplestation.h>
+#include <gpu/gp1.h>
 #include <memory/dma/dma.h>
 #include <stdint.h>
 

@@ -4,6 +4,7 @@
 #include <simplestation.h>
 #include <memory/memory.h>
 #include <memory/dma/channel.h>
+#include <gpu/gp0.h>
 #include <ui/termcolour.h>
 #include <stdlib.h>
 #include <stdio.h>

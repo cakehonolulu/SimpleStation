@@ -1,4 +1,7 @@
 #include <simplestation.h>
+#include <gpu/gpu.h>
+#include <gpu/command_buffer.h>
+#include <stdio.h>
 #include <stdint.h>
 
 void m_gpu_gp1(uint32_t m_value, m_simplestation_state *m_simplestation);

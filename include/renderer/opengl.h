@@ -1,5 +1,11 @@
+#pragma once
+
 #include <GL/glew.h>
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <simplestation.h>

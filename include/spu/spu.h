@@ -1,4 +1,5 @@
 #include <simplestation.h>
+#include <stdio.h>
 #include <stdint.h>
 
 /* Function Definitions */

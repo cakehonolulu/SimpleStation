@@ -1,3 +1,5 @@
+#ifdef VULKAN_SUPPORT
+
 #include <renderer/vulkan.h>
 #include <simplestation.h>
 
@@ -17,3 +19,5 @@ void init_vulkan(m_simplestation_state *m_simplestation)
         exit(1);
     }
 }
+
+#endif

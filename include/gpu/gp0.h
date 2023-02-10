@@ -1,5 +1,6 @@
 #include <simplestation.h>
 #include <renderer/renderer.h>
+#include <gpu/command_buffer.h>
 #include <stdint.h>
 
 void m_gpu_gp0_handler(m_simplestation_state *m_simplestation);
