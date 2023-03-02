@@ -55,10 +55,7 @@ void vk_command_pool_init(vulcano_struct *vulcano_state)
 		VkDeviceSize offsets[] = {0};
 		vkCmdBindVertexBuffers(vulcano_state->vk_command_buf[i], 0, 1, vertexBuffers, offsets);
 
-		vkCmdBindIndexBuffer(vulcano_state->vk_command_buf[i], vulcano_state->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-		vkCmdDrawIndexed(vulcano_state->vk_command_buf[i], vulcano_state->vertex_ct, 1, 0, 0, 0);
-
-		//vkCmdDraw(vulcano_state->vk_command_buf[i], vulcano_state->vertex_ct, 1, 0, 0);
+		vkCmdDraw(vulcano_state->vk_command_buf[i], vulcano_state->vertex_ct, 1, 0, 0);
 		vkCmdEndRenderPass(vulcano_state->vk_command_buf[i]);
 		vkEndCommandBuffer(vulcano_state->vk_command_buf[i]);
 	}

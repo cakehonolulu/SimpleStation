@@ -7,10 +7,6 @@ Vertex vertices[] = {
     {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 };
 
-uint16_t indices[] = {
-    0, 1, 2, 2, 3, 0
-};
-
 
 void vk_buffer_create(vulcano_struct *vulcano_state)
 {
@@ -21,16 +17,6 @@ void vk_buffer_create(vulcano_struct *vulcano_state)
     vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, sizeof(vertices[0]) * sizeof(vertices), 0, &data);
         memcpy(data, vertices, (size_t) sizeof(vertices));
     vkUnmapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory);
-
-    VkDeviceSize idxbufferSize = sizeof(indices[0]) * sizeof(indices);
-    createBuffer(idxbufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vulcano_state->indexBuffer, &vulcano_state->indexBufferMemory, vulcano_state);
-
-    vulcano_state->vertex_ct = sizeof(indices);
-
-    void* data2;
-    vkMapMemory(vulcano_state->device, vulcano_state->indexBufferMemory, 0, idxbufferSize, 0, &data2);
-    memcpy(data2, indices, (size_t) sizeof(indices));
-    vkUnmapMemory(vulcano_state->device, vulcano_state->indexBufferMemory);
 }
 
 uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, vulcano_struct *vulcano_state)
