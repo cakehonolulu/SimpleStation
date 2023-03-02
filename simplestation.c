@@ -14,7 +14,6 @@
 #include <GLFW/glfw3.h>
 
 #ifdef DUMP_VRAM
-#include <GL/glew.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"

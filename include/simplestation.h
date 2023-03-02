@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <vulcano.h>
+
 #if !(__STDC_VERSION__ > 201710L)
 #include <stdbool.h>
 #endif
@@ -356,6 +358,8 @@ typedef struct
 	bool m_debugger;
 
 	bool m_cond;
+
+	vulcano_struct *vulcano_state;
 
 } m_simplestation_state;
 

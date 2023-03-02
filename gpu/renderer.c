@@ -1,364 +1,145 @@
 #include <gpu/renderer.h>
+#include <vk_instance.h>
+#include <vk_image.h>
+#include <vk_command.h>
+#include <vk_framebuffer.h>
+#include <vk_physical.h>
+#include <vk_graphics_queue.h>
+#include <vk_buffer.h>
+#include <vk_queue.h>
+#include <vk_surface.h>
+#include <vk_swapchain.h>
+#include <vk_shader.h>
+#include <vk_pipeline.h>
+#include <vk_sync.h>
+#include <vk_device.h>
 
 SDL_Window   *m_window;
-SDL_GLContext *m_gl_context;
-
-// OpenGL's VAO (Vertex Array Object)
-GLuint m_vao;
-
-// OpenGL's VBO (Vertex Buffer Object)
-GLuint m_vbo;
-
-// Custom Vertex Array containing draw attributes
-Vertex *m_vertex_buffer = NULL;
-
-/* OpenGL Framebuffers */
-
-// Original, OpenGL-provided framebuffer (Visible)
-GLint m_original_fbo;
-
-// Custom off-screen framebuffer
-GLuint m_fbo;
-
-/* OpenGL Textures */
-
-// Texture containing the off-screen framebuffer
-GLuint m_psx_vram_texel;
-
-// Texture for the default (Visible) framebuffer
-GLuint m_window_texture;
-
-GLuint m_psx_gpu_vram;
-/* OpenGL Shader Programs */
-
-// GLSL Off-Screen Program
-GLuint program = 0;
-
-// GLSL Visible Program
-GLuint fb_program = 0;
-
-// GLSL Off-Screen Vertex Shader
-GLuint vertex_shader = 0;
-
-// GLSL Off-Screen Fragment Shader
-GLuint fragment_shader = 0;
-
-// GLSL (Visible) Vertex Shader
-GLuint fb_vertex_shader = 0;
-
-// GLSL (Visible) Fragment Shader
-GLuint fb_fragment_shader = 0;
-
-/* OpenGL Uniforms */
-
-GLint uniform_offset;
-
-/* Auxiliary variables */
-uint32_t count_vertices = 0;
-
-float output_window_vertices[] =
-{
-	// Coords    // texCoords
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	-1.0f, -1.0f,  0.0f, 0.0f,
-	-1.0f,  1.0f,  0.0f, 1.0f,
-
-	 1.0f,  1.0f,  1.0f, 1.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	-1.0f,  1.0f,  0.0f, 1.0f
-};
-unsigned int output_window_vao, output_window_vbo;
 
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 {
+	m_simplestation->vulcano_state = malloc(sizeof(vulcano_struct));
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		SDL_Log("Unable to initialize SDL2: %s", SDL_GetError());
         return EXIT_FAILURE;
 	}
+	
+	m_simplestation->vulcano_state->vulcano_window = SDL_CreateWindow(
+            "Vulcano (SDL2) - Vulkan",
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            640,
+            480,
+            SDL_WINDOW_VULKAN
+            );
+		
+	bool vulkan_error = false;
 
+    m_simplestation->vulcano_state->instance = vk_create_instance(m_simplestation->vulcano_state, &vulkan_error);
+    
+    if (!vulkan_error)
+    {
+        int phys_dev_idx = vk_pick_physical_device(m_simplestation->vulcano_state, &vulkan_error);
 
-	m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  640, 480, SDL_WINDOW_OPENGL);
-						  // 1024, 512
+        m_simplestation->vulcano_state->phys_dev = &m_simplestation->vulcano_state->physical_devices[phys_dev_idx];
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        if (!vulkan_error && phys_dev_idx != -1)
+        {
+            uint32_t queue_family_number = vk_queue_get_prop_count_from_device(m_simplestation->vulcano_state->phys_dev);
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+            vk_queue_get_props_from_device(m_simplestation->vulcano_state, queue_family_number);
 
-	m_gl_context = SDL_GL_CreateContext(m_window);
+            m_simplestation->vulcano_state->device = vk_create_device(m_simplestation->vulcano_state, queue_family_number);
 
-	SDL_GL_MakeCurrent(m_window, m_gl_context);
+            vk_list_device_ext(m_simplestation->vulcano_state);
 
-	GLenum err = glewInit();
+            m_simplestation->vulcano_state->vk_queue_family_idx = vk_graphics_queue_get_family_idx(m_simplestation->vulcano_state, queue_family_number);
 
-	if (GLEW_OK != err)
-	{
-		printf("[GLEW] glewInit(): %s\n", glewGetErrorString(err));
-		m_simplestation_exit(m_simplestation, 1);
-	}
-	printf("[GLEW] glewInit(): Using GLEW %s\n", glewGetString(GLEW_VERSION));
+            m_simplestation->vulcano_state->vk_queue_mode = vk_graphics_queue_get_mode(m_simplestation->vulcano_state, m_simplestation->vulcano_state->vk_queue_family_idx);
 
-	glEnable(GL_DEBUG_OUTPUT);
+            m_simplestation->vulcano_state->vk_image_array_layers = 1;
 
-	// Store the original (Visible) framebuffer into an easily-accessible variable
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_original_fbo);
+            m_simplestation->vulcano_state->draw_queue = vk_graphics_queue_get_draw(m_simplestation->vulcano_state, m_simplestation->vulcano_state->vk_queue_family_idx);
 
-	m_renderer_setup_onscreen();
+	        m_simplestation->vulcano_state->present_queue = vk_graphics_queue_get_presenting(m_simplestation->vulcano_state, m_simplestation->vulcano_state->vk_queue_family_idx, m_simplestation->vulcano_state->vk_queue_mode);
 
-	m_renderer_setup_offscreen();
+            SDL_Vulkan_CreateSurface(m_simplestation->vulcano_state->vulcano_window,
+                (SDL_vulkanInstance) m_simplestation->vulcano_state->instance, (SDL_vulkanSurface *) &m_simplestation->vulcano_state->surface);
 
-#ifdef DUMP_VRAM
-	m_simplestation->m_vram_data = (uint8_t *) malloc(sizeof(uint8_t[1024 * 1024 * 4]));
-#endif
+            VkBool32 vk_surface_support = 0;
+	        
+            vkGetPhysicalDeviceSurfaceSupportKHR(*m_simplestation->vulcano_state->phys_dev, m_simplestation->vulcano_state->vk_queue_family_idx, m_simplestation->vulcano_state->surface, &vk_surface_support);
+
+            if (vk_surface_support)
+            {
+                vk_surface_prepare(m_simplestation->vulcano_state);
+
+                vk_swapchain_create(m_simplestation->vulcano_state);
+
+                vk_image_prepare(m_simplestation->vulcano_state);
+
+                vk_framebuffer_prepare(m_simplestation->vulcano_state);
+
+                vk_framebuffer_create(m_simplestation->vulcano_state);
+
+                uint32_t vertexShaderSize = 0;
+	            char vertexShaderFileName[] = "vert_shader.spv";
+	            m_simplestation->vulcano_state->vertexShaderCode = getShaderCode(vertexShaderFileName, &vertexShaderSize);
+
+                if (m_simplestation->vulcano_state->vertexShaderCode != NULL)
+                {
+                    m_simplestation->vulcano_state->vertexShaderModule = createShaderModule(m_simplestation->vulcano_state, m_simplestation->vulcano_state->vertexShaderCode, vertexShaderSize);
+                    
+                    printf(MAGENTA BOLD "[vulkan] init: Vertex Shader Compiled Successfully!" NORMAL "\n");
+
+                    uint32_t fragmentShaderSize = 0;
+                    char fragmentShaderFileName[] = "frag_shader.spv";
+                    m_simplestation->vulcano_state->fragmentShaderCode = getShaderCode(fragmentShaderFileName, &fragmentShaderSize);
+
+                    if (m_simplestation->vulcano_state->fragmentShaderCode != NULL)
+                    {
+                        m_simplestation->vulcano_state->fragmentShaderModule = createShaderModule(m_simplestation->vulcano_state, m_simplestation->vulcano_state->fragmentShaderCode, fragmentShaderSize);
+                        
+                        printf(MAGENTA BOLD "[vulkan] init: Fragment Shader Compiled Successfully!" NORMAL "\n");
+
+                        vk_create_pipeline(m_simplestation->vulcano_state);
+
+                        vk_buffer_create(m_simplestation->vulcano_state);
+
+                        vk_command_pool_init(m_simplestation->vulcano_state);
+
+                        vk_sync_setup(m_simplestation->vulcano_state);
+
+                        //retval = 0;
+                    }
+                    else
+                    {
+                        printf(RED "[vulkan] init: Couldn't compile the fragment shaders!" NORMAL "\n");
+                    }
+                }
+                else
+                {
+                    printf(RED "[vulkan] init: Couldn't compile the vertex shaders!" NORMAL "\n");
+                }
+            }
+            else
+            {
+                printf(RED "[vulkan] init: Platform doesn't have VkSurfaceKHR support, exiting..." NORMAL "\n");
+            }
+        }
+        else
+        {
+            printf(RED "[vulkan] init: Failed to pick a compute device, exiting..." NORMAL "\n");
+        }
+    }
+    else
+    {
+        printf(RED "[vulkan] init: Failed to create Vulkan Instance, exiting..." NORMAL "\n");
+    }
 
 	return 0;
-}
-
-void m_renderer_setup_onscreen()
-{
-	/* OpenGL On-Screen Framebuffer Configuration */
-
-	GLint m_opengl_status = 0;
-
-	/* Setup the on-screen VAO and VBO */
-
-	// First generate the Vertex Array...
-	glGenVertexArrays(1, &output_window_vao);
-
-	// ... then generate the Vertex Buffer.
-	glGenBuffers(1, &output_window_vbo);
-
-	// Bind to the new Vertex Array
-	glBindVertexArray(output_window_vao);
-
-	// Also bind to the Vertex Buffer...
-	glBindBuffer(GL_ARRAY_BUFFER, output_window_vbo);
-
-	// ...and tell the GPU which data to grab-off the memory
-	glBufferData(GL_ARRAY_BUFFER, sizeof(output_window_vertices), &output_window_vertices, GL_STATIC_DRAW);
-
-	// Specify the values for the VAO (2 triangles)
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-	// Compile the default framebuffer's shaders
-	fb_vertex_shader = renderer_LoadShader("fb_vertex.glsl", GL_VERTEX_SHADER);
-	fb_fragment_shader = renderer_LoadShader("fb_fragment.glsl", GL_FRAGMENT_SHADER);
-
-	// Create the default framebuffer program
-	fb_program = glCreateProgram();
-
-	// Attatch the compiled shaders
-	glAttachShader(fb_program, fb_vertex_shader);
-	glAttachShader(fb_program, fb_fragment_shader);
-
-	// Link the program...
-	glLinkProgram(fb_program);
-
-	glGetProgramiv(fb_program, GL_LINK_STATUS, &m_opengl_status);
-
-	if(m_opengl_status != GL_TRUE)
-	{
-    	printf("OpenGL program linking failed!\n");
-    	glDeleteProgram(fb_program);
-    	exit(1);
-	}
-
-	// ...and run it!
-	glUseProgram(fb_program);
-
-	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
-}
-
-void m_renderer_setup_offscreen()
-{
-	/* OpenGL Off-Screen Framebuffer Configuration */
-
-	GLint m_opengl_status = 0;
-
-	// Generate a new Framebuffer Object...
-	glGenFramebuffers(1, &m_fbo);
-
-	// ...and bind to it
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-	glGenTextures(1, &m_psx_vram_texel);
-	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// The newly-created texture will point at the pixel data provided by the last-bound texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-
-	// Unbind from the newly-created texture
-	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	// Check if the custom framebuffer was correctly created
-	m_opengl_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (m_opengl_status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		printf("[OPENGL] Framebuffer could not be created (%d)! Exiting...\n", m_opengl_status);
-		exit(1);
-	}
-	
-	vertex_shader = renderer_LoadShader("vertex.glsl", GL_VERTEX_SHADER);
-	fragment_shader = renderer_LoadShader("fragment.glsl", GL_FRAGMENT_SHADER);
-
-	// Create program
-	program = glCreateProgram();
-
-	// Attatch the compiled shaders
-	glAttachShader(program, vertex_shader);
-	glAttachShader(program, fragment_shader);
-
-	uniform_offset = glGetUniformLocation(program,
-                                     "offset");
-
-	glUniform2i(uniform_offset, 0, 0);
-
-	// Link the program...
-	glLinkProgram(program);
-
-	glGetProgramiv(program, GL_LINK_STATUS, &m_opengl_status);
-
-	if(m_opengl_status != GL_TRUE)
-	{
-    	printf("OpenGL program linking failed!\n");
-    	glDeleteProgram(program);
-    	exit(1);
-	}
-
-	glGenTextures(1, &m_psx_gpu_vram);
-	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// Initialize the buffers
-	m_renderer_buffers_init();
-
-	// Generate a new texture that will contain the off-screen's pixel data...
-	glGenTextures(1, &m_window_texture);
-
-	// ...bind to it...
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-	
-	// ...allocate space for it...
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-	// ...and set the appropiate parameters (To fill the screen and the texture filters)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	// ...and run it!
-	glUseProgram(program);
-}
-
-void m_renderer_buffers_init()
-{
-	m_vertex_buffer = (Vertex *) malloc(sizeof(Vertex) * VERTEX_BUFFER_LEN);
-
-	// Generate the Vertex Arary Object
-	glGenVertexArrays(1, &m_vao);
-	
-	// Bind to it
-	glBindVertexArray(m_vao);
-
-	// Generate the Vertex Buffer Object
-	glGenBuffers(1, &m_vbo);
-
-	// Bind to it
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
-
-	/* Setup OpenGL Vertex Attributes */
-	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, colour));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, texPage));
-	glEnableVertexAttribArray(2);
-
-	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texCoord));
-	glEnableVertexAttribArray(3);
-
-	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, clut));
-	glEnableVertexAttribArray(4);
-
-	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texDepth));
-	glEnableVertexAttribArray(5);
-
-	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, blendMode));
-	glEnableVertexAttribArray(6);
-
-	glVertexAttribIPointer(7, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, drawTexture));
-	glEnableVertexAttribArray(7);
-}
-
-uint64_t readFile(char *filePath, char **contents) {
-    uint64_t length = 0;
-    FILE *file = fopen(filePath, "r");
-    if (file) {
-        // Check length
-        fseek(file, 0, SEEK_END);
-        length = ftell(file);
-        // Back to beginning of file
-        fseek(file, 0, SEEK_SET);
-        *contents = malloc(sizeof(char) * length + 1);
-        if (*contents != NULL) {
-            if (fread(*contents, 1, length, file) == length)
-			{
-				(*contents)[length] = '\0';
-			}
-        }
-        fclose(file);
-    }
-    return length;
-}
-GLuint renderer_LoadShader(char *path, GLenum type) {
-	char *data = NULL;
-	readFile(path, &data);
-	
-	GLuint shader = glCreateShader(type);
-	glShaderSource(shader, 1, (const char**)&data, NULL);
-	glCompileShader(shader);
-	GLint status = GL_FALSE;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	
-	if (status == GL_FALSE) {
-		printf("Failed to compile shader %s\n", path);
-		GLint maxLength = 0;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-		// The maxLength includes the NULL character
-		GLchar infoLog[maxLength];
-		glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
-
-		printf("Error: %s\n", infoLog);
-
-		exit(1);
-	}
-
-	free(data);
-	return shader;
 }
 
 
@@ -368,7 +149,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	/* Off-screen Framebuffer */
 
 	// Bind to FBO
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	/*glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 	// Use off-screen shaders
 	glUseProgram(program);
@@ -410,7 +191,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	/* On-screen Framebuffer */
 
 	// Bind to FBO
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Use on-screen shaders
 	glUseProgram(fb_program);
@@ -424,26 +205,26 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 
 	// Draw data-off the custom Framebuffer's Texture (GL_COLOR_ATTACHMENT0)
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 6);*/
 }
 
 void m_sync_vram(m_simplestation_state *m_simplestation)
 {
 	(void) m_simplestation;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    /*glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glViewport(0, 0, 640, 480);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
 	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glViewport(0, 0, 1024, 512);
+	glViewport(0, 0, 1024, 512);*/
 }
 
 
 void display(m_simplestation_state *m_simplestation) {
   draw(m_simplestation, false);
-  SDL_GL_SwapWindow(m_window);
+  //SDL_GL_SwapWindow(m_window);
 }
 
 void m_window_changetitle(char *buffer)
@@ -451,21 +232,14 @@ void m_window_changetitle(char *buffer)
 	SDL_SetWindowTitle(m_window, buffer);
 }
 
-Position pos_from_gp0(uint32_t value)
+void pos_from_gp0(uint32_t val, vec2 *vec)
 {
-	Position pos;
-	pos.x = (GLshort) (value & 0xFFFF);
-	pos.y = (GLshort) (value >> 16);
-	return pos;
+	vec = (vec2) {(int16_t) (val & 0xFFFF), (int16_t) (val >> 16)};
 }
 
-Colour col_from_gp0(uint32_t value)
+void col_from_gp0(uint32_t value, vec3 *vec)
 {
-	Colour col;
-	col.r = (GLubyte) (value & 0xFF);
-	col.g = (GLubyte) ((value >> 8) & 0xFF);
-	col.b = (GLubyte) ((value >> 16) & 0xFF);
-	return col;
+	vec = (vec3) {(uint8_t) (value & 0xFF), (uint8_t) ((value >> 8) & 0xFF), (uint8_t) ((value >> 16) & 0xFF)};
 }
 
 TexPage texpage_from_gp0(uint32_t value)
@@ -502,11 +276,11 @@ TextureColourDepth tcd_from_gp0(uint32_t value)
 TextureColourDepth tcd_from_val(textureColourDepthValue value)
 {
 	TextureColourDepth tcd;
-	tcd.depth = (GLubyte) value;
+	tcd.depth = (uint8_t) value;
 	return tcd;
 }
 
-Colour color(GLubyte r, GLubyte g, GLubyte b) {
+Colour color(uint8_t r, uint8_t g, uint8_t b) {
 	Colour colorr;
 
 	colorr.r = r;
@@ -516,7 +290,7 @@ Colour color(GLubyte r, GLubyte g, GLubyte b) {
 }
 
 int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
-	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
+	/*if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		printf("Vertex attribute buffers full, forcing_draw\n");
 		//draw();
@@ -529,7 +303,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 	count_vertices++;
 	
 	m_vertex_buffer[count_vertices] = v3;
-	count_vertices++;
+	count_vertices++;*/
 
 	return 0;	
 }

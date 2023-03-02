@@ -186,7 +186,6 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
     }
 }
 
-extern GLuint m_psx_vram_texel;
 uint32_t m_current_idx = 0;
 
 void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -294,10 +293,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
-                glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &m_simplestation->m_gpu_image_buffer->buffer[0]);
-                glBindTexture(GL_TEXTURE_2D, 0);
-                m_sync_vram(m_simplestation);
+                //glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+				//glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &m_simplestation->m_gpu_image_buffer->buffer[0]);
+                //glBindTexture(GL_TEXTURE_2D, 0);
+                //m_sync_vram(m_simplestation);
                 for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu_image_buffer->buffer[i] = 0;
                 m_current_idx = 0;
                 m_simplestation->m_gpu->m_gp0_mode = command;
@@ -385,14 +384,14 @@ void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
 void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
     (void) m_value;
 
-    uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
+    /*uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
 	uint16_t r = (colour24 & 0xFF) >> 3;
 	uint16_t g = ((colour24 >> 8) & 0xFF) >> 3;
 	uint16_t b = ((colour24 >> 16) & 0xFF) >> 3;
 
     glClearColor(r, g, b, 1.f);
 
-    draw(m_simplestation, true);
+    draw(m_simplestation, true);*/
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -400,7 +399,7 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    /*Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
     Vertex v1, v2, v3, v4;
 
@@ -425,14 +424,14 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     v4.colour = col;
     v4.drawTexture = 0;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4);*/
 }
 
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
 
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    /*Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
     ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
 	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
@@ -484,7 +483,7 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
     v4.blendMode = blend;
     v4.drawTexture = 1;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4);*/
 }
 
 void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -498,17 +497,19 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     memset(&v2, 0, sizeof(Vertex));
     memset(&v3, 0, sizeof(Vertex));
     
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-    v1.drawTexture = 0;
+    
 
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v2.drawTexture = 0;
+    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1], &v1);
+    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0], &v1);
+    //v1.drawTexture = 0;
 
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v3.drawTexture = 0;
+    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3], &v2);
+    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2], &v2);
+    //v2.drawTexture = 0;
+
+    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5], &v3);
+    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4], &v3);
+    //v3.drawTexture = 0;
 
     put_triangle(v1, v2, v3);
     
@@ -520,7 +521,7 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     (void) m_value;
     (void) m_simplestation;
 
-    Vertex v1, v2, v3, v4;
+    /*Vertex v1, v2, v3, v4;
 
     memset(&v1, 0, sizeof(Vertex));
     memset(&v2, 0, sizeof(Vertex));
@@ -543,7 +544,7 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
     v4.drawTexture = 0;
 
-    put_quad(v1, v2, v3, v4);
+    put_quad(v1, v2, v3, v4);*/
     //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
 }
 
@@ -639,17 +640,15 @@ void m_gpu_set_draw_area_bottom_right(uint32_t m_value, m_simplestation_state *m
     m_simplestation->m_gpu->m_drawing_area_left = ((uint16_t) (m_value & 0x3FF));
 }
 
-extern GLint uniform_offset;
-
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    draw(m_simplestation, false);
+    /*draw(m_simplestation, false);
     
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));
 
 
-    glUniform2i(uniform_offset, (GLint) (((int16_t) (m_x << 5)) >> 5), (GLint) (((int16_t) (m_y << 5)) >> 5));
+    glUniform2i(uniform_offset, (GLint) (((int16_t) (m_x << 5)) >> 5), (GLint) (((int16_t) (m_y << 5)) >> 5));*/
 }
 
 void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)

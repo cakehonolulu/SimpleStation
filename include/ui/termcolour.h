@@ -12,5 +12,6 @@
 
 #define DIM			"\x1B[7m"
 #define UNDERSCORE	"\x1B[4m"
+#define BOLD		"\x1B[1m"
 
 #endif /* TERMCOLOUR_H */

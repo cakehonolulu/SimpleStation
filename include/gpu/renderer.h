@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <simplestation.h>
 
-
-#include <GL/glew.h>
-
 #include <SDL2/SDL.h>
 
 #define VERTEX_BUFFER_LEN 64 * 1024
@@ -28,38 +25,38 @@ typedef enum
 #pragma pack(push, 1)
 typedef struct
 {
-	GLshort x;
-	GLshort y;
+	int16_t x;
+	int16_t y;
 } Position;
 
 typedef struct
 {
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
 } Colour;
 
 typedef struct
 {
-	GLushort xBase;
-	GLushort yBase;
+	uint16_t xBase;
+	uint16_t yBase;
 } TexPage;
 
 typedef struct
 {
-	GLubyte x;
-	GLubyte y;
+	uint8_t x;
+	uint8_t y;
 } TexCoord;
 
 typedef struct
 {
-	GLushort x;
-	GLushort y;
+	uint16_t x;
+	uint16_t y;
 } ClutAttr;
 
 typedef struct
 {
-	GLubyte depth;
+	uint8_t depth;
 } TextureColourDepth;
 
 typedef struct
@@ -70,18 +67,16 @@ typedef struct
 	TexCoord texCoord;
 	ClutAttr clut;
 	TextureColourDepth texDepth;
-	GLubyte blendMode;
-	GLubyte drawTexture;
-} Vertex;
+	uint8_t blendMode;
+	uint8_t drawTexture;
+} Vertex2;
 #pragma pack(pop)
 
-Position pos_from_gp0(uint32_t val);
-Colour color_from_gp0(uint32_t val);
-Colour color(GLubyte r, GLubyte g, GLubyte b);
+void pos_from_gp0(uint32_t val, vec2 *vec);
+void col_from_gp0(uint32_t value, vec3 *vec);
+Colour color(uint8_t r, uint8_t g, uint8_t b);
 void display(m_simplestation_state *m_simplestation);
 void m_window_changetitle(char *buffer);
-Position pos_from_gp0(uint32_t value);
-Colour col_from_gp0(uint32_t value);
 TexPage texpage_from_gp0(uint32_t value);
 TexCoord texcoord_from_gp0(uint32_t value);
 ClutAttr clutattr_from_gp0(uint32_t value);
@@ -99,6 +94,5 @@ void m_renderer_setup_offscreen();
 void m_sync_vram(m_simplestation_state *m_simplestation);
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
-GLuint renderer_LoadShader(char *path, GLenum type);
 int put_triangle(Vertex v1, Vertex v2, Vertex v3);
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4);
