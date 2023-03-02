@@ -10,43 +10,46 @@
 <table>
 <thead>
   <tr>
-    <td><h3>Bootup</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" alt="Image"></td>
-    <td><h3>Amidog CPU Tests</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" alt="Image"></td>
-    <td><h3>Quads Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" alt="Image"></td>
-    <td><h3>Goraud Triangle Demo</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" alt="Image"></td>
-    <td><h3>Current Menu</h3><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" alt="Image"></td>
+    <td><h4>PSX Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Experimental Vulkan Rendered Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/vulkan.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Amidog CPU Tests</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Quads Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Goraud Triangle Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" width="250vw" height="185vh" alt="Image"></td>
   </tr>
 </thead>
 </table>
 
 ## ✨ Features
-* Targetting [C23](https://en.cppreference.com/w/c/23) features (Fallbacks present if not available)
+* Targets [C23](https://en.cppreference.com/w/c/23) features (Fallbacks present if not available)
 * LLE Interpreter
-* Multiplatform (Tested on Linux, Windows and macOS)
-* Multiarchitecture (As long as it's little-endian, tested on Raspberry Pi 4B)
+* Multiplatform
+* Multiarchitecture
+* Hardware Renderer (OpenGL 3.3, and an experimental Vulkan renderer)
 
 ## 🖥️ Current state
-#### CPU Subsystem (LSI CoreWare CW33300 MIPS R3051; PSX's R3000A-compatible (MIPS I) 32-bit RISC CPU)
-- [✅] All opcodes implemented (100%)
-    - Regular, e(X)tended, Jump and Branch Opcodes
-    - MIPS Coprocessor 0 Opcodes
-    - MIPS 5-stage Instruction Pipeline Emulation
-    - Readable-format disassembler with debugger and breakpoint support
-- [❌] No cache emulation (_Yet!_)
-- [🛠️] Sony's Coprocessor 2 (GTE, Geometry Transformation Engine)
-    - _in-the-works_
+#### CPU Subsystem
+- All opcodes implemented (100%)
+  - Regular, e(X)tended, Jump and Branch Opcodes
+  - MIPS Coprocessor 0 Opcodes
+  - MIPS 5-stage Instruction Pipeline Emulation
+  - Readable-format disassembler with debugger and breakpoint support
+  - Custom gdbstub implementation to debug PSX code with gdb
+- No cache emulation (_Yet!_)
 
 #### GPU Subsystem
-  - [🛠️] GPU Rasterizer Unit
-    - _in-the-works_
+- Sony's Propietary GPU
+  - _In the works_
+- Sony's Coprocessor 2 "GTE" (Geometry Transformation Engine)
+  - _In the works_
 
 #### DMA Subsystem
-  - [🛠️] DMA Unit
-    - _in-the-works_
+- DMA Unit
+  - _In the works_
 
 #### CDROM Subsystem
-  - [🛠️] CDROM Unit
-    - _in-the-works_
+- CDROM Unit
+  - _In the works_
     
 ## 👷🏼‍♂️ Roadmap
 * MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
