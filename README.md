@@ -20,8 +20,6 @@
 </thead>
 </table>
 
-<br>
-
 <table align="center">
 <h2 align="center">PSX Menus</h2>
 <thead>
