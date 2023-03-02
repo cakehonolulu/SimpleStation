@@ -2,7 +2,7 @@
   <img src="resources/banner.png" width="450vw" height="200vw"/>
 </p>
 
-<h2 align="center">A simple, multiplatform, Sony Playstation 1 (PSX) emulator written in C23</h2>
+<h2 align="center">A simple, multiplatform, Sony Playstation 1 emulator written in C23</h2>
 
 <p align="center">
   <img src="https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg">
