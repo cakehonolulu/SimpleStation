@@ -497,23 +497,51 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     memset(&v2, 0, sizeof(Vertex));
     memset(&v3, 0, sizeof(Vertex));
     
+    vec2 pos1 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16)
+    };
+
+    vec3 col1 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 16) & 0xFF)
+    };
+
+    memcpy(v1.pos, pos1, sizeof(vec2));
+    memcpy(v1.color, col1, sizeof(vec3));
+
+    vec2 pos2 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] >> 16)
+    };
+
+    vec3 col2 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16) & 0xFF)
+    };
+
+    memcpy(v2.pos, pos2, sizeof(vec2));
+    memcpy(v2.color, col2, sizeof(vec3));
+
+    vec2 pos3 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] >> 16)
+    };
+
+    vec3 col3 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[4] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[4] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[4] >> 16) & 0xFF)
+    };
+
+    memcpy(v3.pos, pos3, sizeof(vec2));
+    memcpy(v3.color, col3, sizeof(vec3));
+
+    put_triangle(v1, v2, v3, m_simplestation);
     
-
-    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1], &v1);
-    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0], &v1);
-    //v1.drawTexture = 0;
-
-    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3], &v2);
-    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2], &v2);
-    //v2.drawTexture = 0;
-
-    pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5], &v3);
-    col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4], &v3);
-    //v3.drawTexture = 0;
-
-    put_triangle(v1, v2, v3);
-    
-    //printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
+    printf(CYAN "[VULKAN] Draw Shaded Opaque Triangle\n" NORMAL);
 }
 
 void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)

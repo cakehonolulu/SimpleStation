@@ -10,11 +10,11 @@ Vertex vertices[] = {
 
 void vk_buffer_create(vulcano_struct *vulcano_state)
 {
-    VkDeviceSize bufferSize = sizeof(vertices[0]) * sizeof(vertices);
+    VkDeviceSize bufferSize = 8192;
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vulcano_state->vertexBuffer, &vulcano_state->vertexBufferMemory, vulcano_state);
     void* data;
-    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, sizeof(vertices[0]) * sizeof(vertices), 0, &data);
+    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, 8192, 0, &data);
         memcpy(data, vertices, (size_t) sizeof(vertices));
     vkUnmapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory);
 }

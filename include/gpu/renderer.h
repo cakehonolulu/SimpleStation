@@ -94,5 +94,5 @@ void m_renderer_setup_offscreen();
 void m_sync_vram(m_simplestation_state *m_simplestation);
 uint8_t m_renderer_init(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
-int put_triangle(Vertex v1, Vertex v2, Vertex v3);
+int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation);
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4);

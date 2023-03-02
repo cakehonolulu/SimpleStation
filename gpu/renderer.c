@@ -27,7 +27,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	}
 	
 	m_simplestation->vulcano_state->vulcano_window = SDL_CreateWindow(
-            "Vulcano (SDL2) - Vulkan",
+            "Simplestation (SDL2) - Vulkan",
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             640,
@@ -142,9 +142,57 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 	return 0;
 }
 
+uint32_t current_frame = 0;
 
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
-	(void) m_simplestation;
+	(void) clear_colour;
+
+	    vkDeviceWaitIdle(m_simplestation->vulcano_state->device);
+
+	vkWaitForFences(m_simplestation->vulcano_state->device, 1, &m_simplestation->vulcano_state->vk_front_fences[current_frame], VK_TRUE, UINT64_MAX);
+		uint32_t image_index = 0;
+
+		vkAcquireNextImageKHR(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vk_swapchain, UINT64_MAX, m_simplestation->vulcano_state->vk_wait_semaphore[current_frame], NULL, &image_index);
+
+		//if(vulcano_state->vk_back_fences[image_index] != NULL)
+        //{
+            // FIXME
+			//vkWaitForFences(vulcano_state->device, 1, &vulcano_state->vk_back_fences[image_index], VK_TRUE, UINT64_MAX);
+		//}
+		//vulcano_state->vk_back_fences[image_index] = vulcano_state->vk_front_fences[current_frame];
+
+		VkPipelineStageFlags pipeline_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+		VkSubmitInfo submitInfo = {
+			VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			NULL,
+			1,
+			&m_simplestation->vulcano_state->vk_wait_semaphore[current_frame],
+			&pipeline_flags,
+			1,
+			&m_simplestation->vulcano_state->vk_command_buf[image_index],
+			1,
+			&m_simplestation->vulcano_state->vk_signal_semaphore[current_frame]
+		};
+
+		vkResetFences(m_simplestation->vulcano_state->device, 1, &m_simplestation->vulcano_state->vk_front_fences[current_frame]);
+		vkQueueSubmit(m_simplestation->vulcano_state->draw_queue, 1, &submitInfo, m_simplestation->vulcano_state->vk_front_fences[current_frame]);
+
+		VkPresentInfoKHR present_info = {
+			VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+			NULL,
+			1,
+			&m_simplestation->vulcano_state->vk_signal_semaphore[current_frame],
+			1,
+			&m_simplestation->vulcano_state->vk_swapchain,
+			&image_index,
+			NULL
+		};
+		vkQueuePresentKHR(m_simplestation->vulcano_state->present_queue, &present_info);
+
+		current_frame = (current_frame + 1) % m_simplestation->vulcano_state->vk_max_frames;
+
+	    vkDeviceWaitIdle(m_simplestation->vulcano_state->device);
 
 	/* Off-screen Framebuffer */
 
@@ -289,7 +337,18 @@ Colour color(uint8_t r, uint8_t g, uint8_t b) {
 	return colorr;
 }
 
-int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
+int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation) {
+	Vertex vertices[] = {
+		v1,
+        v2,
+        v3
+	};
+
+	void* data;
+    vkMapMemory(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vertexBufferMemory, 0, 8192, 0, &data);
+        memcpy(data, vertices, (size_t) sizeof(vertices));
+    vkUnmapMemory(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vertexBufferMemory);
+
 	/*if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		printf("Vertex attribute buffers full, forcing_draw\n");
@@ -309,7 +368,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3) {
 }
 
 int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
-	put_triangle(v1, v2, v3);
-	put_triangle(v2, v3, v4);
+	//put_triangle(v1, v2, v3);
+	//put_triangle(v2, v3, v4);
 	return 0;
 }
