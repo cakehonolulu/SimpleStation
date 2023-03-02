@@ -211,7 +211,7 @@ VkPipelineRasterizationStateCreateInfo vk_config_raster_state_info()
 		VK_FALSE,
 		VK_FALSE,
 		VK_POLYGON_MODE_FILL,
-		VK_CULL_MODE_BACK_BIT,
+		VK_CULL_MODE_NONE,
 		VK_FRONT_FACE_CLOCKWISE,
 		VK_FALSE,
 		0.0f,

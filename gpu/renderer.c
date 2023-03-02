@@ -144,6 +144,8 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
 
 uint32_t current_frame = 0;
 
+unsigned int count_vertices = 0;
+
 void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 	(void) clear_colour;
 
@@ -192,6 +194,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour) {
 
 		current_frame = (current_frame + 1) % m_simplestation->vulcano_state->vk_max_frames;
 
+		count_vertices = 0;
 	    vkDeviceWaitIdle(m_simplestation->vulcano_state->device);
 
 	/* Off-screen Framebuffer */
@@ -345,9 +348,14 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simpl
 	};
 
 	void* data;
-    vkMapMemory(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vertexBufferMemory, 0, 8192, 0, &data);
-        memcpy(data, vertices, (size_t) sizeof(vertices));
+
+	//printf("Data: 0x%X, Data + = 0x%X\n", data, data + (count_vertices * sizeof(vertices)));
+    vkMapMemory(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vertexBufferMemory, 0, sizeof(Vertex) * VERTEX_BUFFER_LEN, 0, &data);
+		memcpy(data + (count_vertices * sizeof(vertices)), vertices, sizeof(vertices));
+        //memcpy(data, vertices, (size_t) sizeof(vertices));
     vkUnmapMemory(m_simplestation->vulcano_state->device, m_simplestation->vulcano_state->vertexBufferMemory);
+
+	count_vertices += sizeof(vertices);
 
 	/*if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
@@ -367,8 +375,8 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simpl
 	return 0;	
 }
 
-int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
-	//put_triangle(v1, v2, v3);
-	//put_triangle(v2, v3, v4);
+int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *m_simplestation) {
+	put_triangle(v1, v2, v3, m_simplestation);
+	put_triangle(v2, v3, v4, m_simplestation);
 	return 0;
 }

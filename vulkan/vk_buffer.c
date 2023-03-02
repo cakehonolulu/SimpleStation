@@ -1,4 +1,5 @@
 #include <vk_buffer.h>
+#include <gpu/renderer.h>
 
 Vertex vertices[] = {
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -10,11 +11,11 @@ Vertex vertices[] = {
 
 void vk_buffer_create(vulcano_struct *vulcano_state)
 {
-    VkDeviceSize bufferSize = 8192;
+    VkDeviceSize bufferSize = sizeof(Vertex) * VERTEX_BUFFER_LEN;
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vulcano_state->vertexBuffer, &vulcano_state->vertexBufferMemory, vulcano_state);
     void* data;
-    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, 8192, 0, &data);
+    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, sizeof(Vertex) * VERTEX_BUFFER_LEN, 0, &data);
         memcpy(data, vertices, (size_t) sizeof(vertices));
     vkUnmapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory);
 }

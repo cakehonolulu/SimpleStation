@@ -399,6 +399,63 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
+    vec3 col = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 16) & 0xFF)
+    };
+
+    Vertex v1, v2, v3, v4;
+
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
+    vec2 pos1 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16)
+    };
+
+
+    memcpy(v1.pos, pos1, sizeof(vec2));
+    memcpy(v1.color, col, sizeof(vec3));
+
+    vec2 pos2 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16)
+    };
+
+
+    memcpy(v2.pos, pos2, sizeof(vec2));
+    memcpy(v2.color, col, sizeof(vec3));
+
+    vec2 pos3 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] >> 16)
+    };
+
+    memcpy(v3.pos, pos3, sizeof(vec2));
+    memcpy(v3.color, col, sizeof(vec3));
+
+    vec2 pos4 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[4] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[4] >> 16)
+    };
+
+
+    memcpy(v4.pos, pos4, sizeof(vec2));
+    memcpy(v4.color, col, sizeof(vec3));
+
+    put_quad(v1, v2, v3, v4, m_simplestation);
+
+    //put_triangle(v1, v2, v3, m_simplestation);
+    
+    //put_triangle(v2, v3, v4, m_simplestation);
+
+    
+    //printf(CYAN "[VULKAN] Draw Monochrome Opaque Quad\n" NORMAL);
+
     /*Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
     Vertex v1, v2, v3, v4;
@@ -430,6 +487,59 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
+
+    vec3 col = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 16) & 0xFF)
+    };
+
+    Vertex v1, v2, v3, v4;
+
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
+    vec2 pos1 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16)
+    };
+
+
+    memcpy(v1.pos, pos1, sizeof(vec2));
+    memcpy(v1.color, col, sizeof(vec3));
+
+    vec2 pos2 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] >> 16)
+    };
+
+
+    memcpy(v2.pos, pos2, sizeof(vec2));
+    memcpy(v2.color, col, sizeof(vec3));
+
+    vec2 pos3 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] >> 16)
+    };
+
+    memcpy(v3.pos, pos3, sizeof(vec2));
+    memcpy(v3.color, col, sizeof(vec3));
+
+    vec2 pos4 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[7] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[7] >> 16)
+    };
+
+
+    memcpy(v4.pos, pos4, sizeof(vec2));
+    memcpy(v4.color, col, sizeof(vec3));
+
+    put_quad(v1, v2, v3, v4, m_simplestation);
+
+    
+    //printf(CYAN "[VULKAN] Draw Texture-Blend Opaque Quad\n" NORMAL);
 
     /*Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
@@ -541,13 +651,86 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
 
     put_triangle(v1, v2, v3, m_simplestation);
     
-    printf(CYAN "[VULKAN] Draw Shaded Opaque Triangle\n" NORMAL);
+    //printf(CYAN "[VULKAN] Draw Shaded Opaque Triangle\n" NORMAL);
 }
 
 void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
     (void) m_simplestation;
+
+    Vertex v1, v2, v3, v4;
+
+    memset(&v1, 0, sizeof(Vertex));
+    memset(&v2, 0, sizeof(Vertex));
+    memset(&v3, 0, sizeof(Vertex));
+    memset(&v4, 0, sizeof(Vertex));
+    
+    vec2 pos1 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16)
+    };
+
+
+    vec3 col1 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 16) & 0xFF)
+    };
+
+    memcpy(v1.pos, pos1, sizeof(vec2));
+    memcpy(v1.color, col1, sizeof(vec3));
+
+    vec2 pos2 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] >> 16)
+    };
+
+    vec3 col2 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16) & 0xFF)
+    };
+
+    memcpy(v2.pos, pos2, sizeof(vec2));
+    memcpy(v2.color, col2, sizeof(vec3));
+
+    vec2 pos3 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[5] >> 16)
+    };
+
+    vec3 col3 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[4] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[4] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[4] >> 16) & 0xFF)
+    };
+
+    memcpy(v3.pos, pos3, sizeof(vec2));
+    memcpy(v3.color, col3, sizeof(vec3));
+
+    vec2 pos4 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[7] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[7] >> 16)
+    };
+
+    vec3 col4 = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[6] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[6] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[6] >> 16) & 0xFF)
+    };
+
+    memcpy(v4.pos, pos4, sizeof(vec2));
+    memcpy(v4.color, col4, sizeof(vec3));
+
+    put_quad(v1, v2, v3, v4, m_simplestation);
+
+    //put_triangle(v1, v2, v3, m_simplestation);
+    
+    //put_triangle(v2, v3, v4, m_simplestation);
+
+    
+    //printf(CYAN "[VULKAN] Draw Shaded Opaque Quad\n" NORMAL);
 
     /*Vertex v1, v2, v3, v4;
 

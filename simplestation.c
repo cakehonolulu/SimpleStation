@@ -184,9 +184,9 @@ int main(int argc, char **argv)
 											
 											updates++;
 											deltaTime--;
+											display(&m_simplestation);
 										}
 										
-										display(&m_simplestation);
 
 										if (glfwGetTime() - timer > 1.0) {
 								            timer ++;
