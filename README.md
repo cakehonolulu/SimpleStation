@@ -4,17 +4,33 @@
 
 <h2 align="center">A simple, multiplatform, Sony Playstation 1 (PSX) emulator written in C23</h2>
 
-[![CodeQL](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg)](https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml) ![](https://byob.yarr.is/cakehonolulu/SimpleStation/build)
+<p align="center">
+  <br>
+  <img src="https://github.com/cakehonolulu/SimpleStation/actions/workflows/simplestation.yml/badge.svg">
+  <img src="https://byob.yarr.is/cakehonolulu/SimpleStation/build">
+</p>
 
+<br>
 
-<table>
+<h2 align="center">PSX Demos</h2>
+<table align="center">
+<thead>
+  <tr>
+    <td><h4>Amidog CPU Tests</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Quads Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Goraud Triangle Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" width="250vw" height="185vh" alt="Image"></td>
+  </tr>
+</thead>
+</table>
+
+<br>
+
+<h2 align="center">PSX Menus</h2>
+<table align="center">
 <thead>
   <tr>
     <td><h4>PSX Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" width="250vw" height="185vh" alt="Image"></td>
     <td><h4>Experimental Vulkan Rendered Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/vulkan.png" width="250vw" height="185vh" alt="Image"></td>
-    <td><h4>Amidog CPU Tests</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/amidog.png" width="250vw" height="185vh" alt="Image"></td>
-    <td><h4>Quads Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/quad.png" width="250vw" height="185vh" alt="Image"></td>
-    <td><h4>Goraud Triangle Demo</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/triangle.png" width="250vw" height="185vh" alt="Image"></td>
     <td><h4>BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" width="250vw" height="185vh" alt="Image"></td>
   </tr>
 </thead>
