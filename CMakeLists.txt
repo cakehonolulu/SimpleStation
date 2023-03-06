@@ -90,13 +90,12 @@ add_custom_target(glsl_compile DEPENDS ${SPIRV_BINARY_FILES})
 
 add_dependencies(simplestation glsl_compile)
 
-target_link_libraries(simplestation vulkan glfw ${SDL2_LIBRARIES} cglm_headers)
+target_link_libraries(simplestation glfw ${SDL2_LIBRARIES} cglm_headers)
 
 add_subdirectory(external/cglm/ EXCLUDE_FROM_ALL)
 
-
 if (APPLE)
-  target_link_libraries(simplestation "-framework OpenGL" GLEW::GLEW)
+  target_link_libraries(simplestation "-framework OpenGL" Vulkan::Vulkan GLEW::GLEW)
 else(NOT APPLE)
-  target_link_libraries(simplestation ${GLEW_LIBRARIES})
+  target_link_libraries(simplestation ${GLEW_LIBRARIES} vulkan)
 endif()
