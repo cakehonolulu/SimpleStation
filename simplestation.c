@@ -36,7 +36,13 @@ int main(int argc, char **argv)
 	{	
 		printf("Usage: ./simplestation [arguments]\n");
 		printf("Arguments:\n");
-		printf("-bios [...] - Specifies a PSX BIOS file\n");
+		printf("-bios      [...] - Specifies a PSX BIOS file\n");
+		printf("-break     [...] - Breakpoint to launch the internal debugger from\n");
+		printf("-exe       [...] - Path to PSX-EXE format file to launch\n");
+		printf("-tty             - Print intercepted logs from PSX's BIOS\n");
+		printf("-vramview        - (OpenGL Only) Opens a 1024x512 window with a graphical representation of PSX's VRAM\n");
+		printf("-debugger        - Launch a GDB server for debugging the emulated state machine\n");
+		return 0;
 	}
 	else
 	{
@@ -70,6 +76,7 @@ int main(int argc, char **argv)
 					printf("You must specify a filename to load the BIOS from!\n");
 				}
 			}
+			// Hidden from help menu, meant for internal use only
 			else if (!strcmp(argv[m_args], "-prfrom"))
 			{
 				if (argv[m_args + 1] != NULL)
