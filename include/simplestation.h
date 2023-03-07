@@ -405,6 +405,11 @@ typedef struct context
 	bool stop;
 } context_t;
 
+typedef enum {
+    OPENGL,
+    VULKAN
+} renderer_backends;
+
 /* Structures */
 typedef struct
 {
@@ -454,6 +459,8 @@ typedef struct
 #endif
 
 	bool m_cond;
+
+	renderer_backends renderer;
 
 } m_simplestation_state;
 

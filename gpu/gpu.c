@@ -23,8 +23,21 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
         }
         else
         {
-            init_opengl_renderer(m_simplestation);
-            m_simplestation->m_gpu_command_buffer_state = ON;
+            switch (m_simplestation->renderer)
+            {
+                case OPENGL:
+                    init_opengl_renderer(m_simplestation);
+                    m_simplestation->m_gpu_command_buffer_state = ON;
+                    break;
+
+                case VULKAN:
+                    m_simplestation->m_gpu_command_buffer_state = ON;
+                    break;
+                
+                default:
+                    __builtin_unreachable();
+                    break;
+            }
         }
     }
     else

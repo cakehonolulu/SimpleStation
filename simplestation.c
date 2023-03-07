@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 		printf("-tty             - Print intercepted logs from PSX's BIOS\n");
 		printf("-vramview        - (OpenGL Only) Opens a 1024x512 window with a graphical representation of PSX's VRAM\n");
 		printf("-debugger        - Launch a GDB server for debugging the emulated state machine\n");
+		printf("-renderer  [...] - Selects a renderer backend, possible values: 'vulkan' , 'opengl'\n");
 		return 0;
 	}
 	else
@@ -132,6 +133,33 @@ int main(int argc, char **argv)
 			{
 				m_simplestation.m_debugger = true;
 				printf("Enabled debugger...!\n");
+			}
+			else if (!strcmp(argv[m_args], "-renderer"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					if (strcmp(argv[m_args + 1], "vulkan") == 0)
+					{
+						printf("Using Vulkan renderer backend!\n");
+						m_simplestation.renderer = VULKAN;
+					}
+					else if (strcmp(argv[m_args + 1], "opengl") == 0)
+					{
+						printf("Using OpenGL renderer backend!\n");
+						m_simplestation.renderer = OPENGL;
+					}
+					else
+					{
+						printf("Unknown renderer %s , exiting...!\n", argv[m_args + 1]);
+						return 0;
+					}
+
+					m_args++;
+				}
+				else
+				{
+					printf("You must specify a PSX-EXE filename!\n");
+				}
 			}
 			else
 			{
@@ -301,6 +329,7 @@ int main(int argc, char **argv)
 		else
 		{
 			printf("You must specify a BIOS filename!\n");
+			return 0;
 		}
 	}
 	
