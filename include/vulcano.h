@@ -15,18 +15,27 @@ typedef struct {
     // Vulkan Instance
     VkInstance instance;
 
-    // Vulkan Extension Count
-    unsigned int vulkan_extensions_count;
+    // Vulkan Instance Extensions Count
+    uint32_t vulkan_instance_extensions_count;
 
-    // Vulkan Extensions
-    VkExtensionProperties *vulkan_extensions;
+    // Vulkan Instance Extensions Name
+    VkExtensionProperties *vulkan_instance_extensions;
 
-    // Vulkan Instance Extensions
-    const char** vulkan_instance_extensions;
+    // Vulkan Layer Extensions Count
+    uint32_t vulkan_layer_extensions_count;
 
-    uint32_t vulkan_layer_ext_cnt;
-
+    // Vulkan Layer Extensions Name
     VkLayerProperties *vulkan_layer_extensions;
+
+    // Vulkan Device Extensions Count
+    uint32_t vulkan_device_extensions_count;
+
+    // Vulkan Device Extensions Name
+    VkExtensionProperties *vulkan_device_extensions;
+
+    uint32_t sdl_instance_extension_count;
+
+    const char** sdl_instance_extensions;
 
     // Vulkan Physical Devices
     VkPhysicalDevice *physical_devices;

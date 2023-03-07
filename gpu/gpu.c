@@ -24,9 +24,15 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
         }
         else
         {
-            m_renderer_init(m_simplestation);
-            imageBuffer_Create(m_simplestation);
-            m_simplestation->m_gpu_command_buffer_state = ON;
+            if (m_renderer_init(m_simplestation) == 0)
+            {
+                imageBuffer_Create(m_simplestation);
+                m_simplestation->m_gpu_command_buffer_state = ON;
+            }
+            else
+            {
+                m_result = 1;
+            }
         }
     }
     else
@@ -280,6 +286,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             break;
 
         case image_load:
+        {
             uint16_t width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
 			uint16_t height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
 			if (width == 0) width = 1024;
@@ -303,6 +310,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             }
 
             break;
+        }
 
         default:
             printf(YELLOW "[GP0] Unknown GP0 mode!\n" NORMAL);

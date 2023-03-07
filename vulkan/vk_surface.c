@@ -7,7 +7,7 @@ void vk_surface_prepare(vulcano_struct *vulcano_state)
 	
     uint32_t vk_surface_fmt_num = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(*vulcano_state->phys_dev, vulcano_state->surface, &vk_surface_fmt_num, NULL);
-	
+
     VkSurfaceFormatKHR *vk_surface_fmts = malloc(sizeof(VkSurfaceFormatKHR) * vk_surface_fmt_num);
 	vkGetPhysicalDeviceSurfaceFormatsKHR(*vulcano_state->phys_dev, vulcano_state->surface, &vk_surface_fmt_num, vk_surface_fmts);
 	
