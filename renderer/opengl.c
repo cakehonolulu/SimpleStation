@@ -8,7 +8,7 @@ GLuint m_vao;
 GLuint m_vbo;
 
 // Custom Vertex Array containing draw attributes
-Vertex *m_vertex_buffer = NULL;
+OpenGL_Vertex *m_vertex_buffer = NULL;
 
 /* OpenGL Framebuffers */
 
@@ -368,7 +368,7 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 
 void m_renderer_buffers_init()
 {
-	m_vertex_buffer = (Vertex *) malloc(sizeof(Vertex) * VERTEX_BUFFER_LEN);
+	m_vertex_buffer = (OpenGL_Vertex *) malloc(sizeof(OpenGL_Vertex) * VERTEX_BUFFER_LEN);
 
 	// Generate the Vertex Arary Object
 	glGenVertexArrays(1, &m_vao);
@@ -381,31 +381,31 @@ void m_renderer_buffers_init()
 
 	// Bind to it
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(OpenGL_Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
 	/* Setup OpenGL Vertex Attributes */
-	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, position));
+	glVertexAttribIPointer(0, 2, GL_SHORT, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, position));
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, colour));
+	glVertexAttribIPointer(1, 3, GL_UNSIGNED_BYTE, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, colour));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, texPage));
+	glVertexAttribIPointer(2, 2, GL_UNSIGNED_SHORT, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, texPage));
 	glEnableVertexAttribArray(2);
 
-	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texCoord));
+	glVertexAttribIPointer(3, 2, GL_UNSIGNED_BYTE, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, texCoord));
 	glEnableVertexAttribArray(3);
 
-	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, sizeof(Vertex), (void *) offsetof(Vertex, clut));
+	glVertexAttribIPointer(4, 2, GL_UNSIGNED_SHORT, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, clut));
 	glEnableVertexAttribArray(4);
 
-	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, texDepth));
+	glVertexAttribIPointer(5, 1, GL_UNSIGNED_BYTE, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, texDepth));
 	glEnableVertexAttribArray(5);
 
-	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, blendMode));
+	glVertexAttribIPointer(6, 1, GL_UNSIGNED_BYTE, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, blendMode));
 	glEnableVertexAttribArray(6);
 
-	glVertexAttribIPointer(7, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void *) offsetof(Vertex, drawTexture));
+	glVertexAttribIPointer(7, 1, GL_UNSIGNED_BYTE, sizeof(OpenGL_Vertex), (void *) offsetof(OpenGL_Vertex, drawTexture));
 	glEnableVertexAttribArray(7);
 }
 
@@ -533,7 +533,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part) 
 
 	// Bind to off-screen VVBO
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(OpenGL_Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
 
@@ -625,7 +625,7 @@ void display(m_simplestation_state *m_simplestation) {
 }
 
 
-int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation) {
+int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simplestation_state *m_simplestation) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		//printf("Vertex attribute buffers full, forcing_draw\n");
@@ -644,7 +644,7 @@ int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simpl
 	return 0;	
 }
 
-int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *m_simplestation) {
+int put_quad(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, OpenGL_Vertex v4, m_simplestation_state *m_simplestation) {
 	put_triangle(v1, v2, v3, m_simplestation);
 	put_triangle(v2, v3, v4, m_simplestation);
 	return 0;
@@ -652,7 +652,7 @@ int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *
 
 int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 {
-	Vertex v1 = {
+	OpenGL_Vertex v1 = {
 		r0.position,
 		r0.colour, 
 		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
@@ -662,7 +662,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 		r0.blendMode,
 		r0.drawTexture };
 
-	Vertex v2 = {
+	OpenGL_Vertex v2 = {
 		{ r0.position.x + r0.widthHeight.width, r0.position.y },
 		r0.colour,
 		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
@@ -672,7 +672,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 		r0.blendMode,
 		r0.drawTexture };
 
-	Vertex v3 = {
+	OpenGL_Vertex v3 = {
 		{ r0.position.x, r0.position.y + r0.widthHeight.height },
 		r0.colour,
 		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },
@@ -682,7 +682,7 @@ int put_rect(Rectangle r0, m_simplestation_state *m_simplestation)
 		r0.blendMode,
 		r0.drawTexture };
 
-	Vertex v4 = {
+	OpenGL_Vertex v4 = {
 		{ r0.position.x + r0.widthHeight.width, r0.position.y + r0.widthHeight.height },
 		r0.colour,
 		{ m_simplestation->m_gpu->m_page_base_x * 64, m_simplestation->m_gpu->m_page_base_y * 256 },

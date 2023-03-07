@@ -268,12 +268,12 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
 
     Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
-    Vertex v1, v2, v3, v4;
+    OpenGL_Vertex v1, v2, v3, v4;
 
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
-    memset(&v4, 0, sizeof(Vertex));
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    memset(&v4, 0, sizeof(OpenGL_Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
@@ -307,12 +307,12 @@ void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_stat
 
 	GLubyte blend = (GLubyte) BlendTexture;
 
-    Vertex v1, v2, v3, v4;
+    OpenGL_Vertex v1, v2, v3, v4;
 
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
-    memset(&v4, 0, sizeof(Vertex));
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    memset(&v4, 0, sizeof(OpenGL_Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
@@ -366,12 +366,12 @@ void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state 
 
 	GLubyte blend = (GLubyte) RawTexture;
 
-    Vertex v1, v2, v3, v4;
+    OpenGL_Vertex v1, v2, v3, v4;
 
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
-    memset(&v4, 0, sizeof(Vertex));
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    memset(&v4, 0, sizeof(OpenGL_Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col;
@@ -417,11 +417,11 @@ void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *
     (void) m_value;
     (void) m_simplestation;
 
-    Vertex v1, v2, v3;
+    OpenGL_Vertex v1, v2, v3;
 
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
@@ -442,12 +442,12 @@ void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_si
     (void) m_value;
     (void) m_simplestation;
 
-    Vertex v1, v2, v3, v4;
+    OpenGL_Vertex v1, v2, v3, v4;
 
-    memset(&v1, 0, sizeof(Vertex));
-    memset(&v2, 0, sizeof(Vertex));
-    memset(&v3, 0, sizeof(Vertex));
-    memset(&v4, 0, sizeof(Vertex));
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    memset(&v4, 0, sizeof(OpenGL_Vertex));
     
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
     v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);

@@ -1,22 +1,13 @@
-#include <vk_buffer.h>
-#include <gpu/renderer.h>
-
-Vertex vertices[] = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-};
-
+#include <renderer/vulkan/vk_buffer.h>
+#include <renderer/renderer.h>
 
 void vk_buffer_create(vulcano_struct *vulcano_state)
 {
-    VkDeviceSize bufferSize = sizeof(Vertex) * VERTEX_BUFFER_LEN;
+    VkDeviceSize bufferSize = sizeof(Vulkan_Vertex) * VERTEX_BUFFER_LEN;
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vulcano_state->vertexBuffer, &vulcano_state->vertexBufferMemory, vulcano_state);
     void* data;
-    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, sizeof(Vertex) * VERTEX_BUFFER_LEN, 0, &data);
-        memcpy(data, vertices, (size_t) sizeof(vertices));
+    vkMapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory, 0, sizeof(Vulkan_Vertex) * VERTEX_BUFFER_LEN, 0, &data);
     vkUnmapMemory(vulcano_state->device, vulcano_state->vertexBufferMemory);
 }
 

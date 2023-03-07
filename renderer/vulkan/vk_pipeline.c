@@ -1,4 +1,4 @@
-#include <vk_pipeline.h>
+#include <renderer/vulkan/vk_pipeline.h>
 
 void vk_create_pipeline(vulcano_struct *vulcano_state)
 {
@@ -100,7 +100,7 @@ VkPipelineVertexInputStateCreateInfo vk_config_input_state(vulcano_struct *vulca
 
 	vulcano_state->vbindingdesc = malloc(sizeof(VkVertexInputBindingDescription));
 	vulcano_state->vbindingdesc->binding = 0;
-	vulcano_state->vbindingdesc->stride = sizeof(Vertex);
+	vulcano_state->vbindingdesc->stride = sizeof(Vulkan_Vertex);
 	vulcano_state->vbindingdesc->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	vulcano_state->vattribdesc = malloc(sizeof(VkVertexInputAttributeDescription) * 2);
@@ -108,12 +108,12 @@ VkPipelineVertexInputStateCreateInfo vk_config_input_state(vulcano_struct *vulca
 	vulcano_state->vattribdesc[0].binding = 0;
 	vulcano_state->vattribdesc[0].location = 0;
 	vulcano_state->vattribdesc[0].format = VK_FORMAT_R32G32_SFLOAT;
-	vulcano_state->vattribdesc[0].offset = offsetof(Vertex, pos);
+	vulcano_state->vattribdesc[0].offset = offsetof(Vulkan_Vertex, pos);
 
 	vulcano_state->vattribdesc[1].binding = 0;
 	vulcano_state->vattribdesc[1].location = 1;
 	vulcano_state->vattribdesc[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-	vulcano_state->vattribdesc[1].offset = offsetof(Vertex, color);
+	vulcano_state->vattribdesc[1].offset = offsetof(Vulkan_Vertex, color);
 
 	create_info.vertexBindingDescriptionCount = 1;
 	create_info.pVertexBindingDescriptions = vulcano_state->vbindingdesc;

@@ -1,4 +1,4 @@
-#include <vk_image.h>
+#include <renderer/vulkan/vk_image.h>
 
 void vk_image_prepare(vulcano_struct *vulcano_state)
 {

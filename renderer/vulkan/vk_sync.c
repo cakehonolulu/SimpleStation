@@ -1,4 +1,4 @@
-#include <vk_sync.h>
+#include <renderer/vulkan/vk_sync.h>
 
 void vk_sync_setup(vulcano_struct *vulcano_state)
 {

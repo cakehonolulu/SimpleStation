@@ -1,4 +1,4 @@
-#include <vk_graphics_queue.h>
+#include <renderer/vulkan/vk_graphics_queue.h>
 
 size_t vk_graphics_queue_get_family_idx(vulcano_struct *vulcano_state, uint32_t prop_count)
 {

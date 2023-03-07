@@ -1,5 +1,5 @@
-#include <vk_command.h>
-#include <gpu/renderer.h>
+#include <renderer/vulkan/vk_command.h>
+#include <renderer/renderer.h>
 
 void vk_command_pool_init(vulcano_struct *vulcano_state)
 {
@@ -56,7 +56,7 @@ void vk_command_pool_init(vulcano_struct *vulcano_state)
 		VkDeviceSize offsets[] = {0};
 		vkCmdBindVertexBuffers(vulcano_state->vk_command_buf[i], 0, 1, vertexBuffers, offsets);
 
-		vkCmdDraw(vulcano_state->vk_command_buf[i], sizeof(Vertex) * VERTEX_BUFFER_LEN, 1, 0, 0);
+		vkCmdDraw(vulcano_state->vk_command_buf[i], sizeof(Vulkan_Vertex) * VERTEX_BUFFER_LEN, 1, 0, 0);
 		vkCmdEndRenderPass(vulcano_state->vk_command_buf[i]);
 		vkEndCommandBuffer(vulcano_state->vk_command_buf[i]);
 	}

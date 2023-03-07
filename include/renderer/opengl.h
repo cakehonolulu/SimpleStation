@@ -74,7 +74,7 @@ typedef struct
 	TextureColourDepth texDepth;
 	GLubyte blendMode;
 	GLubyte drawTexture;
-} Vertex;
+} OpenGL_Vertex;
 #pragma pack(pop)
 
 
@@ -127,6 +127,6 @@ void m_sync_vram(m_simplestation_state *m_simplestation);
 uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
 GLuint renderer_LoadShader(char *path, GLenum type);
-int put_triangle(Vertex v1, Vertex v2, Vertex v3, m_simplestation_state *m_simplestation);
-int put_quad(Vertex v1, Vertex v2, Vertex v3, Vertex v4, m_simplestation_state *m_simplestation);
+int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simplestation_state *m_simplestation);
+int put_quad(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, OpenGL_Vertex v4, m_simplestation_state *m_simplestation);
 int put_rect(Rectangle r0, m_simplestation_state *m_simplestation);

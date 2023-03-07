@@ -1,4 +1,4 @@
-#include <vk_shader.h>
+#include <renderer/vulkan/vk_shader.h>
 
 char *getShaderCode(const char *fileName, uint32_t *pShaderSize)
 {

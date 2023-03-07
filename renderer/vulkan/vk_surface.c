@@ -1,4 +1,4 @@
-#include <vk_surface.h>
+#include <renderer/vulkan/vk_surface.h>
 
 void vk_surface_prepare(vulcano_struct *vulcano_state)
 {
