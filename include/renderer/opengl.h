@@ -130,3 +130,4 @@ GLuint renderer_LoadShader(char *path, GLenum type);
 int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simplestation_state *m_simplestation);
 int put_quad(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, OpenGL_Vertex v4, m_simplestation_state *m_simplestation);
 int put_rect(Rectangle r0, m_simplestation_state *m_simplestation);
+

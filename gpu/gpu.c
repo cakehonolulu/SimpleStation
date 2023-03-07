@@ -5,7 +5,7 @@
 #include <ui/termcolour.h>
 #include <stdio.h>
 
-uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
+uint8_t m_gpu_init(m_simplestation_state *m_simplestation, renderstack_t *renderstack)
 {
     uint8_t m_result = 0;
 
@@ -24,21 +24,11 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
         }
         else
         {
-            switch (m_simplestation->renderer)
+            m_result = setup_renderer(m_simplestation, renderstack);
+            
+            if (m_result)
             {
-                case OPENGL:
-                    init_opengl_renderer(m_simplestation);
-                    m_simplestation->m_gpu_command_buffer_state = ON;
-                    break;
-
-                case VULKAN:
-                    init_vulkan_renderer(m_simplestation);
-                    m_simplestation->m_gpu_command_buffer_state = ON;
-                    break;
-                
-                default:
-                    __builtin_unreachable();
-                    break;
+                printf(RED "[GPU] m_gpu_init: Failed to initialize a renderer!\n" NORMAL);
             }
         }
     }

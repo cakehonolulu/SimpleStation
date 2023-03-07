@@ -1,6 +1,8 @@
 #include <gpu/gp0.h>
 #include <ui/termcolour.h>
 
+extern renderstack_t renderstack;
+
 void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
 {
     switch (m_simplestation->m_gpu->m_gp0_cmd_ins)
@@ -9,47 +11,47 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 break;
             
             case 0x01:
-                m_gpu_clear_cache(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_clear_cache(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x02:
-                m_gpu_fill_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_fill_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
             
             case 0x28:
-                m_gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
             
             case 0x2C:
-                m_gpu_draw_texture_blend_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_texture_blend_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x2D:
-                m_gpu_draw_texture_raw_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_texture_raw_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x30:
-                m_gpu_draw_shaded_opaque_triangle(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_shaded_opaque_triangle(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x38:
-                m_gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x65:
-                m_gpu_draw_texture_raw_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_texture_raw_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x68:
-                m_gpu_draw_monochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_monochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0xA0:
-                m_gpu_image_draw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_image_draw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0xC0:
-                m_gpu_image_store(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_image_store(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0xE1:
@@ -206,10 +208,14 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             if (m_simplestation->m_gpu->m_gp0_words_remaining == 0)
             {
-                glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
-                glBindTexture(GL_TEXTURE_2D, 0);
-                m_sync_vram(m_simplestation);
+                if (m_simplestation->renderer == OPENGL)
+                {
+                    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+                    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                    m_sync_vram(m_simplestation);
+                }
+
                 for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;
                 m_current_idx = 0;
                 m_simplestation->m_gpu->m_gp0_write_mode = command;
@@ -222,347 +228,6 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             printf(YELLOW "[GP0] Unknown GP0 mode!\n" NORMAL);
             break;
     }
-}
-
-
-/* GP0 Commands */
-
-void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-
-    for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;
-
-    return;
-}
-
-extern int display_area_x, display_area_y, display_area_width, display_area_height;
-
-void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
-    (void) m_value;
-
-    uint32_t colour24 = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFFFFFF;
-	float r = (colour24 & 0xFF) / 255.0f;
-	float g = ((colour24 >> 8) & 0xFF) / 255.0f;
-	float b = ((colour24 >> 16) & 0xFF) / 255.0f;
-
-    glClearColor(r, g, b, 0.f);
-
-    glEnable(GL_SCISSOR_TEST);
-
-    display_area_x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
-    display_area_y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
-    display_area_width = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
-    display_area_height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
-
-    glScissor(display_area_x, display_area_y, display_area_width, display_area_height);
-    draw(m_simplestation, true, false);
-
-    glDisable(GL_SCISSOR_TEST);
-}
-
-void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-    (void) m_simplestation;
-
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
-    OpenGL_Vertex v1, v2, v3, v4;
-
-    memset(&v1, 0, sizeof(OpenGL_Vertex));
-    memset(&v2, 0, sizeof(OpenGL_Vertex));
-    memset(&v3, 0, sizeof(OpenGL_Vertex));
-    memset(&v4, 0, sizeof(OpenGL_Vertex));
-    
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col;
-    v1.drawTexture = 0;
-
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v2.colour = col;
-    v2.drawTexture = 0;
-
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v3.colour = col;
-    v3.drawTexture = 0;
-
-    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v4.colour = col;
-    v4.drawTexture = 0;
-
-    put_quad(v1, v2, v3, v4, m_simplestation);
-}
-
-void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
-    ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-
-	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-
-	GLubyte blend = (GLubyte) BlendTexture;
-
-    OpenGL_Vertex v1, v2, v3, v4;
-
-    memset(&v1, 0, sizeof(OpenGL_Vertex));
-    memset(&v2, 0, sizeof(OpenGL_Vertex));
-    memset(&v3, 0, sizeof(OpenGL_Vertex));
-    memset(&v4, 0, sizeof(OpenGL_Vertex));
-    
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col;
-    v1.texPage = texPage;
-    v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v1.clut = clut;
-    v1.texDepth = texDepth;
-    v1.blendMode = blend;
-    v1.drawTexture = 1;
-
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col;
-    v2.texPage = texPage;
-    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v2.clut = clut;
-    v2.texDepth = texDepth;
-    v2.blendMode = blend;
-    v2.drawTexture = 1;
-
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col;
-    v3.texPage = texPage;
-    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
-    v3.clut = clut;
-    v3.texDepth = texDepth;
-    v3.blendMode = blend;
-    v3.drawTexture = 1;
-
-    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
-    v4.colour = col;
-    v4.texPage = texPage;
-    v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
-    v4.clut = clut;
-    v4.texDepth = texDepth;
-    v4.blendMode = blend;
-    v4.drawTexture = 1;
-
-    put_quad(v1, v2, v3, v4, m_simplestation);
-}
-
-void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-        (void) m_value;
-
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
-    ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-
-	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-
-	GLubyte blend = (GLubyte) RawTexture;
-
-    OpenGL_Vertex v1, v2, v3, v4;
-
-    memset(&v1, 0, sizeof(OpenGL_Vertex));
-    memset(&v2, 0, sizeof(OpenGL_Vertex));
-    memset(&v3, 0, sizeof(OpenGL_Vertex));
-    memset(&v4, 0, sizeof(OpenGL_Vertex));
-    
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col;
-    v1.texPage = texPage;
-    v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v1.clut = clut;
-    v1.texDepth = texDepth;
-    v1.blendMode = blend;
-    v1.drawTexture = 1;
-
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col;
-    v2.texPage = texPage;
-    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v2.clut = clut;
-    v2.texDepth = texDepth;
-    v2.blendMode = blend;
-    v2.drawTexture = 1;
-
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col;
-    v3.texPage = texPage;
-    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
-    v3.clut = clut;
-    v3.texDepth = texDepth;
-    v3.blendMode = blend;
-    v3.drawTexture = 1;
-
-    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
-    v4.colour = col;
-    v4.texPage = texPage;
-    v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
-    v4.clut = clut;
-    v4.texDepth = texDepth;
-    v4.blendMode = blend;
-    v4.drawTexture = 1;
-
-    put_quad(v1, v2, v3, v4, m_simplestation);
-}
-
-void m_gpu_draw_shaded_opaque_triangle(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-    (void) m_simplestation;
-
-    OpenGL_Vertex v1, v2, v3;
-
-    memset(&v1, 0, sizeof(OpenGL_Vertex));
-    memset(&v2, 0, sizeof(OpenGL_Vertex));
-    memset(&v3, 0, sizeof(OpenGL_Vertex));
-    
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-
-    put_triangle(v1, v2, v3, m_simplestation);
-    
-    //printf(CYAN "[OPENGL] Draw Shaded Opaque Triangle\n" NORMAL);
-}
-
-void m_gpu_draw_shaded_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-    (void) m_simplestation;
-
-    OpenGL_Vertex v1, v2, v3, v4;
-
-    memset(&v1, 0, sizeof(OpenGL_Vertex));
-    memset(&v2, 0, sizeof(OpenGL_Vertex));
-    memset(&v3, 0, sizeof(OpenGL_Vertex));
-    memset(&v4, 0, sizeof(OpenGL_Vertex));
-    
-    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-    v1.drawTexture = 0;
-
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v2.drawTexture = 0;
-
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v3.drawTexture = 0;
-
-    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
-    v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
-    v4.drawTexture = 0;
-
-    put_quad(v1, v2, v3, v4, m_simplestation);
-    //printf(CYAN "[OPENGL] Draw Shaded Opaque Quadrilateral\n" NORMAL);
-}
-
-void m_gpu_draw_texture_raw_variable_size_rect(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    Rectangle r0;
-
-    memset(&r0, 0, sizeof(Rectangle));
-
-    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-    r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    r0.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    r0.blendMode = (GLubyte) RawTexture;
-    r0.drawTexture = 1;
-    r0.widthHeight = rwh_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-
-	put_rect(r0, m_simplestation);
-}
-
-void m_gpu_draw_monochrome_opaque_1x1(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    Rectangle r0;
-    RectWidthHeight r0_wh;
-
-    memset(&r0, 0, sizeof(Rectangle));
-
-    r0_wh.width = 1;
-    r0_wh.height = 1;
-
-    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-	r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
-	r0.widthHeight = r0_wh;
-
-    put_rect(r0, m_simplestation);
-}
-
-void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-
-    uint32_t m_resolution = m_simplestation->m_gpu_command_buffer->m_buffer[2];
-
-    uint16_t m_width = m_resolution & 0xFFFF;
-
-    uint16_t m_height = m_resolution >> 16;
-
-    m_width = ((m_width - 1) & 0x3ff) + 1;
-    m_height = ((m_height - 1) & 0x1ff) + 1;
-
-    uint32_t m_image_sz = ((m_height * m_width) + 1) & ~1;
-
-    m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
-
-    m_simplestation->m_gpu->m_gp0_write_mode = cpu_to_vram;
-}
-
-void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-
-    draw(m_simplestation, false, true);
-    
-
-    const uint32_t coords = m_simplestation->m_gpu_command_buffer->m_buffer[1];
-    const uint32_t res = m_simplestation->m_gpu_command_buffer->m_buffer[2];
-    // TODO: Sanitize this
-    const auto x = coords & 0x3ff;
-    const auto y = (coords >> 16) & 0x1ff;
-
-    uint32_t width = res & 0xffff;
-    uint32_t height = res >> 16;
-
-    width = ((width - 1) & 0x3ff) + 1;
-    height = ((height - 1) & 0x1ff) + 1;
-
-    // The size of the texture in 16-bit pixels. If the number is odd, force align it up
-    const uint32_t size = ((width * height) + 1) & ~1;
-
-    m_simplestation->m_gpu->m_gp0_read_mode = vram_to_cpu;
-    m_simplestation->m_gpu->m_vram_image_size = size / 2;
-
-    m_simplestation->m_gpu->m_vram_image_index = 0;
-
-
-    extern GLuint m_fbo, m_psx_gpu_vram, m_psx_vram_texel;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
-    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
-
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-
-    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 }
 
 void m_gpu_set_draw_mode(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -626,13 +291,13 @@ extern GLint uniform_offset;
 
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    draw(m_simplestation, false, false);
+    renderstack.draw(m_simplestation, false, false);
     
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));
 
 
-    glUniform2i(uniform_offset, (GLint) (((int16_t) (m_x << 5)) >> 5), (GLint) (((int16_t) (m_y << 5)) >> 5));
+    if (m_simplestation->renderer == OPENGL) glUniform2i(uniform_offset, (GLint) (((int16_t) (m_x << 5)) >> 5), (GLint) (((int16_t) (m_y << 5)) >> 5));
 }
 
 void m_gpu_set_mask_bit(uint32_t m_value, m_simplestation_state *m_simplestation)
