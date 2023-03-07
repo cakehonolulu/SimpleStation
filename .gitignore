@@ -25,8 +25,11 @@ build/
 # CMake files
 CMakeCache.txt
 CMakeFiles/
-cmake_install.cmake
+*.cmake
 Makefile
+
+# Vulkan SPIR-V shaders
+*.spv
 
 # Whatever this is
 null.d
