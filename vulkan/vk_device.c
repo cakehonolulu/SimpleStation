@@ -68,12 +68,14 @@ void vk_list_device_ext(vulcano_struct *vulcano_state)
 
     vkEnumerateDeviceExtensionProperties(*vulcano_state->phys_dev, NULL, &vulcano_state->vulkan_extensions_count, vulcano_state->vulkan_extensions);
 
-    printf(BOLD GREEN "[vulkan] vk_list_device_ext: Listing %d available device extensions..." NORMAL "\n", vulcano_state->vulkan_extensions_count);
+    printf(BOLD GREEN "[vulkan] vk_list_device_ext: %d available device extensions..." NORMAL "\n", vulcano_state->vulkan_extensions_count);
 
+#ifdef VULKAN_VERBOSE
     for (size_t i = 0; i < vulcano_state->vulkan_extensions_count; i++)
     {
         printf(BOLD GREEN "[vulkan] #%lu > %s" NORMAL "\n", i, vulcano_state->vulkan_extensions[i].extensionName);
     }
+#endif
 
     if (vulcano_state->vulkan_extensions)
         free(vulcano_state->vulkan_extensions);

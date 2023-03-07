@@ -4,6 +4,8 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
 {
     VkInstance ret = {0};
     size_t vulkan_extensions_size = 0;
+    PFN_vkEnumerateInstanceVersion instance_version;
+    uint32_t vulkan_version = VK_API_VERSION_1_0, maj_ver, min_ver, patch_ver;
    
     VkApplicationInfo app_info = {0};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -12,7 +14,27 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pEngineName = "No Engine";
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion = VK_API_VERSION_1_0;
+    app_info.apiVersion = vulkan_version;
+
+    instance_version = (PFN_vkEnumerateInstanceVersion) vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceVersion");
+
+    // Check if instance version exists
+    if (instance_version != NULL)
+    {
+        vkEnumerateInstanceVersion(&vulkan_version);
+
+        maj_ver = VK_VERSION_MAJOR(vulkan_version);
+        min_ver = VK_VERSION_MINOR(vulkan_version);
+        patch_ver = VK_VERSION_PATCH(vulkan_version);
+    }
+    else
+    {
+        maj_ver = 0;
+        min_ver = 0;
+        patch_ver = 0;
+    }
+
+    printf(BOLD GREEN "[vulkan] vk_create_instance: Detected Vulkan Version: %d.%d.%d" NORMAL "\n", maj_ver, min_ver, patch_ver);
 
     // Find how many extensions the instance will have using Vulkan API functions
     if (vkEnumerateInstanceExtensionProperties(NULL, &vulcano_state->vulkan_extensions_count, NULL) != VK_SUCCESS)
@@ -35,12 +57,14 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
         goto vk_create_instance_end;
     }
 
-    printf(YELLOW "[vulkan] vk_create_instance: Listing %d available extensions..." NORMAL "\n", vulcano_state->vulkan_extensions_count);
+    printf(BOLD YELLOW "[vulkan] vk_create_instance: %d available extensions..." NORMAL "\n", vulcano_state->vulkan_extensions_count);
 
+#ifdef VULKAN_VERBOSE
     for (size_t i = 0; i < vulcano_state->vulkan_extensions_count; i++)
     {
         printf(YELLOW "[vulkan] #%lu > %s (Ver. %d)" NORMAL "\n", i, vulcano_state->vulkan_extensions[i].extensionName, vulcano_state->vulkan_extensions[i].specVersion);
     }
+#endif
 
     if (SDL_Vulkan_GetInstanceExtensions(vulcano_state->vulcano_window, &vulcano_state->vulkan_extensions_count, NULL) != SDL_TRUE)
     {
@@ -64,13 +88,15 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
 
     vkEnumerateInstanceLayerProperties(&vulcano_state->vulkan_layer_ext_cnt, vulcano_state->vulkan_layer_extensions);
 
-    printf(BOLD BLUE "[vulkan] vk_create_instance: Listing %d available layer extensions..." NORMAL "\n", vulcano_state->vulkan_layer_ext_cnt);
+    printf(BOLD YELLOW "[vulkan] vk_create_instance: %d available layer extensions..." NORMAL "\n", vulcano_state->vulkan_layer_ext_cnt);
     
+#ifdef VULKAN_VERBOSE
     for (size_t x = 0; x < vulcano_state->vulkan_layer_ext_cnt; x++)    
     {
         printf(BLUE "[vulkan] #%lu > %s" NORMAL "\n", x, vulcano_state->vulkan_layer_extensions[x].layerName);
     }
-    
+#endif
+
 	const char *vulkan_layers[] = {
 		"VK_LAYER_KHRONOS_validation"
 	};
@@ -84,15 +110,21 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
     creation_info.enabledExtensionCount =  vulcano_state->vulkan_extensions_count;
     creation_info.ppEnabledExtensionNames = vulcano_state->vulkan_instance_extensions;
 
+    size_t cnt = 0;
+    bool cond = true;
+
     // Check if we have Vulkan Validation Layer Support
-    for (size_t i = 0; i < vulcano_state->vulkan_layer_ext_cnt; i++)
+    while (cnt < vulcano_state->vulkan_layer_ext_cnt && cond)
     {
-        if (strcmp(vulcano_state->vulkan_layer_extensions[i].layerName, vulkan_layers[0]) == 0)
+        if (strcmp(vulcano_state->vulkan_layer_extensions[cnt].layerName, vulkan_layers[0]) == 0)
         {
             creation_info.enabledLayerCount = 1;
             creation_info.ppEnabledLayerNames = vulkan_layers;
-            printf(YELLOW "[vulkan] vk_create_instance: Enabling Vulkan Validation Layers..." NORMAL "\n");
+            printf(BOLD YELLOW "[vulkan] vk_create_instance: Enabling Vulkan Validation Layers..." NORMAL "\n");
+            cond = false;
         }
+
+        cnt++;
     }
 
     free(vulcano_state->vulkan_extensions);
@@ -130,12 +162,10 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
             break;
 
         case VK_SUCCESS:
-            printf("YAY!\n");
             break;
             
         default:
             break;
-
     }
 
 
