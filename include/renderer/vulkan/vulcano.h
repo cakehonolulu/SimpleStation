@@ -1,6 +1,6 @@
 #pragma once
 
-#include <renderer/vulkan.h>
+#include <vulkan/vulkan.h>
 #include <SDL.h>
 #include <SDL_vulkan.h>
 #include <ui/termcolour.h>

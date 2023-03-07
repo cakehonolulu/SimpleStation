@@ -1,6 +1,7 @@
 #include <gpu/gpu.h>
 #include <gpu/command_buffer.h>
 #include <renderer/renderer.h>
+#include <renderer/vulkan.h>
 #include <ui/termcolour.h>
 #include <stdio.h>
 
@@ -31,6 +32,7 @@ uint8_t m_gpu_init(m_simplestation_state *m_simplestation)
                     break;
 
                 case VULKAN:
+                    init_vulkan_renderer(m_simplestation);
                     m_simplestation->m_gpu_command_buffer_state = ON;
                     break;
                 

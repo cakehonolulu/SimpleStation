@@ -12,6 +12,8 @@
 #include <extern/gdbstub/gdbstub.h> 
 #endif
 
+#include <renderer/vulkan/vulcano.h>
+
 /* Defines */
 #define KiB 1024
 #define MiB (KiB * KiB)
@@ -461,6 +463,8 @@ typedef struct
 	bool m_cond;
 
 	renderer_backends renderer;
+
+	vulcano_struct *vulcano_state;
 
 } m_simplestation_state;
 
