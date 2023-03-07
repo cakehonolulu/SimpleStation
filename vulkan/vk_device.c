@@ -56,11 +56,13 @@ VkDevice vk_create_device(vulcano_struct *vulcano_state, uint32_t queue_family_n
             has_swapchain = true;
             needed_layers++;
         }
+#ifdef __APPLE
         else if (strcmp(vulcano_state->vulkan_device_extensions[cnt].extensionName, "VK_KHR_portability_subset") == 0)
         {
             needs_compat = true;
             needed_layers++;
         }
+#endif
 
         cnt++;
     }

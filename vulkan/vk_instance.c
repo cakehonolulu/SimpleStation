@@ -102,6 +102,9 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
     size_t cnt = 0, needed_layers = 0;
     bool portability_enumeration = false, phys_prop2 = false, khr_surface = false;
 
+#ifndef __APPLE__
+    bool xlib_surface = false;
+#endif
 #ifdef __APPLE__
     bool khr_metal_surface = false;
 #endif
@@ -115,6 +118,13 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
             khr_surface = true;
             needed_layers++;
         }
+#ifndef __APPLE__
+        if (strcmp(vulcano_state->vulkan_instance_extensions[cnt].extensionName, "VK_KHR_xlib_surface") == 0)
+        {
+            xlib_surface = true;
+            needed_layers++;
+        }
+#endif
 #ifdef __APPLE__
         else if (strcmp(vulcano_state->vulkan_instance_extensions[cnt].extensionName, "VK_KHR_portability_enumeration") == 0)
         {
@@ -152,6 +162,18 @@ VkInstance vk_create_instance(vulcano_struct *vulcano_state, bool *vulkan_error)
         printf(BOLD MAGENTA "[vulkan] vk_create_instance: Enabling VK_KHR_surface extension..." NORMAL "\n");
         creation_info.enabledExtensionCount++;
     }
+
+#ifndef __APPLE__
+    if (xlib_surface)
+    {
+        chosen_instance_extensions[cnt] = malloc(sizeof(char) * (strlen("VK_KHR_xlib_surface") + 1));
+        chosen_instance_extensions[cnt] = "VK_KHR_xlib_surface";
+        cnt++;
+
+        printf(BOLD MAGENTA "[vulkan] vk_create_instance: Enabling VK_KHR_xlib_surface extension..." NORMAL "\n");
+        creation_info.enabledExtensionCount++;
+    }
+#endif
 
 #ifdef __APPLE__
     if (portability_enumeration)

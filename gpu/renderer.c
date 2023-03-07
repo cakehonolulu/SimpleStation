@@ -71,6 +71,7 @@ uint8_t m_renderer_init(m_simplestation_state *m_simplestation)
                 m_simplestation->vulcano_state->instance, &m_simplestation->vulcano_state->surface) != SDL_TRUE)
 			{
 				printf(RED "[vulkan] init: Couldn't create Vulkan Surface!" NORMAL "\n");
+				printf(RED "         %s" NORMAL "\n", SDL_GetError());
 			}
 			else
 			{
