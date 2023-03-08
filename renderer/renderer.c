@@ -51,8 +51,10 @@ void setup_vulkan_renderstack(m_simplestation_state *m_simplestation, renderstac
     renderstack->gpu_draw_monochrome_opaque_quad = &vulkan_gpu_draw_monochrome_opaque_quad;
     renderstack->gpu_draw_texture_blend_opaque_quad = &vulkan_gpu_draw_texture_blend_opaque_quad;
     renderstack->gpu_draw_texture_raw_opaque_quad = &vulkan_gpu_draw_texture_raw_opaque_quad;
+    renderstack->gpu_draw_texture_raw_semitransparent_quad = &vulkan_gpu_draw_texture_raw_opaque_quad;
     renderstack->gpu_draw_shaded_opaque_triangle = &vulkan_gpu_draw_shaded_opaque_triangle;
     renderstack->gpu_draw_shaded_opaque_quad = &vulkan_gpu_draw_shaded_opaque_quad;
+    renderstack->gpu_draw_texture_blend_variable_size_rect = &vulkan_gpu_draw_texture_raw_variable_size_rect;
     renderstack->gpu_draw_texture_raw_variable_size_rect = &vulkan_gpu_draw_texture_raw_variable_size_rect;
     renderstack->gpu_draw_monochrome_opaque_1x1 = &vulkan_gpu_draw_monochrome_opaque_1x1;
     renderstack->gpu_image_draw = &vulkan_gpu_image_draw;
@@ -69,8 +71,11 @@ void setup_opengl_renderstack(m_simplestation_state *m_simplestation, renderstac
     renderstack->gpu_draw_monochrome_opaque_quad = &m_gpu_draw_monochrome_opaque_quad;
     renderstack->gpu_draw_texture_blend_opaque_quad = &m_gpu_draw_texture_blend_opaque_quad;
     renderstack->gpu_draw_texture_raw_opaque_quad = &m_gpu_draw_texture_raw_opaque_quad;
+    renderstack->gpu_draw_texture_raw_semitransparent_quad = &m_gpu_draw_texture_raw_semitransparent_quad;
     renderstack->gpu_draw_shaded_opaque_triangle = &m_gpu_draw_shaded_opaque_triangle;
     renderstack->gpu_draw_shaded_opaque_quad = &m_gpu_draw_shaded_opaque_quad;
+    renderstack->gpu_draw_monochrome_opaque_line = &m_gpu_draw_monochrome_opaque_line;
+    renderstack->gpu_draw_texture_blend_variable_size_rect = &m_gpu_draw_texture_raw_variable_size_rect;
     renderstack->gpu_draw_texture_raw_variable_size_rect = &m_gpu_draw_texture_raw_variable_size_rect;
     renderstack->gpu_draw_monochrome_opaque_1x1 = &m_gpu_draw_monochrome_opaque_1x1;
     renderstack->gpu_image_draw = &m_gpu_image_draw;
