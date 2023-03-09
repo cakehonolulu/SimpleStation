@@ -98,6 +98,17 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
     return m_value;
 }
 
+void dma_step(m_simplestation_state *m_simplestation)
+{
+    for (int m_id = 0; m_id < 7; m_id++)
+    {
+        if (m_channel_get_active(m_simplestation, m_id))
+        {
+            m_dma_run(m_simplestation, m_id);
+        }
+    }
+}
+
 void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     uint8_t m_major = (m_addr & 0x70) >> 4;
@@ -125,11 +136,6 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
                     m_simplestation_exit(m_simplestation, 1);
                     break;
-            }
-
-            if (m_channel_get_active(m_simplestation, m_major))
-            {
-                m_dma_run(m_simplestation, m_major);
             }
 
             break;

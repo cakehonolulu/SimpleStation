@@ -246,24 +246,43 @@ int main(int argc, char **argv)
 #endif
 										while (true)
 										{			
-											/*nowTime = glfwGetTime();
+											nowTime = glfwGetTime();
 											deltaTime += (nowTime - lastTime) / limitFPS;
 											lastTime = nowTime;
 							
-											while (deltaTime >= 1.0)
-											{*/
-												for (int i = 0; i < 365045; i++)
+											for (int j = 0; j < 60; j++)
+											{
+												for (int i = 0; i < 300 / 3; i++)
 												{
 													// Fetch, decode, execute
 													m_cpu_fde(&m_simplestation);
 												}
 												
-												renderstack.display(&m_simplestation);
+												dma_step(&m_simplestation);
 
-												m_cdrom_step(&m_simplestation);
+											}
+											
+											m_cdrom_step(&m_simplestation);
+											m_interrupts_request(VBLANK, &m_simplestation);
+
+										
+											while (deltaTime >= 1.0)
+											{
+
+											updates++;
+											deltaTime--;
+
+											//printf("Rendering...\n");
+											renderstack.display(&m_simplestation);
+											}
+
+
+												//renderstack.display(&m_simplestation);
+
+												//m_cdrom_step(&m_simplestation);
 												
 												// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
-												m_interrupts_request(VBLANK, &m_simplestation);
+												//m_interrupts_request(VBLANK, &m_simplestation);
 												/*
 												updates++;
 												deltaTime--;
@@ -272,7 +291,7 @@ int main(int argc, char **argv)
 											
 
 
-											/*if (glfwGetTime() - timer > 1.0) {
+											if (glfwGetTime() - timer > 1.0) {
 												timer ++;
 												char buffer[1024];
 												snprintf(buffer, sizeof(buffer), "SimpleStation (SDL2) | FPS: %d | MS/F: %.2f", updates, pow(updates / 1000.0f, -1.0));
@@ -280,7 +299,7 @@ int main(int argc, char **argv)
 												m_window_changetitle(buffer);
 
 												updates = 0;
-											}*/
+											}
 
 											while( SDL_PollEvent( &m_event ) )
 											{
