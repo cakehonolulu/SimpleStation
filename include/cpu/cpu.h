@@ -105,6 +105,7 @@ void m_cpu_exit(m_simplestation_state *m_simplestation);
 bool m_cpu_check_signed_addition(int32_t m_first_num, int32_t m_second_num);
 bool m_cpu_check_signed_subtraction(int32_t m_first_num, int32_t m_second_num);
 void m_cpu_delay_slot_handler(m_simplestation_state *m_simplestation);
+bool m_cpu_check_interrupts(m_simplestation_state *m_simplestation);
 
 void m_cpu_load_delay_enqueue_byte(uint8_t m_register, uint8_t m_value, m_simplestation_state *m_simplestation);
 void m_cpu_load_delay_enqueue_word(uint8_t m_register, uint16_t m_value, m_simplestation_state *m_simplestation);

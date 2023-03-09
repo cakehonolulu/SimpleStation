@@ -70,7 +70,7 @@ void setup_opengl_renderstack(m_simplestation_state *m_simplestation, renderstac
 
 extern void vulkan_draw(m_simplestation_state *m_simplestation, bool clear_colour);
 
-extern void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part);
+extern void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, bool isline);
 extern void display(m_simplestation_state *m_simplestation);
 
 /* Vulkan GP0 */

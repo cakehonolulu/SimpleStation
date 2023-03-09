@@ -315,7 +315,7 @@ extern GLint uniform_offset;
 
 void m_gpu_set_draw_offset(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
-    renderstack.draw(m_simplestation, false, false);
+    if (m_simplestation->renderer == OPENGL) draw(m_simplestation, false, false, false);
     
     uint16_t m_x = ((uint16_t) (m_value & 0x7FF));
     uint16_t m_y = ((uint16_t) ((m_value >> 11) & 0x7FF));

@@ -518,7 +518,8 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
 	//printf("vline_start: %d ; vline_end: %d\n\n", m_simplestation->m_gpu->m_display_line_start, m_simplestation->m_gpu->m_display_line_end);
 }
 
-void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part) {
+void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, bool isline)
+{
 
 	/* Off-screen Framebuffer */
 
@@ -548,8 +549,15 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part) 
 	// Off-screen shaders sample-off the off-screen VRAM Texture
 	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 
-	// Draw the scene
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
+	// Check if we need to draw lines
+	if (isline)
+	{
+		glDrawArrays(GL_LINES, 0, (GLsizei) (count_vertices));
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
+	}
 
 	// Copy the display area from the VRAM off to the on-screen texture
 	glBindTexture(GL_TEXTURE_2D, m_window_texture);
@@ -620,7 +628,7 @@ void m_sync_vram(m_simplestation_state *m_simplestation)
 }
 
 void display(m_simplestation_state *m_simplestation) {
-  draw(m_simplestation, false, false);
+  draw(m_simplestation, false, false, false);
   SDL_GL_SwapWindow(m_window);
 }
 
@@ -629,7 +637,7 @@ int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simples
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
 	{
 		//printf("Vertex attribute buffers full, forcing_draw\n");
-		draw(m_simplestation, false, false);
+		draw(m_simplestation, false, false, false);
 	}
 
 	m_vertex_buffer[count_vertices] = v1;
@@ -641,6 +649,21 @@ int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simples
 	m_vertex_buffer[count_vertices] = v3;
 	count_vertices++;
 
+	return 0;	
+}
+
+int put_line(OpenGL_Vertex v1, OpenGL_Vertex v2, m_simplestation_state *m_simplestation)
+{
+	draw(m_simplestation, false, false, false);
+
+	m_vertex_buffer[count_vertices] = v1;
+	count_vertices++;
+
+	m_vertex_buffer[count_vertices] = v2;
+	count_vertices++;
+
+	draw(m_simplestation, false, false, true);
+	
 	return 0;	
 }
 
@@ -725,14 +748,36 @@ void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation) {
     display_area_height = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
 
     glScissor(display_area_x, display_area_y, display_area_width, display_area_height);
-    draw(m_simplestation, true, false);
+    draw(m_simplestation, true, false, false);
 
     glDisable(GL_SCISSOR_TEST);
 }
 
+
 void m_gpu_draw_monochrome_opaque_line(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
+	OpenGL_Vertex v1, v2;
 
+	memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+
+	uint32_t colour = m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xffffff;
+
+	v1.position.x = m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xffff;
+	v1.position.y = m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16;
+
+	v2.position.x = m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xffff;
+	v2.position.y = m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16;
+
+	v1.colour.r = (((colour) >> 0) & 0xff);
+	v1.colour.g = (((colour) >> 8) & 0xff);
+	v1.colour.b = (((colour) >> 16) & 0xff);
+
+	v2.colour.r = (((colour) >> 0) & 0xff);
+	v2.colour.g = (((colour) >> 8) & 0xff);
+	v2.colour.b = (((colour) >> 16) & 0xff);
+
+	put_line(v1, v2, m_simplestation);
 }
 
 void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -1060,7 +1105,7 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;
 
-    draw(m_simplestation, false, true);
+    draw(m_simplestation, false, true, false);
     
 
     const uint32_t coords = m_simplestation->m_gpu_command_buffer->m_buffer[1];
