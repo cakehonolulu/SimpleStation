@@ -48,7 +48,8 @@ void m_cdrom_step(m_simplestation_state *m_simplestation)
 	{
 		m_simplestation->m_cpu_ints->m_interrupt_stat |= 0x04;
 		m_simplestation->m_cdrom->m_interrupt_flag_register = m_simplestation->m_cdrom->m_queued_responses;
-		m_exception(0x00 , m_simplestation);
+		// FIXME?
+		//m_exception(0x01 , m_simplestation);
 		m_simplestation->m_cdrom->m_queued_responses = -1;
 	}
 }
