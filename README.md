@@ -76,19 +76,19 @@
 - SCPH3000.bin	| 849515939161e62f6b866f6853006780
 	- Graphical glitches on boot logo, boots to shell
 - SCPH3500.bin	| cba733ceeff5aef5c32254f1d617fa62
-	- Boots to shell, crashes on unhandled memory read (Fixed by relaxing timers)
+	- Boots to shell
 - SCPH5000.bin	| 57a06303dfa9cf9351222dfcbb4a29d9
-	- Boots to shell, crashes on unhandled memory read (Fixed by relaxing timers)
+	- Boots to shell
 - SCPH5500.bin	| 8dd7d5296a650fac7319bce665a6a53c
-	- Boots to shell, crashes on unhandled memory read (Fixed by relaxing timers)
+	- Boots to shell
 - SCPH5502.bin	| e56ec1b027e2fe8a49217d9678f7f6bb
 	- Nothing displayed, Illegal Opcode 0x0053DE3E
 - SCPH5552.bin	| 32736f17079d0b2b7024407c39bd3050
 	- Infinite loop after boot logo (Right before shell)
 - SCPH7000.bin	| 8e4c14f567745eff2f0408c8129f72a6
-	- Boots to shell, crashes on unhandled memory read (Fixed by relaxing timers)
+	- Boots to shell
 - SCPH7001.bin	| 1e68c231d0896b7eadcad1d7d8e76129
-	- Crashes on unhandled memory read right before entering the shell
+	- Boots to shell
 - SCPH7003.bin	| 490f666e1afb15b7362b406ed1cea246
 	- Boots to shell
 - SCPH7502.bin	| b9d9a0286c33dc6b7237bb13cd46fdee
