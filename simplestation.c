@@ -249,47 +249,32 @@ int main(int argc, char **argv)
 											nowTime = glfwGetTime();
 											deltaTime += (nowTime - lastTime) / limitFPS;
 											lastTime = nowTime;
-							
-											for (int j = 0; j < 60; j++)
+
+											for (int j = 0; j < 3000; j++)
 											{
 												for (int i = 0; i < 300 / 3; i++)
 												{
 													// Fetch, decode, execute
 													m_cpu_fde(&m_simplestation);
 												}
-												
+													
 												dma_step(&m_simplestation);
-
+													
+												for (int i = 0; i < (300 / 1.5f); i++)
+												{
+													m_cdrom_step(&m_simplestation);
+												}
 											}
-											
-											m_cdrom_step(&m_simplestation);
+												
 											m_interrupts_request(VBLANK, &m_simplestation);
-
-										
+												
+											renderstack.display(&m_simplestation);
+												
 											while (deltaTime >= 1.0)
 											{
-
-											updates++;
-											deltaTime--;
-
-											//printf("Rendering...\n");
-											renderstack.display(&m_simplestation);
-											}
-
-
-												//renderstack.display(&m_simplestation);
-
-												//m_cdrom_step(&m_simplestation);
-												
-												// VSync - 59.94 Hz for NTSC or 565,045 cycles/vsync
-												//m_interrupts_request(VBLANK, &m_simplestation);
-												/*
 												updates++;
 												deltaTime--;
-											}*/
-											
-											
-
+											}
 
 											if (glfwGetTime() - timer > 1.0) {
 												timer ++;
