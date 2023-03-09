@@ -10,12 +10,22 @@
 </p>
 
 <table align="center">
-<h2 align="center">PSX Menus</h2>
+<h2 align="center">PSX Bootlogo</h2>
 <thead>
   <tr>
-    <td><h4>PSX Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>PAL PSX</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>NTSC PSX</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bootup2.png" width="250vw" height="185vh" alt="Image"></td>
     <td><h4>Experimental Vulkan Renderer</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/vulkan.png" width="250vw" height="185vh" alt="Image"></td>
+  </tr>
+</thead>
+</table>
+
+<table align="center">
+<h2 align="center">PSX Bootlogo</h2>
+<thead>
+  <tr>
     <td><h4>BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>Another BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios2.png" width="250vw" height="185vh" alt="Image"></td>
   </tr>
 </thead>
 </table>
