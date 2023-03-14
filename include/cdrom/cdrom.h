@@ -13,6 +13,7 @@
 /* CDROM Commands */
 #define CDROM_GETSTAT_CMD       0x01
 #define CDROM_TEST_CMD          0x19
+#define CDROM_GETID_CMD         0x1A
 
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);

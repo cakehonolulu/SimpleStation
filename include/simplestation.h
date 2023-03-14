@@ -466,7 +466,28 @@ typedef struct
 
 	vulcano_struct *vulcano_state;
 
+    // Scheduled events number
+	uint64_t scheduled;
+	
+    // Master cycles
+    uint64_t time;
+
 } m_simplestation_state;
+
+typedef void (*sched_func)(m_simplestation_state *m_simplestation);
+
+/* Structures */
+typedef struct
+{
+    // In how many cycles we have to execute
+    uint64_t time;
+
+    char subsystem[8];
+	
+	// Function to execute
+    sched_func func;
+
+} event_t;
 
 // Exception types
 typedef enum {
