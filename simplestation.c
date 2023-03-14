@@ -290,9 +290,6 @@ int main(int argc, char **argv)
 											}
 
 											m_interrupts_request(VBLANK, &m_simplestation);
-											
-											
-											scheduler_tick(2, &m_simplestation);
 
 											delay_miliseconds -= target_miliseconds;
 										}
