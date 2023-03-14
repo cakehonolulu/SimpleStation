@@ -56,7 +56,7 @@ void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
                 m_simplestation->scheduled--;
 
                 // This acts like a POP
-                for (int j = 0; j < 64; j++)
+                for (int j = 0; j < 63; j++)
                 {
                     events[j] = events[j + 1];
                 }
