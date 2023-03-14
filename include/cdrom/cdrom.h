@@ -13,6 +13,9 @@
 /* CDROM Commands */
 #define CDROM_GETSTAT_CMD       0x01
 #define CDROM_SETLOC_CMD        0x02
+#define CDROM_READN_CMD         0x06
+#define CDROM_PAUSE_CMD         0x09
+#define CDROM_SETMODE_CMD       0x0E
 #define CDROM_SEEKL_CMD         0x15
 #define CDROM_TEST_CMD          0x19
 #define CDROM_GETID_CMD         0x1A
