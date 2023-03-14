@@ -5,6 +5,24 @@
 #include <cpu/instructions.h>
 
 uint8_t queued_fifo[16] = { 0 };
+bool reading = false;
+
+#define SECTOR_SIZE 0x930
+uint8_t SectorBuffer[SECTOR_SIZE];
+int bytes_read = 0;
+bool form2 = false;
+uint8_t drqsts = 0;
+FILE *cd = NULL;
+bool xa_adpcm = false;
+bool WholeSector = false;
+
+#define FORM1_DATA_SIZE 0x800
+#define FORM2_DATA_SIZE 0x914
+
+void cd_init(m_simplestation_state *m_simplestation)
+{
+	cd = fopen(m_simplestation->cd_name, "rb");
+}
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
@@ -14,6 +32,16 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 
     if (m_simplestation->m_cdrom)
     {
+		if (m_simplestation->m_cdrom_in)
+		{
+			printf(BOLD GREEN "[CDROM] Booting CD..." NORMAL "\n");
+			cd_init(m_simplestation);
+		}
+		else
+		{
+			printf(BOLD GREEN "[CDROM] CD-less boot..." NORMAL "\n");
+		}
+
         m_simplestation->m_cdrom_state = ON;
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
 		m_cdrom_setup(m_simplestation);
@@ -62,12 +90,25 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
     {
 		// Index/Status Register
 		case 0:
-			m_simplestation->m_cdrom->m_status_register.index = m_value;
+			m_simplestation->m_cdrom->m_status_register.raw &= ~0b11;
+			m_simplestation->m_cdrom->m_status_register.raw |= m_value & 0b11;
 			break;
 
 		// Command Register Write
 		case 1:
-			m_cdrom_exec_cmd(m_value, m_simplestation);
+			switch (m_simplestation->m_cdrom->m_status_register.raw & 0b11) {
+				case 0:
+					m_cdrom_exec_cmd(m_value, m_simplestation);
+					break;
+				
+				case 3: break;
+
+				default:
+					printf(RED "[CDROM] read: Unhandled CDROM Write (Offset: %d, Index: %d)\n" NORMAL, m_offset, m_simplestation->m_cdrom->m_status_register.raw & 0b11);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+				}
+
 			break;
 
 		// Status's Index-determined write
@@ -96,6 +137,9 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 		case 3:
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
+				case 0:
+					break;
+
 				// Interrupt Flag Register Write
 				case 1:
 					m_simplestation->m_cdrom->m_interrupt_flag_register &= ~m_value;
@@ -125,16 +169,38 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
     {
 		// Index/Status Register
 		case 0:
-			m_value = m_simplestation->m_cdrom->m_status_register.raw;
+			m_value = m_simplestation->m_cdrom->m_status_register.raw | (drqsts << 6) | ((xa_adpcm ? 1 : 0) << 2);
 			break;
 
 		// Response FIFO Read
 		case 1:
-			m_value = m_cdrom_response_fifo_pop(m_simplestation);
+			switch (m_simplestation->m_cdrom->m_status_register.raw & 0b11) {
+				case 0:
+				case 1:
+					m_value = m_cdrom_response_fifo_pop(m_simplestation);
+					break;
+				default:
+					printf(RED "[CDROM] read: Unhandled CDROM Read (Offset: %d, Index: %d)\n" NORMAL, m_offset, m_simplestation->m_cdrom->m_status_register.raw & 0b11);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+				}
+			
 			break;
 
 		case 3:
-			m_value = m_simplestation->m_cdrom->m_interrupt_flag_register | 0xE0;
+			switch (m_simplestation->m_cdrom->m_status_register.raw & 0b11) {
+				case 0:
+					m_value = m_simplestation->m_cdrom->m_interrupt_enable_register;
+					break;
+				case 1:
+					m_value = m_simplestation->m_cdrom->m_interrupt_flag_register;
+					break;
+				default:
+					printf(RED "[CDROM] read: Unhandled CDROM Read (Offset: %d, Index: %d)\n" NORMAL, m_offset, m_simplestation->m_cdrom->m_status_register.raw & 0b11);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+				}
+			
 			break;
 
         default:
@@ -144,6 +210,74 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
     }
 
     return m_value;
+}
+
+uint32_t seekloc = 0;
+
+bool cancel_int1 = false;
+
+uint8_t get_stat() {
+	uint8_t stat = 0b10;	// Pretend that the motor is always on
+	if (reading)
+		stat |= (1 << 5);
+	return stat;
+}
+
+void cd_read(uint32_t loc) {
+	printf("[CDROM] Reading from LBA %d\n", loc);
+	fseek(cd, (loc - 150) * SECTOR_SIZE, SEEK_SET);
+	fread(SectorBuffer, sizeof(uint8_t), SECTOR_SIZE, cd);
+	form2 = (SectorBuffer[0x12] & 32);
+}
+
+uint8_t ReadDataByte(m_simplestation_state *m_simplestation)
+{
+	if (bytes_read > ((WholeSector ? (SECTOR_SIZE - 0xc) : (form2 ? FORM2_DATA_SIZE : FORM1_DATA_SIZE)) - 1)) {
+		printf("[CD] bytes_read overflow\n");
+		exit(0);
+	}
+	if (bytes_read >= ((WholeSector ? (SECTOR_SIZE - 0xc) : (form2 ? FORM2_DATA_SIZE : FORM1_DATA_SIZE)) - 1)) {
+		printf("[All data has been read]\n");
+		drqsts = 0;
+	}
+	return SectorBuffer[(WholeSector ? 0x0c : 0x18) + bytes_read++];
+}
+
+
+void INT1(m_simplestation_state *m_simplestation)
+{
+	if (!cancel_int1) {
+		cd_read(seekloc++);
+
+		bool audio_sector = (SectorBuffer[0x12] & 4);
+		bool realtime = (SectorBuffer[0x12] & 64);
+		bool form2 = (SectorBuffer[0x12] & 32);
+
+		if (!xa_adpcm || !(audio_sector && realtime)) {
+			if (form2) {
+				printf("[CDROM] MODE2/FORM2 sectors are not supported\n");
+				//exit(1);
+			}
+			printf(BOLD MAGENTA "[CDROM] INT1" NORMAL "\n");
+			m_simplestation->m_cdrom->m_interrupt_flag_register &= ~0b111;
+			m_simplestation->m_cdrom->m_interrupt_flag_register |= 0b001;
+
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+			bytes_read = 0;
+		}
+		event_t event;
+		event.time = m_simplestation->time + (33868800 / 75);
+		event.func = &INT1;
+		strcpy(event.subsystem, "CDROM");
+		scheduler_push(event, m_simplestation);
+	m_interrupts_request(CDROM, m_simplestation);
+	}
+	else {
+		cancel_int1 = false;
+	//m_interrupts_request(CDROM, m_simplestation);
+	}
 }
 
 void INT2(m_simplestation_state *m_simplestation)
@@ -173,55 +307,16 @@ void INT3(m_simplestation_state *m_simplestation)
 
 void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 {
+	event_t primary_event, secondary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+	strcpy(secondary_event.subsystem, "CDROM");
+
 	switch(m_cmd)
 	{
-		case CDROM_SETLOC_CMD:
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
-			
-			uint8_t mm = m_cdrom_parameter_fifo_pop(m_simplestation);
-			uint8_t ss = m_cdrom_parameter_fifo_pop(m_simplestation);
-			uint8_t ff = m_cdrom_parameter_fifo_pop(m_simplestation);
-
-			mm = (mm - 6 * (mm >> 4));
-			ss = (ss - 6 * (ss >> 4));
-			ff = (ff - 6 * (ff >> 4));
-
-			uint16_t seekloc = ff + (ss * 75) + (mm * 60 * 75);
-			printf("[CDROM] SetLoc (%d;%d;%d %d)\n", mm, ss, ff, seekloc);
-			m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_status_register.raw, m_simplestation);
-			event_t event3;
-			event3.time = m_simplestation->time + 18491;
-			event3.func = &INT3;
-			strcpy(event3.subsystem, "CDROM");
-			scheduler_push(event3, m_simplestation);
-			printf("Created event CDROM_SETLOC_CMD...\n");
-
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
-			break;
-
-		case CDROM_SEEKL_CMD:
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
-			printf("[CDROM] SeekL\n");
-			m_cdrom_response_fifo_push(0x42, m_simplestation);
-			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
-
-			event_t event4;
-			event4.time = m_simplestation->time + 50401;
-			event4.func = &INT3;
-			strcpy(event4.subsystem, "CDROM");
-			scheduler_push(event4, m_simplestation);
-
-			event_t event5;
-			event5.time = m_simplestation->time + 200000;
-			event5.func = &INT2;
-			strcpy(event5.subsystem, "CDROM");
-			scheduler_push(event5, m_simplestation);
-
-			printf("Created event CDROM_SEEKL_CMD...\n");
-			break;
-
 		case CDROM_GETSTAT_CMD:
+			uint8_t status = get_stat();
+			status &= ~0b11101;
+
 			/*
 				HACK:
 				
@@ -229,15 +324,169 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 				'no-disk' mode for the shell (Informs the shell that the CDROM 'tray'
 				is currently opened == !disk == jump to shell).
 			*/
-			// 0b00010000
-			m_cdrom_response_fifo_push(0b00000000, m_simplestation);
-			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event;
-			event.time = m_simplestation->time + 50401;
-			event.func = &INT3;
-			strcpy(event.subsystem, "CDROM");
-			scheduler_push(event, m_simplestation);
+			if (m_simplestation->m_cdrom_in)
+			{
+				m_cdrom_response_fifo_push(0b00000000, m_simplestation);
+			}
+			else
+			{
+				m_cdrom_response_fifo_push(0b00010000, m_simplestation);
+			}
+
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event CDROM_GETSTAT_CMD...\n");
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+
+			break;
+
+		case CDROM_SETLOC_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			
+			uint8_t ff = m_cdrom_parameter_fifo_pop(m_simplestation);
+			uint8_t ss = m_cdrom_parameter_fifo_pop(m_simplestation);
+			uint8_t mm = m_cdrom_parameter_fifo_pop(m_simplestation);
+
+			mm = (mm - 6 * (mm >> 4));
+			ss = (ss - 6 * (ss >> 4));
+			ff = (ff - 6 * (ff >> 4));
+
+			seekloc = ff + (ss * 75) + (mm * 60 * 75);
+			printf("[CDROM] SetLoc (%d;%d;%d %d)\n", mm, ss, ff, seekloc);
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+			
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			primary_event.time = m_simplestation->time + 18491;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+			printf("Created event CDROM_SETLOC_CMD...\n");
+
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+			break;
+
+		case CDROM_READN_CMD:
+			if (reading) cancel_int1 = true;
+			reading = true;
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;	// Set parameter fifo empty bit
+			printf("[CDROM] ReadN\n");
+			bytes_read = 0;
+
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+
+			queued_fifo[0] = 0x22;
+
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+
+			secondary_event.time = m_simplestation->time + (33868800 / 75);
+			secondary_event.func = &INT1;
+			scheduler_push(secondary_event, m_simplestation);
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;	// Set response fifo empty bit (means it's full)
+			break;
+
+		case CDROM_PAUSE_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;	// Set parameter fifo empty bit
+			printf("[CDROM] Pause\n");
+			if(reading) cancel_int1 = true;
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			reading = false;	// The first response's status code still has bit 5 set
+			queued_fifo[0] = get_stat();
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+
+			secondary_event.time = m_simplestation->time + 50401 + 1097107;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;	// Set response fifo empty bit (means it's full)
+			break;
+
+		case 0x0A:
+			printf("[CDROM] Init\n");
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);;
+
+			queued_fifo[0] = 0b00000010;
+			
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			primary_event.time = m_simplestation->time + 30000;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+
+			secondary_event.time = m_simplestation->time + 40000;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
+
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+
+			break;
+
+		case CDROM_SETMODE_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			uint8_t param = m_cdrom_parameter_fifo_pop(m_simplestation);
+			printf("[CDROM] SETMODE (0x%X)\n", param);
+			int DoubleSpeed = (param & 0b10000000) >> 7;
+			xa_adpcm = (param & 0b01000000) >> 6;
+			int WholeSector1 = (param & 0b00100000) >> 5;
+			int CDDA = param & 1;
+			if (DoubleSpeed) printf("DoubleSpeed\n");
+			if (xa_adpcm) printf("XA-ADPCM\n");
+			if (WholeSector1) {
+				printf("WholeSector\n");
+			}
+			WholeSector = WholeSector1;
+			if (CDDA) { printf("CDDA\n"); 
+				//exit(1); 
+			}
+
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+
+
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+			printf("Created event CDROM_SETMODE_CMD...\n");
+
+			break;
+
+		case CDROM_SEEKL_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			printf("[CDROM] SeekL\n");
+			m_cdrom_response_fifo_push(0x42, m_simplestation);
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+			
+			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+
+			secondary_event.time = m_simplestation->time + 200000;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
+
+			printf("Created event CDROM_SEEKL_CMD...\n");
 			break;
 
 		case CDROM_TEST_CMD:
@@ -245,12 +494,10 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			break;
 
 		case CDROM_GETID_CMD:
-			m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_status_register.raw, m_simplestation);
-			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event2;
-			event2.time = m_simplestation->time + 50401 + 18944;
-			event2.func = &INT2;
-			strcpy(event2.subsystem, "CDROM");
+			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
+			m_simplestation->m_cdrom->m_queued_responses = 1;
+
+			
 			queued_fifo[0] = 0x02;
 			queued_fifo[1] = 0;
 			queued_fifo[2] = 0;
@@ -259,8 +506,12 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			queued_fifo[5] = 'C';
 			queued_fifo[6] = 'E';
 			queued_fifo[7] = 'A';
-			scheduler_push(event2, m_simplestation);
+			
+			primary_event.time = m_simplestation->time + 50401 + 18944;
+			primary_event.func = &INT2;
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event CDROM_GETID_CMD...\n");
+
 			break;
 
 		default:
@@ -272,6 +523,9 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 
 void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simplestation)
 {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
 	switch (m_subcmd)
 	{
 		// INT3(yy,mm,dd,ver)
@@ -284,11 +538,11 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 			m_cdrom_response_fifo_push(0x18, m_simplestation);
 
 			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event;
-			event.time = m_simplestation->time + 50401;
-			event.func = &INT3;
-			strcpy(event.subsystem, "CDROM");
-			scheduler_push(event, m_simplestation);
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event INT3(yy,mm,dd,ver)...\n");
 			break;
 
