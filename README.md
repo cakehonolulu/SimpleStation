@@ -21,11 +21,12 @@
 </table>
 
 <table align="center">
-<h2 align="center">PSX Bootlogo</h2>
+<h2 align="center">PSX Menus</h2>
 <thead>
   <tr>
     <td><h4>BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios.png" width="250vw" height="185vh" alt="Image"></td>
     <td><h4>Another BIOS Menu</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/bios2.png" width="250vw" height="185vh" alt="Image"></td>
+    <td><h4>PSX Game Boot</h4><img src="https://raw.githubusercontent.com/cakehonolulu/SimpleStation/main/resources/psx_logo.png" width="250vw" height="185vh" alt="Image"></td>
   </tr>
 </thead>
 </table>
