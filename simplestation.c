@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 		printf("-vramview        - (OpenGL Only) Opens a 1024x512 window with a graphical representation of PSX's VRAM\n");
 		printf("-debugger        - Launch a GDB server for debugging the emulated state machine\n");
 		printf("-renderer  [...] - Selects a renderer backend, possible values: 'vulkan' , 'opengl'\n");
+		printf("-cdrom     [...] - Path to CDROM (.bin format file) to launch\n");
 		return 0;
 	}
 	else
