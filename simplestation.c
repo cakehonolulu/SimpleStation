@@ -21,6 +21,7 @@
 #endif
 
 renderstack_t renderstack;
+event_t *events;
 
 int main(int argc, char **argv)
 {
@@ -202,6 +203,8 @@ int main(int argc, char **argv)
 							{
 								if (m_cdrom_init(&m_simplestation) == 0)
 								{
+									scheduler_init(&m_simplestation);
+
 									glfwInit();
 									
 
@@ -266,11 +269,14 @@ int main(int argc, char **argv)
 												// Fetch, decode, execute
 												m_cpu_fde(&m_simplestation);
 												dma_step(&m_simplestation);
+
+												scheduler_tick(2, &m_simplestation);
 											}
 
 											m_interrupts_request(VBLANK, &m_simplestation);
 											
-											m_cdrom_step(&m_simplestation);
+											
+											scheduler_tick(2, &m_simplestation);
 
 											delay_miliseconds -= target_miliseconds;
 										}
@@ -400,6 +406,8 @@ uint8_t m_simplestation_exit(m_simplestation_state *m_simplestation, uint8_t m_i
 		m_printregs(m_simplestation);
 		m_cpu_exit(m_simplestation);
 	}
+
+	scheduler_exit(m_simplestation);
 
 	if (m_is_fatal == 1)
 	{
