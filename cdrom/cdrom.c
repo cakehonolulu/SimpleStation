@@ -160,7 +160,6 @@ void INT2(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_response_fifo_index = 0;
 	
 	m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
-
 	m_interrupts_request(CDROM, m_simplestation);
 }
 
@@ -169,7 +168,6 @@ void INT3(m_simplestation_state *m_simplestation)
 	printf(BOLD MAGENTA "[CDROM] INT3" NORMAL "\n");
 	m_simplestation->m_cdrom->m_interrupt_flag_register &= ~0b111;
 	m_simplestation->m_cdrom->m_interrupt_flag_register |= 0b011;
-
 	m_interrupts_request(CDROM, m_simplestation);
 }
 
@@ -177,6 +175,52 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 {
 	switch(m_cmd)
 	{
+		case CDROM_SETLOC_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			
+			uint8_t mm = m_cdrom_parameter_fifo_pop(m_simplestation);
+			uint8_t ss = m_cdrom_parameter_fifo_pop(m_simplestation);
+			uint8_t ff = m_cdrom_parameter_fifo_pop(m_simplestation);
+
+			mm = (mm - 6 * (mm >> 4));
+			ss = (ss - 6 * (ss >> 4));
+			ff = (ff - 6 * (ff >> 4));
+
+			uint16_t seekloc = ff + (ss * 75) + (mm * 60 * 75);
+			printf("[CDROM] SetLoc (%d;%d;%d %d)\n", mm, ss, ff, seekloc);
+			m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_status_register.raw, m_simplestation);
+			event_t event3;
+			event3.time = m_simplestation->time + 18491;
+			event3.func = &INT3;
+			strcpy(event3.subsystem, "CDROM");
+			scheduler_push(event3, m_simplestation);
+			printf("Created event CDROM_SETLOC_CMD...\n");
+
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+			break;
+
+		case CDROM_SEEKL_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			printf("[CDROM] SeekL\n");
+			m_cdrom_response_fifo_push(0x42, m_simplestation);
+			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
+
+			event_t event4;
+			event4.time = m_simplestation->time + 50401;
+			event4.func = &INT3;
+			strcpy(event4.subsystem, "CDROM");
+			scheduler_push(event4, m_simplestation);
+
+			event_t event5;
+			event5.time = m_simplestation->time + 200000;
+			event5.func = &INT2;
+			strcpy(event5.subsystem, "CDROM");
+			scheduler_push(event5, m_simplestation);
+
+			printf("Created event CDROM_SEEKL_CMD...\n");
+			break;
+
 		case CDROM_GETSTAT_CMD:
 			/*
 				HACK:
@@ -201,7 +245,7 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			break;
 
 		case CDROM_GETID_CMD:
-			m_cdrom_response_fifo_push(0x02, m_simplestation);
+			m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_status_register.raw, m_simplestation);
 			m_simplestation->m_cdrom->m_queued_responses = 3;
 			event_t event2;
 			event2.time = m_simplestation->time + 50401 + 18944;
