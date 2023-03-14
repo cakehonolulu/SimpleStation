@@ -22,8 +22,9 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
 {
     if (m_simplestation->scheduled < MAX_ENTRIES)
     {
-		printf("scheduler_push: event.cycle_target is %ld\n", events[m_simplestation->scheduled].time);
-		printf("scheduler_push: event.subsystem is %s\n", events[m_simplestation->scheduled].subsystem);
+        printf("scheduler_push: Adding event to %d\n", m_simplestation->scheduled);
+		printf("scheduler_push: event.cycle_target is %ld\n", event.time);
+		printf("scheduler_push: event.subsystem is %s\n", event.subsystem);
         events[m_simplestation->scheduled] = event;
         m_simplestation->scheduled++;
     }
@@ -42,24 +43,31 @@ void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
 
     //printf("Scheduled events: %d\n", m_simplestation->scheduled);
 
-    for (int i = 0; i < m_simplestation->scheduled; i++)
+    if (m_simplestation->scheduled)
     {
-        //printf("m_simplestation->scheduled: %d\n", m_simplestation->scheduled);
-        //printf("time: %ld, scheduled time: %ld\n", m_simplestation->time, events[i].time);
-		if (m_simplestation->time >= events[i].time)
+        for (int i = 0; i < m_simplestation->scheduled; i++)
         {
-            printf("Executing from %s\n", events[i].subsystem);
-            events[i].func(m_simplestation);
-            events[i].func = NULL;
-            executed++;
-        }
-        else
-        {
-            break;
-        }
-    }
+            if (m_simplestation->time >= events[i].time)
+            {
+                printf("Executing from %s\n", events[i].subsystem);
+                events[i].func(m_simplestation);
+                memset(&events[i], 0, sizeof(event_t));
+                executed++;
+                m_simplestation->scheduled--;
 
-    m_simplestation->scheduled -= executed;
+                // This acts like a POP
+                for (int j = 0; j < 64; j++)
+                {
+                    events[j] = events[j + 1];
+                }
+            }
+            else
+            {
+                break;
+            }
+     }
+    }
+    
 }
 
 void scheduler_exit(m_simplestation_state *m_simplestation)
