@@ -272,8 +272,38 @@ void INT3(m_simplestation_state *m_simplestation)
 
 void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 {
+	event_t primary_event, secondary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+	strcpy(secondary_event.subsystem, "CDROM");
+
 	switch(m_cmd)
 	{
+		case CDROM_GETSTAT_CMD:
+			/*
+				HACK:
+				
+				Returning CDROM STAT w/bit 4 ('ShellOpen') set, enables the
+				'no-disk' mode for the shell (Informs the shell that the CDROM 'tray'
+				is currently opened == !disk == jump to shell).
+			*/
+			if (m_simplestation->m_cdrom_in)
+			{
+				m_cdrom_response_fifo_push(0b00000000, m_simplestation);
+			}
+			else
+			{
+				m_cdrom_response_fifo_push(0b00010000, m_simplestation);
+			}
+
+			m_simplestation->m_cdrom->m_queued_responses = 3;
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+			printf("Created event CDROM_GETSTAT_CMD...\n");
+
+			break;
+
 		case CDROM_SETLOC_CMD:
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
 			
@@ -288,12 +318,12 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			seekloc = ff + (ss * 75) + (mm * 60 * 75);
 			printf("[CDROM] SetLoc (%d;%d;%d %d)\n", mm, ss, ff, seekloc);
 			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
-			event_t event3;
-			event3.time = m_simplestation->time + 18491;
-			event3.func = &INT3;
-			strcpy(event3.subsystem, "CDROM");
-			scheduler_push(event3, m_simplestation);
+			
+			primary_event.time = m_simplestation->time + 18491;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event CDROM_SETLOC_CMD...\n");
+
 
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
 			break;
@@ -309,17 +339,13 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 
 			queued_fifo[0] = 0x22;
 
-			event_t event7;
-			event7.time = m_simplestation->time + 50401;
-			event7.func = &INT3;
-			strcpy(event7.subsystem, "CDROM");
-			scheduler_push(event7, m_simplestation);
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 
-			event_t event8;
-			event8.time = m_simplestation->time + (33868800 / 75);
-			event8.func = &INT1;
-			strcpy(event8.subsystem, "CDROM");
-			scheduler_push(event8, m_simplestation);
+			secondary_event.time = m_simplestation->time + (33868800 / 75);
+			secondary_event.func = &INT1;
+			scheduler_push(secondary_event, m_simplestation);
 
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;	// Set response fifo empty bit (means it's full)
 			break;
@@ -332,61 +358,30 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			reading = false;	// The first response's status code still has bit 5 set
 			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
 			
-			event_t event9;
-			event9.time = m_simplestation->time + 50401;
-			event9.func = &INT3;
-			strcpy(event9.subsystem, "CDROM");
-			scheduler_push(event9, m_simplestation);
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 
-			event_t event10;
-			event10.time = m_simplestation->time + 50401 + 1097107;
-			event10.func = &INT2;
-			strcpy(event10.subsystem, "CDROM");
-			scheduler_push(event10, m_simplestation);
+			secondary_event.time = m_simplestation->time + 50401 + 1097107;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
 
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;	// Set response fifo empty bit (means it's full)
-			break;
-
-		case CDROM_SEEKL_CMD:
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
-			printf("[CDROM] SeekL\n");
-			m_cdrom_response_fifo_push(0x42, m_simplestation);
-			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
-			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
-
-			event_t event4;
-			event4.time = m_simplestation->time + 50401;
-			event4.func = &INT3;
-			strcpy(event4.subsystem, "CDROM");
-			scheduler_push(event4, m_simplestation);
-
-			event_t event5;
-			event5.time = m_simplestation->time + 200000;
-			event5.func = &INT2;
-			strcpy(event5.subsystem, "CDROM");
-			scheduler_push(event5, m_simplestation);
-
-			printf("Created event CDROM_SEEKL_CMD...\n");
 			break;
 
 		case 0x0A:
 			printf("[CDROM] Init\n");
 			m_cdrom_response_fifo_push(get_stat(), m_simplestation);;
 
-
 			queued_fifo[0] = 0b00000010;
 			
-			event_t event11;
-			event11.time = m_simplestation->time + 30000;
-			event11.func = &INT3;
-			strcpy(event11.subsystem, "CDROM");
-			scheduler_push(event11, m_simplestation);
+			primary_event.time = m_simplestation->time + 30000;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 
-			event_t event12;
-			event12.time = m_simplestation->time + 40000;
-			event12.func = &INT2;
-			strcpy(event12.subsystem, "CDROM");
-			scheduler_push(event12, m_simplestation);
+			secondary_event.time = m_simplestation->time + 40000;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
 
 
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
@@ -416,39 +411,29 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 
 			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
 
-			event_t event6;
-			event6.time = m_simplestation->time + 50401;
-			event6.func = &INT3;
-			strcpy(event6.subsystem, "CDROM");
-			scheduler_push(event6, m_simplestation);
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event CDROM_SETMODE_CMD...\n");
 
 			break;
 
-		case CDROM_GETSTAT_CMD:
-			/*
-				HACK:
-				
-				Returning CDROM STAT w/bit 4 ('ShellOpen') set, enables the
-				'no-disk' mode for the shell (Informs the shell that the CDROM 'tray'
-				is currently opened == !disk == jump to shell).
-			*/
-			if (m_simplestation->m_cdrom_in)
-			{
-				m_cdrom_response_fifo_push(0b00000000, m_simplestation);
-			}
-			else
-			{
-				m_cdrom_response_fifo_push(0b00010000, m_simplestation);
-			}
+		case CDROM_SEEKL_CMD:
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00001000;
+			printf("[CDROM] SeekL\n");
+			m_cdrom_response_fifo_push(0x42, m_simplestation);
+			queued_fifo[0] = m_simplestation->m_cdrom->m_status_register.raw;
+			m_simplestation->m_cdrom->m_status_register.raw |= 0b00100000;
 
-			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event;
-			event.time = m_simplestation->time + 50401;
-			event.func = &INT3;
-			strcpy(event.subsystem, "CDROM");
-			scheduler_push(event, m_simplestation);
-			printf("Created event CDROM_GETSTAT_CMD...\n");
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			scheduler_push(primary_event, m_simplestation);
+
+			secondary_event.time = m_simplestation->time + 200000;
+			secondary_event.func = &INT2;
+			scheduler_push(secondary_event, m_simplestation);
+
+			printf("Created event CDROM_SEEKL_CMD...\n");
 			break;
 
 		case CDROM_TEST_CMD:
@@ -458,10 +443,8 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 		case CDROM_GETID_CMD:
 			m_cdrom_response_fifo_push(get_stat(), m_simplestation);
 			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event2;
-			event2.time = m_simplestation->time + 50401 + 18944;
-			event2.func = &INT2;
-			strcpy(event2.subsystem, "CDROM");
+
+			
 			queued_fifo[0] = 0x02;
 			queued_fifo[1] = 0;
 			queued_fifo[2] = 0;
@@ -470,8 +453,12 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 			queued_fifo[5] = 'C';
 			queued_fifo[6] = 'E';
 			queued_fifo[7] = 'A';
-			scheduler_push(event2, m_simplestation);
+			
+			primary_event.time = m_simplestation->time + 50401 + 18944;
+			primary_event.func = &INT2;
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event CDROM_GETID_CMD...\n");
+
 			break;
 
 		default:
@@ -483,6 +470,9 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 
 void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simplestation)
 {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
 	switch (m_subcmd)
 	{
 		// INT3(yy,mm,dd,ver)
@@ -495,11 +485,11 @@ void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simples
 			m_cdrom_response_fifo_push(0x18, m_simplestation);
 
 			m_simplestation->m_cdrom->m_queued_responses = 3;
-			event_t event;
-			event.time = m_simplestation->time + 50401;
-			event.func = &INT3;
-			strcpy(event.subsystem, "CDROM");
-			scheduler_push(event, m_simplestation);
+			
+			primary_event.time = m_simplestation->time + 50401;
+			primary_event.func = &INT3;
+			
+			scheduler_push(primary_event, m_simplestation);
 			printf("Created event INT3(yy,mm,dd,ver)...\n");
 			break;
 
