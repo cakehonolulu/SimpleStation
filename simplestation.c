@@ -56,6 +56,7 @@ int main(int argc, char **argv)
 		m_simplestation.m_sideload = false;
 		m_simplestation.m_tty = false;
 		m_simplestation.m_vramview = false;
+		m_simplestation.m_cdrom_in = false;
 
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
@@ -117,6 +118,21 @@ int main(int argc, char **argv)
 					printf("PSX-EXE Name: %s\n", m_simplestation.exename);
 					m_args++;
 					m_simplestation.m_sideload = true;
+				}
+				else
+				{
+					printf("You must specify a PSX-EXE filename!\n");
+				}
+			}
+			else if (!strcmp(argv[m_args], "-cdrom"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					m_simplestation.cd_name = malloc(strlen(argv[m_args + 1]) * sizeof(uint8_t) + 1);
+					strcpy((char *) m_simplestation.cd_name, argv[m_args + 1]);
+					printf("CD-ROM Name: %s\n", m_simplestation.cd_name);
+					m_args++;
+					m_simplestation.m_cdrom_in = true;
 				}
 				else
 				{

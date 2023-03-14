@@ -19,9 +19,9 @@ bool WholeSector = false;
 #define FORM1_DATA_SIZE 0x800
 #define FORM2_DATA_SIZE 0x914
 
-void cd_init()
+void cd_init(m_simplestation_state *m_simplestation)
 {
-	cd = fopen("rom.bin", "rb");
+	cd = fopen(m_simplestation->cd_name, "rb");
 }
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
@@ -32,7 +32,16 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 
     if (m_simplestation->m_cdrom)
     {
-		cd_init();
+		if (m_simplestation->m_cdrom_in)
+		{
+			printf(BOLD GREEN "[CDROM] Booting CD..." NORMAL "\n");
+			cd_init(m_simplestation);
+		}
+		else
+		{
+			printf(BOLD GREEN "[CDROM] CD-less boot..." NORMAL "\n");
+		}
+
         m_simplestation->m_cdrom_state = ON;
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
 		m_cdrom_setup(m_simplestation);
@@ -424,8 +433,15 @@ void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation)
 				'no-disk' mode for the shell (Informs the shell that the CDROM 'tray'
 				is currently opened == !disk == jump to shell).
 			*/
-			// 0b00010000
-			m_cdrom_response_fifo_push(0b00000000, m_simplestation);
+			if (m_simplestation->m_cdrom_in)
+			{
+				m_cdrom_response_fifo_push(0b00000000, m_simplestation);
+			}
+			else
+			{
+				m_cdrom_response_fifo_push(0b00010000, m_simplestation);
+			}
+
 			m_simplestation->m_cdrom->m_queued_responses = 3;
 			event_t event;
 			event.time = m_simplestation->time + 50401;

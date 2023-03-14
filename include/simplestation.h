@@ -472,6 +472,10 @@ typedef struct
     // Master cycles
     uint64_t time;
 
+	char *cd_name;
+
+	bool m_cdrom_in;
+
 } m_simplestation_state;
 
 typedef void (*sched_func)(m_simplestation_state *m_simplestation);
