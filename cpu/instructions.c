@@ -52,18 +52,7 @@ void m_cop2(m_simplestation_state *m_simplestation)
 	printf("cop2\n");
 #endif
 
-	switch (m_simplestation->m_cpu->m_opcode & 0x3F)
-	{
-		case 0x00:
-			// TODO: Properly implement the opcode
-			break;
-			
-		default:
-			printf(RED "[CPU] gte: Unimplemented 'GTE' Opcode: 0x%08X\n" NORMAL, m_simplestation->m_cpu->m_opcode & 0x3F);
-			//m_simplestation_exit(m_simplestation, 1);
-			break;
-	}
-
+	gte_execute(m_simplestation->m_cpu->m_opcode, m_simplestation);
 }
 
 void m_cop3(m_simplestation_state *m_simplestation)
