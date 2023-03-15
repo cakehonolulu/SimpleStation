@@ -260,6 +260,49 @@ void vulkan_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestati
     // TODO
 }
 
+void vulkan_gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    vec3 col = {
+        (uint8_t) (m_simplestation->m_gpu_command_buffer->m_buffer[0] & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 8) & 0xFF),
+        (uint8_t) ((m_simplestation->m_gpu_command_buffer->m_buffer[0] >> 16) & 0xFF)
+    };
+    
+    Vulkan_Vertex v1, v2, v3;
+
+    memset(&v1, 0, sizeof(Vulkan_Vertex));
+    memset(&v2, 0, sizeof(Vulkan_Vertex));
+    memset(&v3, 0, sizeof(Vulkan_Vertex));
+    
+    vec2 pos1 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[1] >> 16)
+    };
+
+    vec2 pos2 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[2] >> 16)
+    };
+
+
+    vec2 pos3 = {
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] & 0xFFFF),
+        (int16_t) (m_simplestation->m_gpu_command_buffer->m_buffer[3] >> 16)
+    };
+
+
+    memcpy(v1.pos, pos1, sizeof(vec2));
+    memcpy(v1.color, col, sizeof(vec3));
+
+    memcpy(v2.pos, pos2, sizeof(vec2));
+    memcpy(v2.color, col, sizeof(vec3));
+
+    memcpy(v3.pos, pos3, sizeof(vec2));
+    memcpy(v3.color, col, sizeof(vec3));
+
+    vulkan_put_triangle(v1, v2, v3, m_simplestation);
+}
+
 void vulkan_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;

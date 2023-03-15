@@ -23,6 +23,9 @@ typedef struct renderstack_s
     // GP0 0x02
     gp0 gpu_fill_rect;
 
+    // GP0 0x20
+    gp0 gpu_draw_opaque_three_point_monochrome_poly;
+    
     // GP0 0x28
     gp0 gpu_draw_monochrome_opaque_quad;
     
@@ -76,6 +79,7 @@ extern void display(m_simplestation_state *m_simplestation);
 /* Vulkan GP0 */
 extern void vulkan_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void vulkan_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation);
+extern void vulkan_gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void vulkan_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void vulkan_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void vulkan_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
@@ -90,6 +94,7 @@ extern void vulkan_gpu_image_store(uint32_t m_value, m_simplestation_state *m_si
 extern void m_gpu_clear_cache(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void m_gpu_fill_rect(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void m_gpu_draw_monochrome_opaque_line(uint32_t m_value, m_simplestation_state *m_simplestation);
+extern void m_gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);
 extern void m_gpu_draw_texture_raw_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation);

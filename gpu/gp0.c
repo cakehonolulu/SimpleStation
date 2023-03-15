@@ -19,7 +19,7 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 break;
             
             case 0x20:
-                gpu_draw_opaque_three_point_monochrome_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                renderstack.gpu_draw_opaque_three_point_monochrome_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x28:

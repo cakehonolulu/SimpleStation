@@ -822,7 +822,7 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     put_quad(v1, v2, v3, v4, m_simplestation);
 }
 
-void gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
+void m_gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
 	Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 

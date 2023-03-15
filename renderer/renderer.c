@@ -48,6 +48,7 @@ void setup_vulkan_renderstack(m_simplestation_state *m_simplestation, renderstac
 {
     renderstack->gpu_clear_cache = &vulkan_gpu_clear_cache;
     renderstack->gpu_fill_rect = &vulkan_gpu_fill_rect;
+    renderstack->gpu_draw_opaque_three_point_monochrome_poly = &vulkan_gpu_draw_opaque_three_point_monochrome_poly;
     renderstack->gpu_draw_monochrome_opaque_quad = &vulkan_gpu_draw_monochrome_opaque_quad;
     renderstack->gpu_draw_texture_blend_opaque_quad = &vulkan_gpu_draw_texture_blend_opaque_quad;
     renderstack->gpu_draw_texture_raw_opaque_quad = &vulkan_gpu_draw_texture_raw_opaque_quad;
@@ -68,6 +69,7 @@ void setup_opengl_renderstack(m_simplestation_state *m_simplestation, renderstac
 {
     renderstack->gpu_clear_cache = &m_gpu_clear_cache;
     renderstack->gpu_fill_rect = &m_gpu_fill_rect;
+    renderstack->gpu_draw_opaque_three_point_monochrome_poly = &m_gpu_draw_opaque_three_point_monochrome_poly;
     renderstack->gpu_draw_monochrome_opaque_quad = &m_gpu_draw_monochrome_opaque_quad;
     renderstack->gpu_draw_texture_blend_opaque_quad = &m_gpu_draw_texture_blend_opaque_quad;
     renderstack->gpu_draw_texture_raw_opaque_quad = &m_gpu_draw_texture_raw_opaque_quad;
