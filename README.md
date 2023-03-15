@@ -110,7 +110,7 @@
 
 ## 🪐 Special Thanks
 - @wheremyfoodat
-- @iuk7071
+- @liuk7071
 
 ## 📃 Documentation
 * Integrated Device Technology, Inc. (1996). _IDT MIPS Microprocessor Family Software Reference Manual_. Wayback Machine. [https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf](https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf)
