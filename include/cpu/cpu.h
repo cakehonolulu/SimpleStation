@@ -80,6 +80,9 @@ extern const char *m_cpu_regnames[];
 #define COP0_CAUSE (m_simplestation->m_cpu_cop0->m_registers[13])
 #define COP0_EPC (m_simplestation->m_cpu_cop0->m_registers[14])
 
+#define COP2D (m_simplestation->m_gte->cop2d)
+#define COP2C (m_simplestation->m_gte->cop2c)
+
 /* Macros */
 // FIXME: This is Pre-C23 (ckd_add...)
 #if defined(__clang__)

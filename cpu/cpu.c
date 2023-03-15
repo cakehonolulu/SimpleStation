@@ -46,6 +46,8 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 			printf("[CPU] init: Allocated COP0 structure!\n");
 #endif
 
+			gte_init(m_simplestation);
+
 			// Point Program Counter to the initial BIOS address
 			PC = 0;
 			NXT_PC = 0xBFC00000;
@@ -121,6 +123,8 @@ uint8_t m_cpu_init(m_simplestation_state *m_simplestation)
 // Function to free the CPU struct after end-of-emulation
 void m_cpu_exit(m_simplestation_state *m_simplestation)
 {
+	gte_exit(m_simplestation);
+
 	// Clear the COP0 structures
 	m_cpu_cop0_exit(m_simplestation);
 	

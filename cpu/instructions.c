@@ -60,7 +60,7 @@ void m_cop2(m_simplestation_state *m_simplestation)
 			
 		default:
 			printf(RED "[CPU] gte: Unimplemented 'GTE' Opcode: 0x%08X\n" NORMAL, m_simplestation->m_cpu->m_opcode & 0x3F);
-			m_simplestation_exit(m_simplestation, 1);
+			//m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 
@@ -1553,8 +1553,7 @@ void m_lwc2(m_simplestation_state *m_simplestation)
 	printf("lwc2\n");
 #endif
 
-	printf(RED "[CPU] lwc2: Unhandled instr.\n" NORMAL);
-	m_simplestation_exit(m_simplestation, 1);
+	COP2D[REGIDX_T] = m_memory_read(REGS[REGIDX_S] + SIMMDT, dword, m_simplestation);
 }
 
 void m_lwc3(m_simplestation_state *m_simplestation)
@@ -1596,8 +1595,7 @@ void m_swc2(m_simplestation_state *m_simplestation)
 	printf("swc2\n");
 #endif
 
-	printf(RED "[CPU] swc2: Unhandled instr.\n" NORMAL);
-	m_simplestation_exit(m_simplestation, 1);
+	m_memory_write(REGS[REGIDX_S] + SIMMDT, COP2D[REGIDX_T], dword, m_simplestation);
 }
 
 void m_swc3(m_simplestation_state *m_simplestation)

@@ -90,6 +90,12 @@ typedef struct m_corewave_cw33300_cop0
 
 } m_mips_r3000a_cop0_t;
 
+typedef struct m_psx_gte
+{
+	uint32_t cop2d[32];
+	uint32_t cop2c[32];
+} m_psx_gte_t;
+
 typedef struct m_cpu_ints
 {	
 	uint32_t m_interrupt_stat;
@@ -475,6 +481,8 @@ typedef struct
 	char *cd_name;
 
 	bool m_cdrom_in;
+
+	m_psx_gte_t *m_gte;
 
 } m_simplestation_state;
 
