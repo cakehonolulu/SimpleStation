@@ -21,12 +21,13 @@ GLuint m_fbo;
 /* OpenGL Textures */
 
 // Texture containing the off-screen framebuffer
-GLuint m_psx_vram_texel;
+GLuint vram_sample;
+
+GLuint m_psx_gpu_vram;
 
 // Texture for the default (Visible) framebuffer
 GLuint m_window_texture;
 
-GLuint m_psx_gpu_vram;
 /* OpenGL Shader Programs */
 
 // GLSL Off-Screen Program
@@ -275,8 +276,8 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	// ...and bind to it
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-	glGenTextures(1, &m_psx_vram_texel);
-	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	glGenTextures(1, &vram_sample);
+	glBindTexture(GL_TEXTURE_2D, vram_sample);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
 
@@ -286,7 +287,7 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// The newly-created texture will point at the pixel data provided by the last-bound texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vram_sample, 0);
 
 	// Unbind from the newly-created texture
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -518,6 +519,25 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
 	//printf("vline_start: %d ; vline_end: %d\n\n", m_simplestation->m_gpu->m_display_line_start, m_simplestation->m_gpu->m_display_line_end);
 }
 
+void opengl_sync_vram(int x, int y, int width, int height, m_simplestation_state *m_simplestation)
+{
+	/* Copy data from the VRAM write buffer into the OpenGL Texture we'll get Texture Data from */
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glBindTexture(GL_TEXTURE_2D, vram_sample);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glViewport(0, 0, 1024, 512);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vram_sample, 0);
+	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glViewport(0, 0, 1024, 512);
+}
+
 void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, bool isline)
 {
 
@@ -532,11 +552,19 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	// Bind to off-screen VAO
 	glBindVertexArray(m_vao);
 
-	// Bind to off-screen VVBO
+	// Bind to off-screen VBO
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(OpenGL_Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+	// If we're not on VRAM View mode, draw to the window texture directly
+	if (!m_simplestation->m_vramview)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_window_texture, 0);
+	}
+	else
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+	}
 
 	if (clear_colour)
 	{
@@ -547,7 +575,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	glViewport(0, 0, 1024, 512);
 	
 	// Off-screen shaders sample-off the off-screen VRAM Texture
-	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	glBindTexture(GL_TEXTURE_2D, vram_sample);
 
 	// Check if we need to draw lines
 	if (isline)
@@ -559,18 +587,12 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 		glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	}
 
-	// Copy the display area from the VRAM off to the on-screen texture
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
+	// If we're on VRAM View, update the texture accordingly
+	if (m_simplestation->m_vramview)
+	{
+		// Copy the display area from the VRAM off to the on-screen texture
+		glBindTexture(GL_TEXTURE_2D, m_window_texture);
 
-	if (!m_simplestation->m_vramview)
-	{
-		glViewport(0, 0, res_w, res_h);
-		
-		// Copy the texture to the window
-		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, res_w, res_h, 0);
-	}
-	else
-	{
 		glViewport(0, 0, 1024, 512);
 		
 		// Copy the texture to the window
@@ -612,19 +634,6 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-void m_sync_vram(m_simplestation_state *m_simplestation)
-{
-	(void) m_simplestation;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, 640, 480);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glViewport(0, 0, 1024, 512);
 }
 
 void display(m_simplestation_state *m_simplestation) {
@@ -1162,9 +1171,8 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-
-    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	/* Read-off the VRAM sample */
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vram_sample, 0);
+    glBindTexture(GL_TEXTURE_2D, vram_sample);
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 }
