@@ -108,7 +108,7 @@
 ## 👷🏼‍♂️ Roadmap
 * MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
 
-## 🪐 Special Agreements
+## 🪐 Special Thanks
 - @wheremyfoodat
 - @iuk7071
 
