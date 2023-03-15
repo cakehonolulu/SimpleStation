@@ -108,6 +108,10 @@
 ## 👷🏼‍♂️ Roadmap
 * MIPS I R3000A to x86_64 (AMD64) Dynamic Recompilation (JIT)
 
+## 🪐 Special Agreements
+- @wheremyfoodat
+- @iuk7071
+
 ## 📃 Documentation
 * Integrated Device Technology, Inc. (1996). _IDT MIPS Microprocessor Family Software Reference Manual_. Wayback Machine. [https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf](https://web.archive.org/web/20061010210946/http://decstation.unix-ag.org/docs/ic_docs/3715.pdf)
 * Flandrin, L. (2016, 20 October). _Playstation Emulation Guide_. svkt.org. [https://svkt.org/~simias/guide.pdf](https://svkt.org/~simias/guide.pdf)
