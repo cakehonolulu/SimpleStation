@@ -813,6 +813,35 @@ void m_gpu_draw_monochrome_opaque_quad(uint32_t m_value, m_simplestation_state *
     put_quad(v1, v2, v3, v4, m_simplestation);
 }
 
+void gpu_draw_opaque_three_point_monochrome_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+	Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+
+    OpenGL_Vertex v1, v2, v3;
+
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col;
+
+	//printf("Position 1: %d %d\n", v1.position.x, v1.position.y);
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.colour = col;
+
+	//printf("Position 2: %d %d\n", v2.position.x, v2.position.y);
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v3.colour = col;
+
+	//printf("Position 3: %d %d\n", v3.position.x, v3.position.y);
+
+	//printf("END\n\n");
+
+	put_triangle(v1, v2, v3, m_simplestation);
+}
+
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     (void) m_value;

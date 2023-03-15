@@ -1541,8 +1541,9 @@ void m_lwc2(m_simplestation_state *m_simplestation)
 #ifdef DEBUG_INSTRUCTIONS
 	printf("lwc2\n");
 #endif
+	uint32_t addr = REGS[REGIDX_S] + SIMMDT;
+	writeCop2d(REGIDX_T, m_memory_read(addr, dword, m_simplestation), m_simplestation);
 
-	COP2D[REGIDX_T] = m_memory_read(REGS[REGIDX_S] + SIMMDT, dword, m_simplestation);
 }
 
 void m_lwc3(m_simplestation_state *m_simplestation)
@@ -1584,7 +1585,10 @@ void m_swc2(m_simplestation_state *m_simplestation)
 	printf("swc2\n");
 #endif
 
-	m_memory_write(REGS[REGIDX_S] + SIMMDT, COP2D[REGIDX_T], dword, m_simplestation);
+		uint32_t addr = REGS[REGIDX_S] + SIMMDT;
+		//uint32_t val = readCop2d(REGIDX_T, m_simplestation);
+		m_memory_write(addr, readCop2d(REGIDX_T, m_simplestation), dword, m_simplestation);
+		
 }
 
 void m_swc3(m_simplestation_state *m_simplestation)

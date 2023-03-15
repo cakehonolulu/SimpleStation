@@ -90,10 +90,74 @@ typedef struct m_corewave_cw33300_cop0
 
 } m_mips_r3000a_cop0_t;
 
+typedef union {
+		struct {
+			uint8_t l, h, h2, h3;
+		} b;
+		struct {
+			uint16_t l, h;
+		} w;
+		struct {
+			int8_t l, h, h2, h3;
+		} sb;
+		struct {
+			int16_t l, h;
+		} sw;
+		uint32_t d;
+		int32_t sd;
+	} pair;
+
 typedef struct m_psx_gte
 {
-	uint32_t cop2d[32];
+	
+	/*union {
+		struct {
+			int16_t vx0, vy0, vz0;
+			int16_t vx1, vy1, vz1;
+			int16_t vx2, vy2, vz2;
+			uint8_t r, g, b, c;
+			int32_t otz;
+			int32_t ir0, ir1, ir2, ir3;
+			int16_t sx0, sy0;
+			int16_t sx1, sy1;
+			int16_t sx2, sy2;
+			int16_t sz0, n0;
+			int16_t sz1, n1;
+			int16_t sz2, n2;
+			uint8_t r0, g0, b0, c0;
+			uint8_t r1, g1, b1, c1;
+			uint8_t r2, g2, b2, c2;
+			int32_t reserved;
+			int32_t mac0, mac1, mac2, mac3;
+			uint32_t irgb, orgb;
+			int32_t lzcs, lzcr;
+		} regs;
+		uint32_t raw[32];
+		pair r[32];
+	} cop2d;
+
+	union {
+		struct {
+			int16_t r11, r12, r13, r21, r22, r23, r31, r32, r33, n0;
+			int32_t trX, trY, trZ;
+			int16_t l11, l12, l13, l21, l22, l23, l31, l32, l33, n1;
+			int32_t rbk, gbk, bbk;
+			int16_t lr1, lr2, lr3, lg1, lg2, lg3, lb1, lb2, lb3, n2;
+			int32_t rfc, gfc, bfc;
+			int32_t ofx, ofy;
+			int32_t h;
+			int32_t dqa, dqb;
+			int32_t zsf3, zsf4;
+			int32_t flag;
+		} regs;
+		uint32_t raw[32];
+		pair r[32];
+	} cop2c;*/
+
 	uint32_t cop2c[32];
+	uint32_t cop2d[32];
+
+
 } m_psx_gte_t;
 
 typedef struct m_cpu_ints
