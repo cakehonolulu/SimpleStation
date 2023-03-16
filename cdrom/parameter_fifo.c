@@ -52,12 +52,7 @@ uint8_t m_cdrom_parameter_fifo_pop(m_simplestation_state *m_simplestation)
                 m_simplestation->m_cdrom->m_parameter_fifo[i] = m_simplestation->m_cdrom->m_parameter_fifo[i + 1];
             }
 
-            m_simplestation->m_cdrom->m_parameter_fifo_index--;
-        }
-        else
-        {
-            printf(RED "[CDROM] parameter_fifo_pop: FIFO Index Underflow, aborting...!\n" NORMAL);
-            m_simplestation_exit(m_simplestation, 1);
+            if (m_simplestation->m_cdrom->m_parameter_fifo_index != 0) m_simplestation->m_cdrom->m_parameter_fifo_index--;
         }
     }
 

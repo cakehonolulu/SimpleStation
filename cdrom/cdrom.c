@@ -217,6 +217,21 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			printf("[CDROM] read: STATUS Register, value: 0x%X\n", m_value);
 			break;
 
+		case 1:
+			switch (m_simplestation->m_cdrom->m_status_register.index)
+			{
+				case 1:
+					m_value = m_cdrom_response_fifo_pop(m_simplestation);
+					break;
+
+				default:
+					printf(RED "[CDROM] write: Unhandled Offset 1 CDROM Read (Index: %d)\n" NORMAL,
+							m_simplestation->m_cdrom->m_status_register.index);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
+			break;
+
 		case 3:
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
