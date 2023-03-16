@@ -22,9 +22,9 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
 {
     if (m_simplestation->scheduled < MAX_ENTRIES)
     {
-        printf("scheduler_push: Adding event to %d\n", m_simplestation->scheduled);
-		printf("scheduler_push: event.cycle_target is %ld\n", event.time);
-		printf("scheduler_push: event.subsystem is %s\n", event.subsystem);
+        //printf("scheduler_push: Adding event to %d\n", m_simplestation->scheduled);
+		//printf("scheduler_push: event.cycle_target is %ld\n", event.time);
+		//printf("scheduler_push: event.subsystem is %s\n", event.subsystem);
         events[m_simplestation->scheduled] = event;
         m_simplestation->scheduled++;
     }
@@ -49,7 +49,7 @@ void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
         {
             if (m_simplestation->time >= events[i].time)
             {
-                printf("Executing from %s\n", events[i].subsystem);
+                //printf("Executing from %s\n", events[i].subsystem);
                 events[i].func(m_simplestation);
                 memset(&events[i], 0, sizeof(event_t));
                 executed++;
