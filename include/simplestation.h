@@ -348,6 +348,33 @@ typedef struct {
 	} m_status_register;
 	
 	/*
+		Status code (stat)
+		0  Error         Invalid Command/parameters (followed by Error Byte)
+		1  Spindle Motor (0=Motor off, or in spin-up phase, 1=Motor on)
+		2  SeekError     (0=Okay, 1=Seek error)     (followed by Error Byte)
+		3  IdError       (0=Okay, 1=GetID denied) (also set when Setmode.Bit4=1)
+		4  ShellOpen     Once shell open (0=Closed, 1=Is/was Open)
+		5  Read          Reading data sectors  ;/set until after Seek completion)
+		6  Seek          Seeking               ; at a time (ie. Read/Play won't get
+		7  Play          Playing CD-DA         ;\only ONE of these bits can be set
+	*/
+	union
+	{
+		struct {
+			uint8_t error 			: 1;
+			uint8_t spindleMotor	: 1;
+			uint8_t seekError		: 1;
+			uint8_t getIdError		: 1;
+			uint8_t shellOpen		: 1;
+			uint8_t read			: 1;
+			uint8_t seek			: 1;
+			uint8_t play			: 1;
+		};
+
+    	uint8_t raw;
+	} m_stat;
+
+	/*
 		1F801803h.Index0 - Interrupt Enable Register (R)
 		1F801803h.Index2 - Interrupt Enable Register (R) (Mirror)
 		0-4  Interrupt Enable Bits (usually all set, ie. 1Fh=Enable All IRQs)
