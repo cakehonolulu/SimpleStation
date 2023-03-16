@@ -61,9 +61,13 @@ void m_cdrom_set_interrupt_flag_register(uint8_t value, m_simplestation_state *m
 {
 	if (value & 0x40)
 	{
-		m_simplestation->m_cdrom->m_status_register.prmempt = 1;
-		m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
 		m_parameter_fifo_flush(m_simplestation);
+		m_cdrom_update_status_register(m_simplestation);
+	}
+
+	if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+	{
+		m_cdrom_interrupt_fifo_pop(m_simplestation);
 	}
 }
 
@@ -84,6 +88,24 @@ void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_status_register.prmempt = (m_simplestation->m_cdrom->m_parameter_fifo_index == 0);
     m_simplestation->m_cdrom->m_status_register.prmwrdy = !(m_simplestation->m_cdrom->m_parameter_fifo_index >= 16);
     m_simplestation->m_cdrom->m_status_register.rslrrdy = (m_simplestation->m_cdrom->m_parameter_fifo_index != 0);
+}
+
+void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
+{
+	printf(MAGENTA "[CDROM] GETSTAT" NORMAL "\n");
+
+	// TODO: Handle if disk is inserted or not
+
+	//if (m_simplestation->m_cdrom_in)
+	//{
+		m_cdrom_response_fifo_push(0b00000000, m_simplestation);
+	//}
+	//else
+	//{
+	//	m_cdrom_response_fifo_push(0b00010000, m_simplestation);
+	//}
+
+    m_cdrom_interrupt_fifo_push(0x3, m_simplestation);
 }
 
 void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
@@ -112,14 +134,21 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 {
 	printf("[CDROM] execute: Command recieved\n");
 
+	m_interrupt_fifo_flush(m_simplestation);
+    m_response_fifo_flush(m_simplestation);
+
 	switch (value)
 	{
+		case CDROM_GETSTAT_CMD:
+			m_cdrom_getstat_cmd(m_simplestation);
+			break;
+
 		case CDROM_TEST_CMD:
 			m_cdrom_test_cmd(m_simplestation);
 			break;
 
 		default:
-			printf(RED "[CDROM] execute: Unhandled CDROM command 0x%X" NORMAL "\n", value);
+			printf(RED "[CDROM] execute: Unhandled CDROM command 0x%02X" NORMAL "\n", value);
 			m_simplestation_exit(m_simplestation, 1);
 			break;
 	}

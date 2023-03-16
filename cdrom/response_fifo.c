@@ -50,6 +50,8 @@ uint8_t m_cdrom_response_fifo_pop(m_simplestation_state *m_simplestation)
         }
 
         if (m_simplestation->m_cdrom->m_response_fifo_index != 0) m_simplestation->m_cdrom->m_response_fifo_index--;
+
+        m_cdrom_update_status_register(m_simplestation);
     }
 
     return m_response;

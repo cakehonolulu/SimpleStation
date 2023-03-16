@@ -286,9 +286,9 @@ int main(int argc, char **argv)
 												// Fetch, decode, execute
 												m_cpu_fde(&m_simplestation);
 												dma_step(&m_simplestation);
-
-												m_cdrom_tick(&m_simplestation);
 											}
+											
+											m_cdrom_tick(&m_simplestation);
 
 											m_interrupts_trigger(VBLANK, &m_simplestation);
 
