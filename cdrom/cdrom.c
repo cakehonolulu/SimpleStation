@@ -133,6 +133,19 @@ void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 	}
 }
 
+void m_cdrom_getid_cmd(m_simplestation_state *m_simplestation)
+{
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+    m_cdrom_response_fifo_push(0x00, m_simplestation);
+    m_cdrom_response_fifo_push(0x20, m_simplestation);
+    m_cdrom_response_fifo_push(0x00, m_simplestation);
+    m_cdrom_response_fifo_push('S', m_simplestation);
+    m_cdrom_response_fifo_push('C', m_simplestation);
+    m_cdrom_response_fifo_push('E', m_simplestation);
+    m_cdrom_response_fifo_push('A', m_simplestation);
+    m_cdrom_interrupt_fifo_push(0x2, m_simplestation);
+}
+
 void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 {
 	printf("[CDROM] execute: Command recieved\n");
@@ -148,6 +161,10 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 
 		case CDROM_TEST_CMD:
 			m_cdrom_test_cmd(m_simplestation);
+			break;
+
+		case CDROM_GETID_CMD:
+			m_cdrom_getid_cmd(m_simplestation);
 			break;
 
 		default:
