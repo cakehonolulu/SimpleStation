@@ -45,8 +45,14 @@ uint8_t m_cdrom_parameter_fifo_pop(m_simplestation_state *m_simplestation)
         // Only pop parameters if the current FIFO index's not 0
         if (m_simplestation->m_cdrom->m_parameter_fifo_index != 0)
         {
+            m_parameter = m_cdrom_parameter_fifo_front;
+
+            for (int i = 0; i < m_simplestation->m_cdrom->m_parameter_fifo_index; i++)
+            {
+                m_simplestation->m_cdrom->m_parameter_fifo[i] = m_simplestation->m_cdrom->m_parameter_fifo[i + 1];
+            }
+
             m_simplestation->m_cdrom->m_parameter_fifo_index--;
-            m_parameter = m_simplestation->m_cdrom->m_parameter_fifo[m_simplestation->m_cdrom->m_parameter_fifo_index];
         }
         else
         {

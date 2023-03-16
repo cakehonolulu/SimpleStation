@@ -47,6 +47,11 @@ void m_cdrom_set_status(uint8_t value, m_simplestation_state *m_simplestation)
     m_simplestation->m_cdrom->m_status_register.index = value & 0x3;
 }
 
+uint8_t m_cdrom_get_status_register(m_simplestation_state *m_simplestation)
+{
+    return m_simplestation->m_cdrom->m_status_register.raw;
+}
+
 void m_cdrom_set_interrupt_register(uint8_t value, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_cdrom->m_interrupt_enable_register.raw = value;
@@ -62,9 +67,16 @@ void m_cdrom_set_interrupt_flag_register(uint8_t value, m_simplestation_state *m
 	}
 }
 
-uint8_t m_cdrom_get_status_register(m_simplestation_state *m_simplestation)
+uint8_t m_cdrom_get_interrupt_flag_register(m_simplestation_state *m_simplestation)
 {
-    return m_simplestation->m_cdrom->m_status_register.raw;
+    uint8_t flags = 0b11100000;
+
+    if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+	{
+        flags |= m_cdrom_interrupt_fifo_front & 0x7;
+    }
+
+    return flags;
 }
 
 void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
@@ -76,7 +88,7 @@ void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
 
 void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 {
-	uint8_t sub_cmd = m_cdrom_parameter_fifo_pop(m_simplestation);
+	uint8_t sub_cmd = m_cdrom_parameter_fifo_front;
 
 	switch (sub_cmd)
 	{
@@ -120,7 +132,7 @@ void m_cdrom_tick(m_simplestation_state *m_simplestation)
 {
 	if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
 	{
-		if ((m_simplestation->m_cdrom->m_interrupt_enable_register.raw & 0x7) & (m_cdrom_interrupt_fifo_pop(m_simplestation) & 0x7))
+		if ((m_simplestation->m_cdrom->m_interrupt_enable_register.raw & 0x7) & (m_cdrom_interrupt_fifo_front & 0x7))
 		{
 			printf("[CDROM] tick: Triggering CDROM interrupt...\n");
 			m_interrupts_trigger(CDROM, m_simplestation);
@@ -204,6 +216,23 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			m_value = m_cdrom_get_status_register(m_simplestation);
 			printf("[CDROM] read: STATUS Register, value: 0x%X\n", m_value);
 			break;
+
+		case 3:
+			switch (m_simplestation->m_cdrom->m_status_register.index)
+			{
+				case 1:
+					m_value = m_cdrom_get_interrupt_flag_register(m_simplestation);
+					printf("[CDROM] read: Interrupt Flag Register, value: 0x%X\n", m_value);
+					break;
+
+				default:
+					printf(RED "[CDROM] write: Unhandled Offset 3 CDROM Read (Index: %d)\n" NORMAL,
+							m_simplestation->m_cdrom->m_status_register.index);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
+			break;
+
 
         default:
             printf(RED "[CDROM] read: Unhandled CDROM Read (Offset: %d)\n" NORMAL, m_offset);
