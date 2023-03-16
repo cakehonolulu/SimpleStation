@@ -1,6 +1,7 @@
 #include <cdrom/cdrom.h>
 #include <cdrom/parameter_fifo.h>
 #include <cdrom/response_fifo.h>
+#include <cdrom/interrupt_fifo.h>
 #include <cpu/cpu.h>
 #include <cpu/instructions.h>
 
@@ -17,6 +18,7 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 		m_cdrom_setup(m_simplestation);
 		m_cdrom_parameter_fifo_init(m_simplestation);
 		m_cdrom_response_fifo_init(m_simplestation);
+		m_cdrom_interrupt_fifo_init(m_simplestation);
     }
     else
     {
@@ -56,6 +58,7 @@ void m_cdrom_set_interrupt_flag_register(uint8_t value, m_simplestation_state *m
 	{
 		m_simplestation->m_cdrom->m_status_register.prmempt = 1;
 		m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
+		m_parameter_fifo_flush(m_simplestation);
 	}
 }
 
@@ -68,21 +71,61 @@ void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cdrom->m_status_register.prmempt = (m_simplestation->m_cdrom->m_parameter_fifo_index == 0);
     m_simplestation->m_cdrom->m_status_register.prmwrdy = !(m_simplestation->m_cdrom->m_parameter_fifo_index >= 16);
+    m_simplestation->m_cdrom->m_status_register.rslrrdy = (m_simplestation->m_cdrom->m_parameter_fifo_index != 0);
+}
+
+void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
+{
+	uint8_t sub_cmd = m_cdrom_parameter_fifo_pop(m_simplestation);
+
+	switch (sub_cmd)
+	{
+		case INT3_yy_mm_dd_ver:
+			printf("[CDROM] test_cmd: INT3(yy,mm,dd)\n");
+			m_cdrom_response_fifo_push(0x94, m_simplestation);
+            m_cdrom_response_fifo_push(0x09, m_simplestation);
+            m_cdrom_response_fifo_push(0x19, m_simplestation);
+            m_cdrom_response_fifo_push(0xC0, m_simplestation);
+			m_cdrom_interrupt_fifo_push(0x3, m_simplestation);
+			break;
+
+		default:
+			printf(RED "[CDROM] test_cmd: Unhandled CDROM sub-command 0x%X" NORMAL "\n", sub_cmd);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
 }
 
 void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 {
-	printf("[CDROM] execute: Got a command!\n");
-	m_simplestation_exit(m_simplestation, 1);
+	printf("[CDROM] execute: Command recieved\n");
+
+	switch (value)
+	{
+		case CDROM_TEST_CMD:
+			m_cdrom_test_cmd(m_simplestation);
+			break;
+
+		default:
+			printf(RED "[CDROM] execute: Unhandled CDROM command 0x%X" NORMAL "\n", value);
+			m_simplestation_exit(m_simplestation, 1);
+			break;
+	}
+
+	m_parameter_fifo_flush(m_simplestation);
+	m_cdrom_update_status_register(m_simplestation);
 }
 
 void m_cdrom_tick(m_simplestation_state *m_simplestation)
 {
-	/*if (!interruptQueue.empty()) {
-        if ((interrupt.enable & 0x7) & (interruptQueue.front() & 0x7)) {
-            interruptController->trigger(InterruptRequestNumber::CDROMIRQ);
-        }
-    }*/
+	if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+	{
+		if ((m_simplestation->m_cdrom->m_interrupt_enable_register.raw & 0x7) & (m_cdrom_interrupt_fifo_pop(m_simplestation) & 0x7))
+		{
+			printf("[CDROM] tick: Triggering CDROM interrupt...\n");
+			m_interrupts_trigger(CDROM, m_simplestation);
+		}
+	}
 }
 
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)

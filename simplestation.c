@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 												m_cpu_fde(&m_simplestation);
 												dma_step(&m_simplestation);
 
-												scheduler_tick(2, &m_simplestation);
+												m_cdrom_tick(&m_simplestation);
 											}
 
 											m_interrupts_trigger(VBLANK, &m_simplestation);

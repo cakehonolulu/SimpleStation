@@ -376,6 +376,9 @@ typedef struct {
 	uint8_t m_response_fifo[16];
 	uint8_t m_response_fifo_index;
 
+	uint8_t m_interrupt_fifo[16];
+	uint8_t m_interrupt_fifo_index;
+
 	int8_t m_queued_responses;
 
 } m_psx_cdrom_t;

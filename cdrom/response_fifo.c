@@ -10,19 +10,19 @@ void m_cdrom_response_fifo_init(m_simplestation_state *m_simplestation)
 
 void m_cdrom_response_fifo_push(uint8_t m_response, m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_cdrom->m_response_fifo_index < 16)
-    {
-        // Push the response to the FIFO
-        m_simplestation->m_cdrom->m_response_fifo[m_simplestation->m_cdrom->m_response_fifo_index++] = m_response;
-
-        // We just buffered a response, FIFO isn't empty, therefore set RSLRRDY bit to 1 (!0 = !Empty, 0 = Empty)
-        m_simplestation->m_cdrom->m_status_register.rslrrdy = 1;
-    }
-    else
+    if (m_simplestation->m_cdrom->m_response_fifo_index >= 16)
     {
         printf(RED "[CDROM] response_fifo_push: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
         m_simplestation_exit(m_simplestation, 1);
     }
+    else
+    {
+        // Push the response to the FIFO
+        m_simplestation->m_cdrom->m_response_fifo[m_simplestation->m_cdrom->m_response_fifo_index] = m_response;
+        m_simplestation->m_cdrom->m_response_fifo_index++;
+    }
+
+    m_cdrom_update_status_register(m_simplestation);
 }
 
 uint8_t m_cdrom_response_fifo_pop(m_simplestation_state *m_simplestation)
