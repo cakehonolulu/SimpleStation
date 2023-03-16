@@ -36,10 +36,53 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
 
 void m_cdrom_setup(m_simplestation_state *m_simplestation)
 {
-	m_simplestation->m_cdrom->m_status_register.prmempt = 1;
-	m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
-	m_simplestation->m_cdrom->m_status_register.rslrrdy = 1;
-	m_simplestation->m_cdrom->m_queued_responses = -1;
+	m_simplestation->m_cdrom->m_status_register.raw = 0x18;
+}
+
+void m_cdrom_set_status(uint8_t value, m_simplestation_state *m_simplestation)
+{
+	// TODO: Check the next line's accuracy
+    m_simplestation->m_cdrom->m_status_register.index = value & 0x3;
+}
+
+void m_cdrom_set_interrupt_register(uint8_t value, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cdrom->m_interrupt_enable_register.raw = value;
+}
+
+void m_cdrom_set_interrupt_flag_register(uint8_t value, m_simplestation_state *m_simplestation)
+{
+	if (value & 0x40)
+	{
+		m_simplestation->m_cdrom->m_status_register.prmempt = 1;
+		m_simplestation->m_cdrom->m_status_register.prmwrdy = 1;
+	}
+}
+
+uint8_t m_cdrom_get_status_register(m_simplestation_state *m_simplestation)
+{
+    return m_simplestation->m_cdrom->m_status_register.raw;
+}
+
+void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
+{
+	m_simplestation->m_cdrom->m_status_register.prmempt = (m_simplestation->m_cdrom->m_parameter_fifo_index == 0);
+    m_simplestation->m_cdrom->m_status_register.prmwrdy = !(m_simplestation->m_cdrom->m_parameter_fifo_index >= 16);
+}
+
+void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
+{
+	printf("[CDROM] execute: Got a command!\n");
+	m_simplestation_exit(m_simplestation, 1);
+}
+
+void m_cdrom_tick(m_simplestation_state *m_simplestation)
+{
+	/*if (!interruptQueue.empty()) {
+        if ((interrupt.enable & 0x7) & (interruptQueue.front() & 0x7)) {
+            interruptController->trigger(InterruptRequestNumber::CDROMIRQ);
+        }
+    }*/
 }
 
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -48,16 +91,29 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
     {
 		// Index/Status Register
 		case 0:
-			m_simplestation->m_cdrom->m_status_register.index = (m_value & 0xFF) & 0x3;
+			// Get least significant byte
+			m_cdrom_set_status(m_value & 0xFF, m_simplestation);
+			printf("[CDROM] write: STATUS Register, written value (0x%X)\n", m_value & 0xFF);
+			break;
+
+		case 1:
+			m_cdrom_execute(m_value, m_simplestation);
 			break;
 
 		// Status's Index-determined write
 		case 2:
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
+				// Parameter FIFO Push
+				case 0:
+					m_cdrom_parameter_fifo_push(m_value, m_simplestation);
+					printf("[CDROM] write: Parameter FIFO, written value (0x%X)\n", m_value);
+					break;
+
 				// Interrupt Enable Register Write
 				case 1:
-					m_simplestation->m_cdrom->m_interrupt_enable_register = m_value;
+					m_cdrom_set_interrupt_register(m_value, m_simplestation);
+					printf("[CDROM] write: Interrupt Register, written value (0x%X)\n", m_value);
 					break;
 
 				default:
@@ -74,7 +130,8 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 			{
 				// Interrupt Flag Register Write
 				case 1:
-					m_simplestation->m_cdrom->m_interrupt_flag_register &= ~m_value;
+					m_cdrom_set_interrupt_flag_register(m_value, m_simplestation);
+					printf("[CDROM] write: Interrupt Flag Register, written value (0x%X)\n", m_value);
 					break;
 
 				default:
@@ -101,7 +158,8 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
     {
 		// Status Register
 		case 0:
-			m_value = m_simplestation->m_cdrom->m_status_register.raw;
+			m_value = m_cdrom_get_status_register(m_simplestation);
+			printf("[CDROM] read: STATUS Register, value: 0x%X\n", m_value);
 			break;
 
         default:
