@@ -134,6 +134,7 @@ int main(int argc, char **argv)
 					printf("CD-ROM Name: %s\n", m_simplestation.cd_name);
 					m_args++;
 					m_simplestation.m_cdrom_in = true;
+					printf(BOLD GREEN "[CDROM] Booting from CD...!" NORMAL "\n");
 				}
 				else
 				{

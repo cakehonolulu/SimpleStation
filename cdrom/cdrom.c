@@ -96,17 +96,16 @@ void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
 {
 	printf(MAGENTA "[CDROM] GETSTAT" NORMAL "\n");
 
-	// TODO: Handle if disk is inserted or not
-	//if (m_simplestation->m_cdrom_in)
-	//{
-	m_simplestation->m_cdrom->m_stat.shellOpen = 0;
-	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
-	//}
-	//else
-	//{
-	//	m_simplestation->m_cdrom->m_stat.shellOpen = 1;
-	//	m_cdrom_response_fifo_push(0b00010000, m_simplestation);
-	//}
+	if (m_simplestation->m_cdrom_in)
+	{
+		m_simplestation->m_cdrom->m_stat.shellOpen = 0;
+		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+	}
+	else
+	{
+		m_simplestation->m_cdrom->m_stat.shellOpen = 1;
+		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+	}
 
     m_cdrom_interrupt_fifo_push(0x3, m_simplestation);
 }
