@@ -59,7 +59,7 @@ uint8_t m_cdrom_parameter_fifo_pop(m_simplestation_state *m_simplestation)
 
     m_simplestation->m_cdrom->parameter_fifo->front = (m_simplestation->m_cdrom->parameter_fifo->front + 1) % m_simplestation->m_cdrom->parameter_fifo->maxsize;
     m_simplestation->m_cdrom->parameter_fifo->size--;
-    
+
     m_cdrom_update_status_register(m_simplestation);
 }
 

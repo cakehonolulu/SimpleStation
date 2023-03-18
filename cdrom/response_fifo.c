@@ -57,6 +57,7 @@ uint8_t m_cdrom_response_fifo_pop(m_simplestation_state *m_simplestation)
         m_simplestation_exit(m_simplestation, 1);
     }
 
+
     m_simplestation->m_cdrom->response_fifo->front = (m_simplestation->m_cdrom->response_fifo->front + 1) % m_simplestation->m_cdrom->response_fifo->maxsize;
     m_simplestation->m_cdrom->response_fifo->size--;
 }

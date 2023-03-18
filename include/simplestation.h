@@ -415,6 +415,8 @@ typedef struct {
 
 	int8_t m_queued_responses;
 
+	uint32_t m_seek_location;
+
 } m_psx_cdrom_t;
 
 typedef struct {

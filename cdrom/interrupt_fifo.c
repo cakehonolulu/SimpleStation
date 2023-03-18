@@ -49,16 +49,20 @@ void m_cdrom_interrupt_fifo_push(uint8_t m_parameter, m_simplestation_state *m_s
 
 uint8_t m_cdrom_interrupt_fifo_pop(m_simplestation_state *m_simplestation)
 {
+    uint8_t m_return = 0;
+
     if (m_cdrom_interrupt_fifo_is_empty(m_simplestation))
     {
         printf(BOLD RED "[CDROM] interrupt_pop: Underflow detected, exiting..." NORMAL "\n");
         m_simplestation_exit(m_simplestation, 1);
     }
 
+    m_return = m_cdrom_interrupt_fifo_front(m_simplestation);
+    
     m_simplestation->m_cdrom->interrupt_fifo->front = (m_simplestation->m_cdrom->interrupt_fifo->front + 1) % m_simplestation->m_cdrom->interrupt_fifo->maxsize;
     m_simplestation->m_cdrom->interrupt_fifo->size--;
 
-    m_cdrom_update_status_register(m_simplestation);
+    return m_return;
 }
 
 void m_interrupt_fifo_flush(m_simplestation_state *m_simplestation)

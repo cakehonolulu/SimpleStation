@@ -41,6 +41,7 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_status_register.raw = 0x18;
 	m_simplestation->m_cdrom->m_interrupt_enable_register.raw = 0x0;
 	m_simplestation->m_cdrom->m_stat.raw = 0x10;
+	m_simplestation->m_cdrom->m_seek_location = 0;
 }
 
 void m_cdrom_set_status(uint8_t value, m_simplestation_state *m_simplestation)
@@ -110,9 +111,27 @@ void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
     m_cdrom_interrupt_fifo_push(0x3, m_simplestation);
 }
 
+void m_cdrom_setloc_cmd(m_simplestation_state *m_simplestation)
+{
+	uint8_t minute = BCD_TO_DEC(m_cdrom_parameter_fifo_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+    uint8_t second = BCD_TO_DEC(m_cdrom_parameter_fifo_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+    uint8_t sector = BCD_TO_DEC(m_cdrom_parameter_fifo_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+
+    m_simplestation->m_cdrom->m_seek_location = (minute * SPM * SPS) + (second * SPS) + sector;
+
+    m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+    m_cdrom_interrupt_fifo_push(0x3, m_simplestation);
+
+	printf(BOLD MAGENTA "[CDROM] SetLoc (Minute: %d, Second: %d, Sector: %d | LBA: %d)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_location);
+}
+
 void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 {
 	uint8_t sub_cmd = m_cdrom_parameter_fifo_front(m_simplestation);
+	m_cdrom_parameter_fifo_pop(m_simplestation);
 
 	switch (sub_cmd)
 	{
@@ -157,6 +176,10 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 	{
 		case CDROM_GETSTAT_CMD:
 			m_cdrom_getstat_cmd(m_simplestation);
+			break;
+
+		case CDROM_SETLOC_CMD:
+			m_cdrom_setloc_cmd(m_simplestation);
 			break;
 
 		case CDROM_TEST_CMD:
