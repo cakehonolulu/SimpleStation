@@ -5,6 +5,8 @@
 #include <cpu/cpu.h>
 #include <cpu/instructions.h>
 
+FILE *cd = NULL;
+
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
     uint8_t m_result = 0;
@@ -13,6 +15,11 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 
     if (m_simplestation->m_cdrom)
     {
+		if (m_simplestation->m_cdrom_in)
+		{
+			cd = fopen(m_simplestation->cd_name, "rb");
+		}
+
         m_simplestation->m_cdrom_state = ON;
         memset(m_simplestation->m_cdrom, 0, sizeof(m_psx_cdrom_t));
 		m_cdrom_setup(m_simplestation);
@@ -36,12 +43,28 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
     }
 }
 
+cdrom_sector m_cdrom_read_sector(uint32_t location, m_simplestation_state *m_simplestation)
+{
+    location -= (2 * SPS);
+
+    cdrom_sector sector;
+
+    fseek(cd, location * sizeof(cdrom_sector), SEEK_SET);
+
+    fread(&sector, sizeof(uint8_t), sizeof(cdrom_sector), cd);
+
+
+    return sector;
+}
+
 void m_cdrom_setup(m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cdrom->m_status_register.raw = 0x18;
 	m_simplestation->m_cdrom->m_interrupt_enable_register.raw = 0x0;
 	m_simplestation->m_cdrom->m_stat.raw = 0x10;
 	m_simplestation->m_cdrom->m_seek_location = 0;
+	m_simplestation->m_cdrom->m_mode.raw = 0;
+	m_simplestation->m_cdrom->m_counter = 0;
 }
 
 void m_cdrom_set_status(uint8_t value, m_simplestation_state *m_simplestation)
@@ -93,7 +116,7 @@ void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
     m_simplestation->m_cdrom->m_status_register.rslrrdy = !m_cdrom_response_fifo_is_empty(m_simplestation);
 }
 
-void m_cdrom_set_state(enum CdState state, m_simplestation_state *m_simplestation)
+void m_cdrom_set_state(cdrom_state state, m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cdrom->m_stat.error = false;
     m_simplestation->m_cdrom->m_stat.spindleMotor = true;
@@ -110,9 +133,19 @@ void m_cdrom_set_state(enum CdState state, m_simplestation_state *m_simplestatio
     m_simplestation->m_cdrom->m_stat.raw |= mask;
 }
 
+cdrom_sector_size m_cdrom_get_sector_sz(m_simplestation_state *m_simplestation)
+{
+	return (cdrom_sector_size) m_simplestation->m_cdrom->m_mode._sectorSize;
+}
+
+cdrom_speed m_cdrom_get_speed(m_simplestation_state *m_simplestation) 
+{
+	return (cdrom_speed) m_simplestation->m_cdrom->m_mode._speed;
+}
+
 void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
 {
-	printf(BOLD MAGENTA "[CDROM] GETSTAT" NORMAL "\n");
+	printf(BOLD MAGENTA "[CDROM] GetStat" NORMAL "\n");
 
 	if (m_simplestation->m_cdrom_in)
 	{
@@ -125,7 +158,7 @@ void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
 		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
 	}
 
-    m_cdrom_interrupt_fifo_push(IRQ3, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
 }
 
 void m_cdrom_setloc_cmd(m_simplestation_state *m_simplestation)
@@ -140,9 +173,36 @@ void m_cdrom_setloc_cmd(m_simplestation_state *m_simplestation)
     m_simplestation->m_cdrom->m_seek_location = (minute * SPM * SPS) + (second * SPS) + sector;
 
     m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
-    m_cdrom_interrupt_fifo_push(IRQ3, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
 
 	printf(BOLD MAGENTA "[CDROM] SetLoc (Minute: %d, Second: %d, Sector: %d | LBA: %d)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_location);
+}
+
+void m_cdrom_readn_cmd(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] ReadN" NORMAL "\n");
+
+	m_simplestation->m_cdrom->m_sector_to_read = m_simplestation->m_cdrom->m_seek_location;
+
+	m_cdrom_set_state(READ, m_simplestation);
+
+    m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+
+    m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
+}
+
+void m_cdrom_setmode_cmd(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] SetMode" NORMAL "\n");
+
+	uint8_t value = m_cdrom_parameter_fifo_front(m_simplestation);
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+
+    m_simplestation->m_cdrom->m_mode.raw = value;
+
+    m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+	
+	m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
 }
 
 void m_cdrom_seekl_cmd(m_simplestation_state *m_simplestation)
@@ -151,13 +211,13 @@ void m_cdrom_seekl_cmd(m_simplestation_state *m_simplestation)
 
     m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
 
-    m_cdrom_interrupt_fifo_push(IRQ3, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
 
     m_cdrom_set_state(SEEK, m_simplestation);
 
     m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
 
-    m_cdrom_interrupt_fifo_push(IRQ2, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT2, m_simplestation);
 
 	printf(BOLD MAGENTA"[CDROM] SeekL" NORMAL "\n");
 }
@@ -175,7 +235,7 @@ void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
             m_cdrom_response_fifo_push(0x09, m_simplestation);
             m_cdrom_response_fifo_push(0x19, m_simplestation);
             m_cdrom_response_fifo_push(0xC0, m_simplestation);
-			m_cdrom_interrupt_fifo_push(IRQ3, m_simplestation);
+			m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
 			break;
 
 		default:
@@ -187,7 +247,7 @@ void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 
 void m_cdrom_getid_cmd(m_simplestation_state *m_simplestation)
 {
-	printf(BOLD MAGENTA"[CDROM] GETID" NORMAL "\n");
+	printf(BOLD MAGENTA"[CDROM] GetId" NORMAL "\n");
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
     m_cdrom_response_fifo_push(0x00, m_simplestation);
     m_cdrom_response_fifo_push(0x20, m_simplestation);
@@ -196,7 +256,7 @@ void m_cdrom_getid_cmd(m_simplestation_state *m_simplestation)
     m_cdrom_response_fifo_push('C', m_simplestation);
     m_cdrom_response_fifo_push('E', m_simplestation);
     m_cdrom_response_fifo_push('A', m_simplestation);
-    m_cdrom_interrupt_fifo_push(IRQ2, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT2, m_simplestation);
 }
 
 void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
@@ -214,6 +274,14 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 
 		case CDROM_SETLOC_CMD:
 			m_cdrom_setloc_cmd(m_simplestation);
+			break;
+
+		case CDROM_READN_CMD:
+			m_cdrom_readn_cmd(m_simplestation);
+			break;
+		
+		case CDROM_SETMODE_CMD:
+			m_cdrom_setmode_cmd(m_simplestation);
 			break;
 
 		case CDROM_SEEKL_CMD:
@@ -248,6 +316,21 @@ void m_cdrom_tick(m_simplestation_state *m_simplestation)
 			m_interrupts_trigger(CDROM, m_simplestation);
 		}
 	}
+
+	m_simplestation->m_cdrom->m_counter++;
+
+    if ((m_simplestation->m_cdrom->m_stat.play || m_simplestation->m_cdrom->m_stat.read) && m_simplestation->m_cdrom->m_counter >= SystemClocksPerCDROMInt1DoubleSpeed) {
+
+    	m_cdrom_interrupt_fifo_push(INT1, m_simplestation);
+
+        m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+
+        m_simplestation->m_cdrom->m_counter = 0;
+
+        cdrom_sector sector = m_cdrom_read_sector(m_simplestation->m_cdrom->m_sector_to_read, m_simplestation);
+
+        m_simplestation->m_cdrom->m_sector_to_read++;
+    }
 }
 
 void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation)

@@ -383,6 +383,22 @@ typedef struct {
     	uint8_t raw;
 	} m_stat;
 
+	union
+	{
+		struct {
+			uint8_t CDDASectorsReadEnable : 1;
+			uint8_t endOfTrackAutoPauseEnable : 1;
+			uint8_t reportInterruptsForAudioPlayEnable : 1;
+			uint8_t XAFilterEnable : 1;
+			uint8_t unknown : 1;
+			uint8_t _sectorSize : 1;
+			uint8_t XAADPCMEnable : 1;
+			uint8_t _speed : 1;
+		};
+
+		uint8_t raw;
+	} m_mode;
+
 	/*
 		1F801803h.Index0 - Interrupt Enable Register (R)
 		1F801803h.Index2 - Interrupt Enable Register (R) (Mirror)
@@ -417,6 +433,7 @@ typedef struct {
 
 	uint32_t m_seek_location;
 	uint32_t m_sector_to_read;
+	uint32_t m_counter;
 
 } m_psx_cdrom_t;
 

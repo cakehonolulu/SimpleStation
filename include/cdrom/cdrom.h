@@ -28,15 +28,39 @@
 #define SPS                     75
 #define SPM                     60
 
-#define IRQ2                    2
-#define IRQ3                    3
+#define SystemClocksPerCDROMInt1SingleSpeed 2352
+#define SystemClocksPerCDROMInt1DoubleSpeed 2352/2
 
-enum CdState {
+#define INT1                    1
+#define INT2                    2
+#define INT3                    3
+
+typedef enum {
     UNKN = 0,
     READ = 5,
     SEEK = 6,
     PLAY = 7,
-};
+} cdrom_state;
+
+typedef enum  {
+    DataOnly800h = 0,
+    WholeSector924h = 1,
+} cdrom_sector_size ;
+
+typedef enum  {
+    Normal = 0,
+    Double = 1,
+} cdrom_speed;
+
+typedef struct {
+    uint8_t sync[12];
+    uint8_t header[4];
+    uint8_t subheader[4];
+    uint8_t subheaderCopy[4];
+    uint8_t data[2048];
+    uint8_t EDC[4];
+    uint8_t ECC[276];
+} cdrom_sector;
 
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
