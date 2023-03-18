@@ -67,7 +67,7 @@ void m_cdrom_set_interrupt_flag_register(uint8_t value, m_simplestation_state *m
 		m_cdrom_update_status_register(m_simplestation);
 	}
 
-	if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+	if (!m_cdrom_interrupt_fifo_is_empty(m_simplestation))
 	{
 		m_cdrom_interrupt_fifo_pop(m_simplestation);
 	}
@@ -77,9 +77,9 @@ uint8_t m_cdrom_get_interrupt_flag_register(m_simplestation_state *m_simplestati
 {
     uint8_t flags = 0b11100000;
 
-    if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+    if (!m_cdrom_interrupt_fifo_is_empty(m_simplestation))
 	{
-        flags |= m_cdrom_interrupt_fifo_front & 0x7;
+        flags |= m_cdrom_interrupt_fifo_front(m_simplestation) & 0x7;
     }
 
     return flags;
@@ -87,14 +87,14 @@ uint8_t m_cdrom_get_interrupt_flag_register(m_simplestation_state *m_simplestati
 
 void m_cdrom_update_status_register(m_simplestation_state *m_simplestation)
 {
-	m_simplestation->m_cdrom->m_status_register.prmempt = (m_simplestation->m_cdrom->m_parameter_fifo_index == 0);
-    m_simplestation->m_cdrom->m_status_register.prmwrdy = !(m_simplestation->m_cdrom->m_parameter_fifo_index >= 16);
-    m_simplestation->m_cdrom->m_status_register.rslrrdy = (m_simplestation->m_cdrom->m_parameter_fifo_index != 0);
+	m_simplestation->m_cdrom->m_status_register.prmempt = m_cdrom_parameter_fifo_is_empty(m_simplestation);
+    m_simplestation->m_cdrom->m_status_register.prmwrdy = !(m_cdrom_parameter_fifo_size(m_simplestation) >= 16);
+    m_simplestation->m_cdrom->m_status_register.rslrrdy = !m_cdrom_response_fifo_is_empty(m_simplestation);
 }
 
 void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
 {
-	printf(MAGENTA "[CDROM] GETSTAT" NORMAL "\n");
+	printf(BOLD MAGENTA "[CDROM] GETSTAT" NORMAL "\n");
 
 	if (m_simplestation->m_cdrom_in)
 	{
@@ -112,12 +112,12 @@ void m_cdrom_getstat_cmd(m_simplestation_state *m_simplestation)
 
 void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 {
-	uint8_t sub_cmd = m_cdrom_parameter_fifo_front;
+	uint8_t sub_cmd = m_cdrom_parameter_fifo_front(m_simplestation);
 
 	switch (sub_cmd)
 	{
 		case INT3_yy_mm_dd_ver:
-			printf("[CDROM] test_cmd: INT3(yy,mm,dd)\n");
+			printf(BOLD MAGENTA"[CDROM] test_cmd: INT3(yy,mm,dd)" NORMAL "\n");
 			m_cdrom_response_fifo_push(0x94, m_simplestation);
             m_cdrom_response_fifo_push(0x09, m_simplestation);
             m_cdrom_response_fifo_push(0x19, m_simplestation);
@@ -134,6 +134,7 @@ void m_cdrom_test_cmd(m_simplestation_state *m_simplestation)
 
 void m_cdrom_getid_cmd(m_simplestation_state *m_simplestation)
 {
+	printf(BOLD MAGENTA"[CDROM] GETID" NORMAL "\n");
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
     m_cdrom_response_fifo_push(0x00, m_simplestation);
     m_cdrom_response_fifo_push(0x20, m_simplestation);
@@ -178,9 +179,9 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 
 void m_cdrom_tick(m_simplestation_state *m_simplestation)
 {
-	if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
+	if (!m_cdrom_interrupt_fifo_is_empty(m_simplestation))
 	{
-		if ((m_simplestation->m_cdrom->m_interrupt_enable_register.raw & 0x7) & (m_cdrom_interrupt_fifo_front & 0x7))
+		if ((m_simplestation->m_cdrom->m_interrupt_enable_register.raw & 0x7) & (m_cdrom_interrupt_fifo_front(m_simplestation) & 0x7))
 		{
 			printf("[CDROM] tick: Triggering CDROM interrupt...\n");
 			m_interrupts_trigger(CDROM, m_simplestation);
@@ -269,7 +270,8 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			switch (m_simplestation->m_cdrom->m_status_register.index)
 			{
 				case 1:
-					m_value = m_cdrom_response_fifo_pop(m_simplestation);
+					m_value = m_cdrom_response_fifo_front(m_simplestation);
+					m_cdrom_response_fifo_pop(m_simplestation);
 					break;
 
 				default:

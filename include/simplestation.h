@@ -320,6 +320,15 @@ typedef struct m_gpu
 
 } m_psx_gpu_t;
 
+struct byte_queue
+{
+	uint8_t *items;
+	int8_t maxsize;
+	int8_t front;
+	int8_t rear;
+	int8_t size;
+};
+
 typedef struct {
 	/*
 		1F801800h - Index/Status Register (Bit0-1 R/W) (Bit2-7 Read Only)
@@ -396,15 +405,13 @@ typedef struct {
 	// FIFOs
 
 	// Parameter FIFO
-	uint8_t m_parameter_fifo[16];
-	uint8_t m_parameter_fifo_index;
+	struct byte_queue *parameter_fifo;
 
 	// Response FIFO
-	uint8_t m_response_fifo[16];
-	uint8_t m_response_fifo_index;
+	struct byte_queue *response_fifo;
 
-	uint8_t m_interrupt_fifo[16];
-	uint8_t m_interrupt_fifo_index;
+	// Interrupt FIFO
+	struct byte_queue *interrupt_fifo;
 
 	int8_t m_queued_responses;
 

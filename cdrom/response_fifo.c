@@ -4,55 +4,66 @@
 
 void m_cdrom_response_fifo_init(m_simplestation_state *m_simplestation)
 {
-    memset(m_simplestation->m_cdrom->m_response_fifo, 0, sizeof(m_simplestation->m_cdrom->m_response_fifo));
-    m_simplestation->m_cdrom->m_response_fifo_index = 0;
+    m_simplestation->m_cdrom->response_fifo = malloc(sizeof(struct byte_queue));
+
+    m_simplestation->m_cdrom->response_fifo->items = malloc(RESPONSE_FIFO_SIZE * sizeof(uint8_t));
+    m_simplestation->m_cdrom->response_fifo->maxsize = RESPONSE_FIFO_SIZE;
+    m_simplestation->m_cdrom->response_fifo->front = 0;
+    m_simplestation->m_cdrom->response_fifo->rear = -1;
+    m_simplestation->m_cdrom->response_fifo->size = 0;
 }
 
-void m_cdrom_response_fifo_push(uint8_t m_response, m_simplestation_state *m_simplestation)
+uint8_t m_cdrom_response_fifo_size(m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_cdrom->m_response_fifo_index >= 16)
+    return m_simplestation->m_cdrom->response_fifo->size;
+}
+
+uint8_t m_cdrom_response_fifo_is_empty(m_simplestation_state *m_simplestation)
+{
+    return !m_cdrom_response_fifo_size(m_simplestation);
+}
+
+uint8_t m_cdrom_response_fifo_front(m_simplestation_state *m_simplestation)
+{
+    if (m_cdrom_response_fifo_is_empty(m_simplestation))
     {
-        printf(RED "[CDROM] response_fifo_push: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
+        printf(BOLD RED "[CDROM] response_front: Underflow detected, exiting..." NORMAL "\n");
         m_simplestation_exit(m_simplestation, 1);
     }
-    else
+
+    return m_simplestation->m_cdrom->response_fifo->items[m_simplestation->m_cdrom->response_fifo->front];
+}
+
+void m_cdrom_response_fifo_push(uint8_t m_parameter, m_simplestation_state *m_simplestation)
+{
+    if (m_cdrom_response_fifo_size(m_simplestation) == m_simplestation->m_cdrom->response_fifo->maxsize)
     {
-        // Push the response to the FIFO
-        m_simplestation->m_cdrom->m_response_fifo[m_simplestation->m_cdrom->m_response_fifo_index] = m_response;
-        m_simplestation->m_cdrom->m_response_fifo_index++;
+        printf(BOLD RED "[CDROM] response_push: Overflow detected, exiting..." NORMAL "\n");
+        m_simplestation_exit(m_simplestation, 1);
     }
+
+    m_simplestation->m_cdrom->response_fifo->rear = (m_simplestation->m_cdrom->response_fifo->rear + 1) % m_simplestation->m_cdrom->response_fifo->maxsize;
+    m_simplestation->m_cdrom->response_fifo->items[m_simplestation->m_cdrom->response_fifo->rear] = m_parameter;
+    m_simplestation->m_cdrom->response_fifo->size++;
 
     m_cdrom_update_status_register(m_simplestation);
 }
 
-void m_response_fifo_flush(m_simplestation_state *m_simplestation)
-{
-    memset(m_simplestation->m_cdrom->m_response_fifo, 0, sizeof(m_simplestation->m_cdrom->m_response_fifo));
-    m_simplestation->m_cdrom->m_response_fifo_index = 0;
-}
-
 uint8_t m_cdrom_response_fifo_pop(m_simplestation_state *m_simplestation)
 {
-    uint8_t m_response = 0;
-
-    if (m_simplestation->m_cdrom->m_response_fifo_index >= 15)
+    if (m_cdrom_response_fifo_is_empty(m_simplestation))
     {
-        printf(RED "[CDROM] response_fifo_pop: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
+        printf(BOLD RED "[CDROM] response_pop: Underflow detected, exiting..." NORMAL "\n");
         m_simplestation_exit(m_simplestation, 1);
     }
-    else
-    {
-        m_response = m_cdrom_response_fifo_front;
 
-        for (int i = 0; i < m_simplestation->m_cdrom->m_response_fifo_index; i++)
-        {
-            m_simplestation->m_cdrom->m_response_fifo[i] = m_simplestation->m_cdrom->m_response_fifo[i + 1];
-        }
+    m_simplestation->m_cdrom->response_fifo->front = (m_simplestation->m_cdrom->response_fifo->front + 1) % m_simplestation->m_cdrom->response_fifo->maxsize;
+    m_simplestation->m_cdrom->response_fifo->size--;
+}
 
-        if (m_simplestation->m_cdrom->m_response_fifo_index != 0) m_simplestation->m_cdrom->m_response_fifo_index--;
-
-        m_cdrom_update_status_register(m_simplestation);
-    }
-
-    return m_response;
+void m_response_fifo_flush(m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cdrom->response_fifo->front = 0;
+    m_simplestation->m_cdrom->response_fifo->rear = -1;
+    m_simplestation->m_cdrom->response_fifo->size = 0;
 }

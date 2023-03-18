@@ -4,57 +4,66 @@
 
 void m_cdrom_interrupt_fifo_init(m_simplestation_state *m_simplestation)
 {
-    memset(m_simplestation->m_cdrom->m_interrupt_fifo, 0, sizeof(m_simplestation->m_cdrom->m_interrupt_fifo));
-    m_simplestation->m_cdrom->m_interrupt_fifo_index = 0;
+    m_simplestation->m_cdrom->interrupt_fifo = malloc(sizeof(struct byte_queue));
+
+    m_simplestation->m_cdrom->interrupt_fifo->items = malloc(INTERRUPT_FIFO_SIZE * sizeof(uint8_t));
+    m_simplestation->m_cdrom->interrupt_fifo->maxsize = INTERRUPT_FIFO_SIZE;
+    m_simplestation->m_cdrom->interrupt_fifo->front = 0;
+    m_simplestation->m_cdrom->interrupt_fifo->rear = -1;
+    m_simplestation->m_cdrom->interrupt_fifo->size = 0;
 }
 
-void m_cdrom_interrupt_fifo_push(uint8_t m_interrupt, m_simplestation_state *m_simplestation)
+uint8_t m_cdrom_interrupt_fifo_size(m_simplestation_state *m_simplestation)
 {
-    if (m_simplestation->m_cdrom->m_interrupt_fifo_index >= 16)
+    return m_simplestation->m_cdrom->interrupt_fifo->size;
+}
+
+uint8_t m_cdrom_interrupt_fifo_is_empty(m_simplestation_state *m_simplestation)
+{
+    return !m_cdrom_interrupt_fifo_size(m_simplestation);
+}
+
+uint8_t m_cdrom_interrupt_fifo_front(m_simplestation_state *m_simplestation)
+{
+    if (m_cdrom_interrupt_fifo_is_empty(m_simplestation))
     {
-        printf(RED "[CDROM] interrupt_fifo_push: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
+        printf(BOLD RED "[CDROM] interrupt_front: Underflow detected, exiting..." NORMAL "\n");
         m_simplestation_exit(m_simplestation, 1);
     }
-    else
+
+    return m_simplestation->m_cdrom->interrupt_fifo->items[m_simplestation->m_cdrom->interrupt_fifo->front];
+}
+
+void m_cdrom_interrupt_fifo_push(uint8_t m_parameter, m_simplestation_state *m_simplestation)
+{
+    if (m_cdrom_interrupt_fifo_size(m_simplestation) == m_simplestation->m_cdrom->interrupt_fifo->maxsize)
     {
-        // Push the interrupt to the FIFO
-        m_simplestation->m_cdrom->m_interrupt_fifo[m_simplestation->m_cdrom->m_interrupt_fifo_index] = m_interrupt;
-        m_simplestation->m_cdrom->m_interrupt_fifo_index++;
+        printf(BOLD RED "[CDROM] interrupt_pop: Overflow detected, exiting..." NORMAL "\n");
+        m_simplestation_exit(m_simplestation, 1);
     }
+
+    m_simplestation->m_cdrom->interrupt_fifo->rear = (m_simplestation->m_cdrom->interrupt_fifo->rear + 1) % m_simplestation->m_cdrom->interrupt_fifo->maxsize;
+    m_simplestation->m_cdrom->interrupt_fifo->items[m_simplestation->m_cdrom->interrupt_fifo->rear] = m_parameter;
+    m_simplestation->m_cdrom->interrupt_fifo->size++;
+}
+
+uint8_t m_cdrom_interrupt_fifo_pop(m_simplestation_state *m_simplestation)
+{
+    if (m_cdrom_interrupt_fifo_is_empty(m_simplestation))
+    {
+        printf(BOLD RED "[CDROM] interrupt_pop: Underflow detected, exiting..." NORMAL "\n");
+        m_simplestation_exit(m_simplestation, 1);
+    }
+
+    m_simplestation->m_cdrom->interrupt_fifo->front = (m_simplestation->m_cdrom->interrupt_fifo->front + 1) % m_simplestation->m_cdrom->interrupt_fifo->maxsize;
+    m_simplestation->m_cdrom->interrupt_fifo->size--;
 
     m_cdrom_update_status_register(m_simplestation);
 }
 
 void m_interrupt_fifo_flush(m_simplestation_state *m_simplestation)
 {
-    memset(m_simplestation->m_cdrom->m_interrupt_fifo, 0, sizeof(m_simplestation->m_cdrom->m_interrupt_fifo));
-    m_simplestation->m_cdrom->m_interrupt_fifo_index = 0;
-}
-
-uint8_t m_cdrom_interrupt_fifo_pop(m_simplestation_state *m_simplestation)
-{
-    uint8_t m_interrupt = 0;
-
-    if (m_simplestation->m_cdrom->m_interrupt_fifo_index >= 15)
-    {
-        printf(RED "[CDROM] interrupt_fifo_pop: FIFO Index Exceeded 16, aborting...!\n" NORMAL);
-        m_simplestation_exit(m_simplestation, 1);
-    }
-    else
-    {
-        // Only pop interrupts if the current FIFO index's not 0
-        if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0)
-        {
-            m_interrupt = m_cdrom_interrupt_fifo_front;
-
-            for (int i = 0; i < m_simplestation->m_cdrom->m_interrupt_fifo_index; i++)
-            {
-                m_simplestation->m_cdrom->m_interrupt_fifo[i] = m_simplestation->m_cdrom->m_interrupt_fifo[i + 1];
-            }
-
-            if (m_simplestation->m_cdrom->m_interrupt_fifo_index != 0) m_simplestation->m_cdrom->m_interrupt_fifo_index--;
-        }
-    }
-
-    return m_interrupt;
+    m_simplestation->m_cdrom->interrupt_fifo->front = 0;
+    m_simplestation->m_cdrom->interrupt_fifo->rear = -1;
+    m_simplestation->m_cdrom->interrupt_fifo->size = 0;
 }
