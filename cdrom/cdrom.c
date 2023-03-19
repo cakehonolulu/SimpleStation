@@ -280,6 +280,23 @@ void m_cdrom_pause_cmd(m_simplestation_state *m_simplestation)
     m_cdrom_interrupt_fifo_push(INT2, m_simplestation);
 }
 
+void m_cdrom_init_cmd(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA"[CDROM] Init" NORMAL "\n");
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT3, m_simplestation);
+
+	m_simplestation->m_cdrom->m_stat.spindleMotor = 1;
+
+	m_cdrom_set_state(UNKN, m_simplestation);
+
+	m_simplestation->m_cdrom->m_mode.raw = 0x00;
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->m_stat.raw, m_simplestation);
+    m_cdrom_interrupt_fifo_push(INT2, m_simplestation);
+}
+
 void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 {
 	printf("[CDROM] execute: Command recieved\n");
@@ -303,6 +320,10 @@ void m_cdrom_execute(uint8_t value, m_simplestation_state *m_simplestation)
 		
 		case CDROM_PAUSE_CMD:
 			m_cdrom_pause_cmd(m_simplestation);
+			break;
+
+		case CDROM_INIT_CMD:
+			m_cdrom_init_cmd(m_simplestation);
 			break;
 
 		case CDROM_SETMODE_CMD:
