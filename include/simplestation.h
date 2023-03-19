@@ -330,6 +330,16 @@ struct byte_queue
 };
 
 typedef struct {
+    uint8_t sync[12];
+    uint8_t header[4];
+    uint8_t subheader[4];
+    uint8_t subheaderCopy[4];
+    uint8_t data[2048];
+    uint8_t EDC[4];
+    uint8_t ECC[276];
+} cdrom_sector;
+
+typedef struct {
 	/*
 		1F801800h - Index/Status Register (Bit0-1 R/W) (Bit2-7 Read Only)
 		0-1 Index   Port 1F801801h-1F801803h index (0..3 = Index0..Index3)   (R/W)
@@ -434,6 +444,11 @@ typedef struct {
 	uint32_t m_seek_location;
 	uint32_t m_sector_to_read;
 	uint32_t m_counter;
+
+	cdrom_sector sector;
+
+	uint8_t readBuffer[2048];
+    uint32_t readBufferIndex;
 
 } m_psx_cdrom_t;
 

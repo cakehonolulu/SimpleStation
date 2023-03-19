@@ -18,6 +18,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 renderstack.gpu_fill_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
             
+            case 0x20:
+                gpu_draw_opaque_three_point_monochrome_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x28:
                 renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -122,6 +126,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x02:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 3;
+                break;
+
+            case 0x20:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 4;
                 break;
 
             case 0x28:
@@ -234,10 +242,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             {
                 if (m_simplestation->renderer == OPENGL)
                 {
-                    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-                    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    m_sync_vram(m_simplestation);
+                    opengl_sync_vram(x, y, width, height, m_simplestation);
                 }
 
                 for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;

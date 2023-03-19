@@ -258,11 +258,11 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         m_source = m_gpu_get_read(m_simplestation);
                         break;
 
-                    case cdrom:
-			            /*printf("[DMA] Start CDROM Block Copy\n");
+                   /* case cdrom:
+			            printf("[DMA] Start CDROM Block Copy\n");
                         printf("[DMA] Transfer direction: device to ram\n");
                         printf("[DMA] MADR: 0x%x\n", m_address);
-                        printf("[DMA] Transfer size: %d words\n", m_size);*/
+                        printf("[DMA] Transfer size: %d words\n", m_size);
                         //bus.mem.CDROM.cd.buff_left = 0;
 
 
@@ -271,12 +271,18 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         uint8_t b3 = 0;
                         uint8_t b4 = 0;
                         
-                        /*uint8_t b1 = ReadDataByte(m_simplestation);
+                        uint8_t b1 = ReadDataByte(m_simplestation);
                         uint8_t b2 = ReadDataByte(m_simplestation);
                         uint8_t b3 = ReadDataByte(m_simplestation);
-                        uint8_t b4 = ReadDataByte(m_simplestation);*/
+                        uint8_t b4 = ReadDataByte(m_simplestation);
                         m_source = (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
 				
+                        break;
+*/
+
+                    case cdrom:
+                        m_source = loadWordFromReadBuffer(m_simplestation);
+                        //if (m_source) printf("DMA Value: 0x%08X\n", m_source);
                         break;
 
                     case otc:

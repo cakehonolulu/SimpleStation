@@ -68,4 +68,5 @@ void m_parameter_fifo_flush(m_simplestation_state *m_simplestation)
     m_simplestation->m_cdrom->parameter_fifo->front = 0;
     m_simplestation->m_cdrom->parameter_fifo->rear = -1;
     m_simplestation->m_cdrom->parameter_fifo->size = 0;
+    memset(m_simplestation->m_cdrom->parameter_fifo->items, 0, sizeof(m_simplestation->m_cdrom->parameter_fifo->items));
 }

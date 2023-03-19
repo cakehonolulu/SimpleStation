@@ -38,7 +38,7 @@ void m_cdrom_interrupt_fifo_push(uint8_t m_parameter, m_simplestation_state *m_s
 {
     if (m_cdrom_interrupt_fifo_size(m_simplestation) == m_simplestation->m_cdrom->interrupt_fifo->maxsize)
     {
-        printf(BOLD RED "[CDROM] interrupt_pop: Overflow detected, exiting..." NORMAL "\n");
+        printf(BOLD RED "[CDROM] interrupt_push: Overflow detected, exiting..." NORMAL "\n");
         m_simplestation_exit(m_simplestation, 1);
     }
 
@@ -70,4 +70,5 @@ void m_interrupt_fifo_flush(m_simplestation_state *m_simplestation)
     m_simplestation->m_cdrom->interrupt_fifo->front = 0;
     m_simplestation->m_cdrom->interrupt_fifo->rear = -1;
     m_simplestation->m_cdrom->interrupt_fifo->size = 0;
+    memset(m_simplestation->m_cdrom->interrupt_fifo->items, 0, sizeof(m_simplestation->m_cdrom->interrupt_fifo->items));
 }

@@ -28,8 +28,6 @@
 #define SPS                     75
 #define SPM                     60
 
-#define SystemClocksPerCDROMInt1SingleSpeed 2352
-#define SystemClocksPerCDROMInt1DoubleSpeed 2352/2
 
 #define INT1                    1
 #define INT2                    2
@@ -51,16 +49,6 @@ typedef enum  {
     Normal = 0,
     Double = 1,
 } cdrom_speed;
-
-typedef struct {
-    uint8_t sync[12];
-    uint8_t header[4];
-    uint8_t subheader[4];
-    uint8_t subheaderCopy[4];
-    uint8_t data[2048];
-    uint8_t EDC[4];
-    uint8_t ECC[276];
-} cdrom_sector;
 
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
