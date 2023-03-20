@@ -73,6 +73,18 @@ void updateStatusRegister(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->status.responseFifoEmpty = !response_isempty(m_simplestation);
 }
 
+uint8_t getInterruptFlagRegister(m_simplestation_state *m_simplestation)
+{
+    uint8_t flags = 0b11100000;
+    
+	if (!interrupt_isempty(m_simplestation))
+	{
+        flags |= interrupt_front(m_simplestation) & 0x7;
+    }
+    
+	return flags;
+}
+
 /* 0x19 */
 
 void operationTest(m_simplestation_state *m_simplestation)
@@ -142,6 +154,21 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 		// Status Register
 		case 0:
 			m_value = getStatusRegister(m_simplestation);
+			break;
+
+		case 3:
+			switch (m_simplestation->m_cdrom->status.index)
+			{
+                case 1:
+					m_value = getInterruptFlagRegister(m_simplestation);
+					break;
+
+				default:
+					printf(RED "[CDROM] read: Unhandled Offset 2 CDROM read (Index: %d)\n" NORMAL,
+							m_simplestation->m_cdrom->status.index);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
 			break;
 
         default:
