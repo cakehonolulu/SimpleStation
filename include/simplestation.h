@@ -320,35 +320,77 @@ typedef struct m_gpu
 
 } m_psx_gpu_t;
 
-typedef struct {
-	union
-	{
-		struct
-		{
-			uint8_t index : 2;
-			uint8_t adpbusy : 1;
-			uint8_t prmempt : 1;
-			uint8_t prmwrdy : 1;
-			uint8_t rslrrdy : 1;
-			uint8_t drqsts : 1;
-			uint8_t busysts : 1;
-		};
 
-		uint8_t raw;
-	} m_status_register;
+	/*
+		1F801800h - Index/Status Register (Bit0-1 R/W) (Bit2-7 Read Only)
+		0-1 Index   Port 1F801801h-1F801803h index (0..3 = Index0..Index3)   (R/W)
+		2   ADPBUSY XA-ADPCM fifo empty  (0=Empty) ;set when playing XA-ADPCM sound
+		3   PRMEMPT Parameter fifo empty (1=Empty) ;triggered before writing 1st byte
+		4   PRMWRDY Parameter fifo full  (0=Full)  ;triggered after writing 16 bytes
+		5   RSLRRDY Response fifo empty  (0=Empty) ;triggered after reading LAST byte
+		6   DRQSTS  Data fifo empty      (0=Empty) ;triggered after reading LAST byte
+		7   BUSYSTS Command/parameter transmission busy  (1=Busy)
+	*/
+
+typedef union
+		{
+			struct {
+				uint8_t index : 2;
+				uint8_t XAADCPMFifoEmpty : 1;
+				uint8_t parameterFifoEmpty : 1;
+				uint8_t parameterFifoFull : 1;
+				uint8_t responseFifoEmpty : 1;
+				uint8_t dataFifoEmpty : 1;
+				uint8_t transmissionBusy : 1;
+			};
+
+    	uint8_t _value;
+} CDROMStatus;
+
+	/*
+		1F801803h.Index0 - Interrupt Enable Register (R)
+		1F801803h.Index2 - Interrupt Enable Register (R) (Mirror)
+		0-4  Interrupt Enable Bits (usually all set, ie. 1Fh=Enable All IRQs)
+		5-7  Unknown/unused (write: should be zero) (read: usually all bits set)
+	*/
+	typedef union
+		{
+			struct {
+				uint8_t enable : 4;
+        		uint8_t unknown : 4;
+			};
+
+    	uint8_t _value;
+	} CDROMInterrupt;
+
+typedef struct
+{
+
+
+	CDROMStatus status;
+	CDROMInterrupt interrupt;
 
 	uint8_t m_interrupt_flag_register;
-	uint8_t m_interrupt_enable_register;
 
 	// FIFOs
 
 	// Parameter FIFO
 	uint8_t m_parameter_fifo[16];
-	uint8_t m_parameter_fifo_index;
+	int8_t m_parameter_fifo_front;
+	int8_t m_parameter_fifo_rear;
+	int8_t m_parameter_fifo_count;
 
 	// Response FIFO
 	uint8_t m_response_fifo[16];
-	uint8_t m_response_fifo_index;
+	int8_t m_response_fifo_front;
+	int8_t m_response_fifo_rear;
+	int8_t m_response_fifo_count;
+
+	
+	uint8_t m_interrupt_fifo[64];
+	int8_t m_interrupt_fifo_front;
+	int8_t m_interrupt_fifo_rear;
+	int8_t m_interrupt_fifo_count;
 
 	int8_t m_queued_responses;
 

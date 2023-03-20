@@ -134,6 +134,7 @@ int main(int argc, char **argv)
 					printf("CD-ROM Name: %s\n", m_simplestation.cd_name);
 					m_args++;
 					m_simplestation.m_cdrom_in = true;
+					printf(BOLD GREEN "[CDROM] Booting from CD...!" NORMAL "\n");
 				}
 				else
 				{
@@ -278,24 +279,45 @@ int main(int argc, char **argv)
 												m_simplestation_exit(&m_simplestation, 1);
 											}
 										}
+										uint32_t systemClockStep = 21;
+										uint32_t totalSystemClocksThisFrame = 0;
+										uint32_t videoSystemClockStep = systemClockStep*11/7;
+										uint32_t videoSystemClocksScanlineCounter = 0;
+										uint32_t totalScanlines = 0;
 
 										while (delay_miliseconds >= target_miliseconds)
 										{
-											for (int i = 0; i < (3386880 / 60); i++)
+											while (totalSystemClocksThisFrame < (33868800 / 60))
 											{
-												// Fetch, decode, execute
-												m_cpu_fde(&m_simplestation);
-												dma_step(&m_simplestation);
+												for (uint32_t i = 0; i < systemClockStep / 3; i++)
+												{
+													m_cpu_fde(&m_simplestation);
+													dma_step(&m_simplestation);
+													totalSystemClocksThisFrame++;
+												}
 
-												scheduler_tick(2, &m_simplestation);
+												cdrom_tick(&m_simplestation);
+
+												videoSystemClocksScanlineCounter += videoSystemClockStep;
+
+												if (videoSystemClocksScanlineCounter >= 3413)
+												{
+													totalScanlines++;
+													videoSystemClocksScanlineCounter = 0;
+												}
+												
+												if (totalScanlines >= 263) {
+													m_interrupts_request(VBLANK, &m_simplestation);
+													totalScanlines = 0;
+												}
+											
 											}
-
-											m_interrupts_request(VBLANK, &m_simplestation);
-
-											delay_miliseconds -= target_miliseconds;
+											
+												delay_miliseconds -= target_miliseconds;
 										}
-
+										
 										renderstack.display(&m_simplestation);
+
 									}
 #ifdef GDBSTUB_SUPPORT
 									}
