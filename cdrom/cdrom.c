@@ -53,12 +53,18 @@ void setInterruptRegister(uint8_t value, m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->interrupt.enable = value;
 }
 
-void setInterruptFlagRegister(uint8_t value, m_simplestation_state *m_simplestation) {
-    if (value & 0x40) {
-        m_simplestation->m_cdrom->status.parameterFifoEmpty = 1;
-        m_simplestation->m_cdrom->status.parameterFifoFull = 1;
+void setInterruptFlagRegister(uint8_t value, m_simplestation_state *m_simplestation)
+{
+    if (value & 0x40)
+	{
         clearParameters(m_simplestation);
+		updateStatusRegister(m_simplestation);
     }
+
+	if (!interrupt_isempty(m_simplestation))
+	{
+		interrupt_pop(m_simplestation);
+	}
 }
 
 uint8_t getStatusRegister(m_simplestation_state *m_simplestation)
@@ -113,6 +119,9 @@ void operationTest(m_simplestation_state *m_simplestation)
 
 void execute(uint8_t command, m_simplestation_state *m_simplestation)
 {
+	clearInterrupts(m_simplestation);
+	clearResponses(m_simplestation);
+
 	switch (command)
 	{
         case 0x19:
@@ -156,6 +165,21 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 			m_value = getStatusRegister(m_simplestation);
 			break;
 
+		case 1:
+			switch (m_simplestation->m_cdrom->status.index)
+			{
+                case 1:
+					m_value = m_cdrom_response_fifo_pop(m_simplestation);
+					break;
+
+				default:
+					printf(RED "[CDROM] read: Unhandled Offset 1 CDROM read (Index: %d)\n" NORMAL,
+							m_simplestation->m_cdrom->status.index);
+					m_simplestation_exit(m_simplestation, 1);
+					break;
+			}
+			break;
+
 		case 3:
 			switch (m_simplestation->m_cdrom->status.index)
 			{
@@ -164,7 +188,7 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 					break;
 
 				default:
-					printf(RED "[CDROM] read: Unhandled Offset 2 CDROM read (Index: %d)\n" NORMAL,
+					printf(RED "[CDROM] read: Unhandled Offset 3 CDROM read (Index: %d)\n" NORMAL,
 							m_simplestation->m_cdrom->status.index);
 					m_simplestation_exit(m_simplestation, 1);
 					break;
