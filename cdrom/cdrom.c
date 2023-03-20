@@ -50,6 +50,9 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_read_sector = 0;
 	m_simplestation->m_cdrom->mode._value = 0;
 	m_simplestation->m_cdrom->m_count = 0;
+	memset(m_simplestation->m_cdrom->currentSector, 0, sizeof(m_simplestation->m_cdrom->currentSector));
+	memset(m_simplestation->m_cdrom->readBuffer, 0, sizeof(m_simplestation->m_cdrom->readBuffer));
+	m_simplestation->m_cdrom->readBufferIndex = 0;
 }
 
 /* Helper functions */
@@ -138,6 +141,85 @@ CDSector readSector(uint32_t location, m_simplestation_state *m_simplestation)
 uint8_t getInterruptRegister(m_simplestation_state *m_simplestation)
 {
     return m_simplestation->m_cdrom->interrupt.enable;
+}
+
+bool isReadBufferEmpty(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_cdrom->readBufferIndex == 0)
+	{
+        return true;
+    }
+
+    CDROMModeSectorSize sectorSize_ = sectorSize(m_simplestation);
+
+    if (sectorSize_ == DataOnly800h) {
+        return m_simplestation->m_cdrom->readBufferIndex >= 0x800;
+    } else { // WholeSector924h
+        return m_simplestation->m_cdrom->readBufferIndex >= 0x924;
+    }
+}
+
+void setRequestRegister(uint8_t value, m_simplestation_state *m_simplestation)
+{
+    if (value & 0x80) {
+        if (isReadBufferEmpty(m_simplestation)) {
+            CDROMModeSectorSize sectorSize_ = sectorSize(m_simplestation);
+            if (sectorSize_ == DataOnly800h)
+			{
+				memcpy(m_simplestation->m_cdrom->readBuffer, &m_simplestation->m_cdrom->currentSector.data[0], 0x800);
+
+                //copy(&currentSector.data[0], &currentSector.data[0x800], back_inserter(readBuffer));
+            } else { // WholeSector924h
+                //copy(&currentSector.header[0], &currentSector.ECC[276], back_inserter(readBuffer));
+				printf(BOLD RED "[CDROM] setRequestRegister: Unimplemented whole sector copy!" NORMAL "\n");
+				m_simplestation_exit(m_simplestation, 1);
+            }
+            m_simplestation->m_cdrom->readBufferIndex = 0;
+            m_simplestation->m_cdrom->status.dataFifoEmpty = 1;
+        } else {
+			memset(m_simplestation->m_cdrom->readBuffer, 0, sizeof(m_simplestation->m_cdrom->readBuffer));
+            m_simplestation->m_cdrom->readBufferIndex = 0;
+            m_simplestation->m_cdrom->status.dataFifoEmpty = 0;
+        }
+    }
+}
+
+uint8_t loadByteFromReadBuffer(m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_cdrom->readBufferIndex == 0)
+	{
+        return 0;
+    }
+
+    /*
+		The PSX hardware allows to read 800h-byte or 924h-byte sectors, indexed as [000h..7FFh] or
+		[000h..923h], when trying to read further bytes, then the PSX will repeat the byte at
+		index [800h-8] or [924h-4] as padding value.
+    */
+    CDROMModeSectorSize sectorSize_ = sectorSize(m_simplestation);
+    if (sectorSize_ == DataOnly800h && m_simplestation->m_cdrom->readBufferIndex >= 0x800) {
+        return m_simplestation->m_cdrom->readBuffer[0x800 - 0x8];
+    } else if (sectorSize_ == WholeSector924h && m_simplestation->m_cdrom->readBufferIndex >= 0x924) {
+        return m_simplestation->m_cdrom->readBuffer[0x924 - 0x4];
+    }
+
+    uint8_t value = m_simplestation->m_cdrom->readBuffer[m_simplestation->m_cdrom->readBufferIndex];
+    m_simplestation->m_cdrom->readBufferIndex++;
+    if (isReadBufferEmpty(m_simplestation)) {
+        m_simplestation->m_cdrom->status.dataFifoEmpty = 0;
+    }
+
+    return value;
+}
+
+uint32_t loadWordFromReadBuffer(m_simplestation_state *m_simplestation)
+{
+    uint32_t value = 0;
+    for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
+        uint8_t byte = loadByteFromReadBuffer(m_simplestation);
+        value |= (((uint32_t)byte) << (i * 8));
+    }
+    return value;
 }
 
 /* CDROM Commands */
@@ -315,7 +397,7 @@ void cdrom_tick(m_simplestation_state *m_simplestation)
 
         m_simplestation->m_cdrom->m_count = 0;
 
-        CDSector sector = readSector(m_simplestation->m_cdrom->m_read_sector, m_simplestation);
+        m_simplestation->m_cdrom->currentSector = readSector(m_simplestation->m_cdrom->m_read_sector, m_simplestation);
         m_simplestation->m_cdrom->m_read_sector++;
     }
 }
@@ -418,6 +500,10 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 		case 3:
 			switch (m_simplestation->m_cdrom->status.index)
 			{
+				case 0:
+					setRequestRegister(m_value, m_simplestation);
+					break;
+
 				// Interrupt Flag Register Write
 				case 1:
 					setInterruptFlagRegister(m_value, m_simplestation);

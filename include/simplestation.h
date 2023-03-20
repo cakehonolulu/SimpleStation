@@ -449,6 +449,10 @@ typedef struct
 
 	uint64_t m_count;
 
+    CDSector currentSector;
+    uint32_t readBuffer[2048];
+    uint32_t readBufferIndex;
+
 } m_psx_cdrom_t;
 
 typedef struct {
