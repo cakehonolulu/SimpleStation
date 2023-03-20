@@ -91,6 +91,15 @@ uint8_t getInterruptFlagRegister(m_simplestation_state *m_simplestation)
 	return flags;
 }
 
+/* 0x01 */
+void operationGetstat(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] GetStat" NORMAL "\n");
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->status._value, m_simplestation);
+	interrupt_push(0x03, m_simplestation);
+}
+
 /* 0x19 */
 
 void operationTest(m_simplestation_state *m_simplestation)
@@ -124,6 +133,10 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 
 	switch (command)
 	{
+		case 0x01:
+			operationGetstat(m_simplestation);
+			break;
+
         case 0x19:
             operationTest(m_simplestation);
             break;
