@@ -27,6 +27,8 @@ typedef enum {
     Playing = 7,
 } CDROMState;
 
+#define BCD_DECODE(value) (((value >> 4) & 0xF) * 10 + (value & 0xF))
+
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
 void m_cdrom_exit(m_simplestation_state *m_simplestation);

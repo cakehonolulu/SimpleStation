@@ -4,6 +4,9 @@
 #include <cpu/cpu.h>
 #include <cpu/instructions.h>
 
+const uint32_t SecondsPerMinute = 60;
+const uint32_t SectorsPerSecond = 75;
+
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
     uint8_t m_result = 0;
@@ -40,6 +43,7 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->status._value = 0x18;
 	m_simplestation->m_cdrom->interrupt._value = 0x00;
 	m_simplestation->m_cdrom->statusCode._value = 0x10;
+	m_simplestation->m_cdrom->m_seek_sector = 0;
 }
 
 /* Helper functions */
@@ -120,8 +124,22 @@ void operationGetstat(m_simplestation_state *m_simplestation)
 	interrupt_push(0x03, m_simplestation);
 }
 
-/* 0x19 */
+/* 0x02 */
+void operationSetloc(m_simplestation_state *m_simplestation)
+{
+    uint8_t second = BCD_DECODE(m_cdrom_parameter_fifo_pop(m_simplestation));
+    uint8_t sector = BCD_DECODE(m_cdrom_parameter_fifo_pop(m_simplestation));
+	uint8_t minute = BCD_DECODE(m_cdrom_parameter_fifo_pop(m_simplestation));
 
+    m_simplestation->m_cdrom->m_seek_sector = (minute * SecondsPerMinute * SectorsPerSecond) + (second * SectorsPerSecond) + sector;
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+
+	printf(BOLD MAGENTA "[CDROM] SetLoc (%d, %d, %d | LBA: %d)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_sector);
+}
+
+/* 0x19 */
 void operationTest(m_simplestation_state *m_simplestation)
 {
 	uint8_t subfunction = param_front(m_simplestation);
@@ -144,6 +162,21 @@ void operationTest(m_simplestation_state *m_simplestation)
     }
 }
 
+/* 0x1A */
+void operationGetID(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] GetId" NORMAL "\n");
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    m_cdrom_response_fifo_push(0x00, m_simplestation);
+    m_cdrom_response_fifo_push(0x20, m_simplestation);
+    m_cdrom_response_fifo_push(0x00, m_simplestation);
+    m_cdrom_response_fifo_push('S', m_simplestation);
+    m_cdrom_response_fifo_push('C', m_simplestation);
+    m_cdrom_response_fifo_push('E', m_simplestation);
+    m_cdrom_response_fifo_push('A', m_simplestation);
+    interrupt_push(0x02, m_simplestation);
+}
+
 /* CDROM Commands */
 
 void execute(uint8_t command, m_simplestation_state *m_simplestation)
@@ -157,9 +190,17 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 			operationGetstat(m_simplestation);
 			break;
 
+		case 0x02:
+			operationSetloc(m_simplestation);
+			break;
+
         case 0x19:
             operationTest(m_simplestation);
             break;
+		
+		case 0x1A:
+			operationGetID(m_simplestation);
+			break;
 
         default:
             printf(BOLD RED "[CDROM] execute: Unhandled CDROM Command 0x%X" NORMAL "\n", command);
