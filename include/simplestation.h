@@ -418,6 +418,7 @@ typedef struct
 	int8_t m_queued_responses;
 
 	uint32_t m_seek_sector;
+	uint32_t m_read_sector;
 
 } m_psx_cdrom_t;
 
