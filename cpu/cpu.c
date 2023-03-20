@@ -233,7 +233,11 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	}
 #endif
 
-	if (m_cpu_check_interrupts(m_simplestation)) return;
+	if (m_interrupts_pending(m_simplestation))
+	{
+        m_exception(interrupt, m_simplestation);
+		return;
+    }
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct)
@@ -254,14 +258,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 		printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
 		m_exc_types m_exc = illegal;
 		m_exception(m_exc, m_simplestation);
-	}
-}
-
-bool m_cpu_check_interrupts(m_simplestation_state *m_simplestation)
-{
-	if ((COP0_CAUSE & 0x0000FF00) && (COP0_SR & 0x0000FF00) && (COP0_SR & 1))
-	{
-		m_exception(interrupt, m_simplestation);
 	}
 }
 

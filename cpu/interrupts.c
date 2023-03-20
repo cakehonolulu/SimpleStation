@@ -24,17 +24,25 @@ uint8_t m_interrupts_init(m_simplestation_state *m_simplestation)
 	return m_return;
 }
 
-void m_interrupts_check(m_simplestation_state *m_simplestation)
+bool m_interrupt_isactive(m_simplestation_state *m_simplestation)
 {
-	// Set bit 10 of the cause register to request an interrupt
-	COP0_CAUSE &= ~(1 << 10);
-	COP0_CAUSE |= ((uint32_t) ((m_simplestation->m_cpu_ints->m_interrupt_stat & m_simplestation->m_cpu_ints->m_interrupt_mask) != 0)) << 10;
+    return (m_simplestation->m_cpu_ints->m_interrupt_stat & m_simplestation->m_cpu_ints->m_interrupt_mask) != 0;
 }
 
 void m_interrupts_request(m_int_types m_int, m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cpu_ints->m_interrupt_stat |= 1 << (uint32_t) m_int;
-	m_interrupts_check(m_simplestation);
+	m_interrupts_update(m_simplestation);
+}
+
+bool m_interrupts_pending(m_simplestation_state *m_simplestation)
+{
+	return (COP0_CAUSE_IP & COP0_SR_IM) && (COP0_SR & 1);
+}
+
+void m_interrupts_update(m_simplestation_state *m_simplestation)
+{
+	COP0_CAUSE = (COP0_CAUSE & 0xFFFF00FF) | ((uint32_t)(m_interrupt_isactive(m_simplestation) ? 4 : 0) <<  8);
 }
 
 void m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation_state *m_simplestation)
@@ -54,8 +62,6 @@ void m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation
 			m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
-
-	m_interrupts_check(m_simplestation);
 }
 
 uint32_t m_interrupts_read(uint32_t m_int_addr, m_simplestation_state *m_simplestation)
