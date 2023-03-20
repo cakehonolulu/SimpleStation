@@ -92,6 +92,22 @@ uint8_t getInterruptFlagRegister(m_simplestation_state *m_simplestation)
 	return flags;
 }
 
+void setState(CDROMState state, m_simplestation_state *m_simplestation)
+{
+    m_simplestation->m_cdrom->statusCode.error = false;
+    m_simplestation->m_cdrom->statusCode.spindleMotor = true;
+    m_simplestation->m_cdrom->statusCode.seekError = false;
+    m_simplestation->m_cdrom->statusCode.getIdError = false;
+
+	if (state == Unknown)
+	{
+    	return;
+    }
+
+    uint8_t mask = 1 << state;
+	m_simplestation->m_cdrom->statusCode._value |= mask;
+}
+
 /* 0x01 */
 void operationGetstat(m_simplestation_state *m_simplestation)
 {

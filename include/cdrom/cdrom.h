@@ -20,6 +20,13 @@
 #define CDROM_TEST_CMD          0x19
 #define CDROM_GETID_CMD         0x1A
 
+typedef enum {
+    Unknown = 0,
+    Reading = 5,
+    Seeking = 6,
+    Playing = 7,
+} CDROMState;
+
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
 void m_cdrom_exit(m_simplestation_state *m_simplestation);
