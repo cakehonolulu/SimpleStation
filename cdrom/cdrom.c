@@ -146,6 +146,19 @@ void operationSetloc(m_simplestation_state *m_simplestation)
 	printf(BOLD MAGENTA "[CDROM] SetLoc (%d, %d, %d | LBA: %d)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_sector);
 }
 
+/* 0x06 */
+void operationReadN(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] ReadN" NORMAL "\n");
+
+	m_simplestation->m_cdrom->m_read_sector = m_simplestation->m_cdrom->m_seek_sector;
+
+    setState(Reading, m_simplestation);
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+}
+
 /* 0x0E */
 void operationSetMode(m_simplestation_state *m_simplestation)
 {
@@ -226,6 +239,10 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 
 		case 0x02:
 			operationSetloc(m_simplestation);
+			break;
+
+		case 0x06:
+			operationReadN(m_simplestation);
 			break;
 
 		case 0x0E:
