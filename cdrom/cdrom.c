@@ -39,6 +39,7 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cdrom->status._value = 0x18;
 	m_simplestation->m_cdrom->interrupt._value = 0x00;
+	m_simplestation->m_cdrom->statusCode._value = 0x10;
 }
 
 /* Helper functions */
@@ -96,7 +97,7 @@ void operationGetstat(m_simplestation_state *m_simplestation)
 {
 	printf(BOLD MAGENTA "[CDROM] GetStat" NORMAL "\n");
 
-	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->status._value, m_simplestation);
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
 	interrupt_push(0x03, m_simplestation);
 }
 
