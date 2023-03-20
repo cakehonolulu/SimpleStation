@@ -97,6 +97,9 @@ void operationGetstat(m_simplestation_state *m_simplestation)
 {
 	printf(BOLD MAGENTA "[CDROM] GetStat" NORMAL "\n");
 
+	if (m_simplestation->m_cdrom_in)
+		m_simplestation->m_cdrom->statusCode.shellOpen = 0;
+
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
 	interrupt_push(0x03, m_simplestation);
 }
