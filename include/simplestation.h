@@ -447,6 +447,8 @@ typedef struct
 	uint32_t m_seek_sector;
 	uint32_t m_read_sector;
 
+	uint64_t m_count;
+
 } m_psx_cdrom_t;
 
 typedef struct {

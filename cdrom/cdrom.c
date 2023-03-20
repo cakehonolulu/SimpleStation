@@ -4,8 +4,7 @@
 #include <cpu/cpu.h>
 #include <cpu/instructions.h>
 
-const uint32_t SecondsPerMinute = 60;
-const uint32_t SectorsPerSecond = 75;
+FILE *cd = NULL;
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
@@ -21,6 +20,9 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 		m_cdrom_parameter_fifo_init(m_simplestation);
 		m_cdrom_response_fifo_init(m_simplestation);
 		m_cdrom_interrupt_fifo_init(m_simplestation);
+
+		if (m_simplestation->m_cdrom_in)
+			cd = fopen(m_simplestation->cd_name, "rb");
     }
     else
     {
@@ -34,6 +36,7 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
 {
     if (m_simplestation->m_cdrom)
     {
+		fclose(cd);
         free(m_simplestation->m_cdrom);
     }
 }
@@ -46,6 +49,7 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->m_seek_sector = 0;
 	m_simplestation->m_cdrom->m_read_sector = 0;
 	m_simplestation->m_cdrom->mode._value = 0;
+	m_simplestation->m_cdrom->m_count = 0;
 }
 
 /* Helper functions */
@@ -117,6 +121,24 @@ void setState(CDROMState state, m_simplestation_state *m_simplestation)
 CDROMModeSectorSize sectorSize(m_simplestation_state *m_simplestation) { return (CDROMModeSectorSize) m_simplestation->m_cdrom->mode._sectorSize; }
 
 CDROMModeSpeed speed(m_simplestation_state *m_simplestation) { return (CDROMModeSpeed) m_simplestation->m_cdrom->mode._speed; }
+
+CDSector readSector(uint32_t location, m_simplestation_state *m_simplestation)
+{
+    // TODO: there is a two seconds pre-gap at the first index of the single-track data CDs *only*
+    location -= (2 * SectorsPerSecond);
+
+    CDSector sector;
+    fseek(cd, location * sizeof(CDSector), SEEK_SET);
+
+	fread(&sector, sizeof(sector), 1, cd);
+
+    return sector;
+}
+
+uint8_t getInterruptRegister(m_simplestation_state *m_simplestation)
+{
+    return m_simplestation->m_cdrom->interrupt.enable;
+}
 
 /* CDROM Commands */
 /* 0x01 */
@@ -283,6 +305,19 @@ void cdrom_tick(m_simplestation_state *m_simplestation)
             m_interrupts_request(CDROM, m_simplestation);
         }
     }
+
+	m_simplestation->m_cdrom->m_count++;
+
+    if ((m_simplestation->m_cdrom->statusCode.play || m_simplestation->m_cdrom->statusCode.read) && m_simplestation->m_cdrom->m_count >= SystemClocksPerCDROMInt1DoubleSpeed)
+	{
+    	interrupt_push(0x01, m_simplestation);
+		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+
+        m_simplestation->m_cdrom->m_count = 0;
+
+        CDSector sector = readSector(m_simplestation->m_cdrom->m_read_sector, m_simplestation);
+        m_simplestation->m_cdrom->m_read_sector++;
+    }
 }
 
 /* Cdrom RW Functions */
@@ -316,8 +351,16 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 		case 3:
 			switch (m_simplestation->m_cdrom->status.index)
 			{
+				case 0:
+					m_value = getInterruptRegister(m_simplestation);
+					break;
+
                 case 1:
 					m_value = getInterruptFlagRegister(m_simplestation);
+					break;
+				
+				case 2:
+					m_value = getInterruptRegister(m_simplestation);
 					break;
 
 				default:
