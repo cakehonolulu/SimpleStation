@@ -27,6 +27,16 @@ typedef enum {
     Playing = 7,
 } CDROMState;
 
+typedef enum {
+    DataOnly800h = 0,
+    WholeSector924h = 1,
+} CDROMModeSectorSize;
+
+typedef enum {
+    Normal = 0,
+    Double = 1,
+} CDROMModeSpeed;
+
 #define BCD_DECODE(value) (((value >> 4) & 0xF) * 10 + (value & 0xF))
 
 /* Function Definitions */

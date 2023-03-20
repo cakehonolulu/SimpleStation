@@ -45,6 +45,7 @@ void m_cdrom_setup(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->statusCode._value = 0x10;
 	m_simplestation->m_cdrom->m_seek_sector = 0;
 	m_simplestation->m_cdrom->m_read_sector = 0;
+	m_simplestation->m_cdrom->mode._value = 0;
 }
 
 /* Helper functions */
@@ -113,6 +114,11 @@ void setState(CDROMState state, m_simplestation_state *m_simplestation)
 	m_simplestation->m_cdrom->statusCode._value |= mask;
 }
 
+CDROMModeSectorSize sectorSize(m_simplestation_state *m_simplestation) { return (CDROMModeSectorSize) m_simplestation->m_cdrom->mode._sectorSize; }
+
+CDROMModeSpeed speed(m_simplestation_state *m_simplestation) { return (CDROMModeSpeed) m_simplestation->m_cdrom->mode._speed; }
+
+/* CDROM Commands */
 /* 0x01 */
 void operationGetstat(m_simplestation_state *m_simplestation)
 {
@@ -138,6 +144,18 @@ void operationSetloc(m_simplestation_state *m_simplestation)
     interrupt_push(0x03, m_simplestation);
 
 	printf(BOLD MAGENTA "[CDROM] SetLoc (%d, %d, %d | LBA: %d)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_sector);
+}
+
+/* 0x0E */
+void operationSetMode(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] SetMode" NORMAL "\n");
+
+	uint8_t value = m_cdrom_parameter_fifo_pop(m_simplestation);
+    m_simplestation->m_cdrom->mode._value = value;
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
 }
 
 /* 0x15 */
@@ -208,6 +226,10 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 
 		case 0x02:
 			operationSetloc(m_simplestation);
+			break;
+
+		case 0x0E:
+			operationSetMode(m_simplestation);
 			break;
 
 		case 0x15:
