@@ -354,12 +354,39 @@ typedef union {
 typedef union
 	{
 		struct {
-			uint8_t enable : 4;
-       		uint8_t unknown : 4;
+			uint8_t enable : 5;
+       		uint8_t unknown : 3;
 		};
 
    	uint8_t _value;
 } CDROMInterrupt;
+
+/*
+	1F801803h.Index1 - Interrupt Flag Register (R/W)
+	1F801803h.Index3 - Interrupt Flag Register (R) (Mirror)
+	0-2   Read: Response Received   Write: 7=Acknowledge   ;INT1..INT7
+	3     Read: Unknown (usually 0) Write: 1=Acknowledge   ;INT8  ;XXX CLRBFEMPT
+	4     Read: Command Start       Write: 1=Acknowledge   ;INT10h;XXX CLRBFWRDY
+	5     Read: Always 1 ;XXX "_"   Write: 1=Unknown              ;XXX SMADPCLR
+	6     Read: Always 1 ;XXX "_"   Write: 1=Reset Parameter Fifo ;XXX CLRPRM
+	7     Read: Always 1 ;XXX "_"   Write: 1=Unknown              ;XXX CHPRST
+*/
+typedef union
+	{
+   		struct {
+			uint8_t responseReceived : 3;
+			uint8_t unknown : 1;
+			uint8_t commandStart : 1;
+			uint8_t unknown2 : 1;
+			uint8_t unknown3 : 1;
+			uint8_t unknown4 : 1;
+		};
+
+    uint8_t _value;
+
+} CDROMInterruptFlag;
+
+
 
 /*
 	Status code (stat)
@@ -413,12 +440,41 @@ typedef union {
 	uint8_t _value;
 } CDROMMode;
 
+/*
+    Mode2/Form1 (CD-XA)
+    000h 0Ch  Sync
+    00Ch 4    Header (Minute,Second,Sector,Mode=02h)
+    010h 4    Sub-Header (File, Channel, Submode AND DFh, Codinginfo)
+    014h 4    Copy of Sub-Header
+    018h 800h Data (2048 bytes)
+    818h 4    EDC (checksum accross [010h..817h])
+    81Ch 114h ECC (error correction codes)
+*/
+typedef struct {
+    uint8_t sync[12];
+    uint8_t header[4];
+    uint8_t subheader[4];
+    uint8_t subheaderCopy[4];
+    uint8_t data[2048];
+    uint8_t EDC[4];
+    uint8_t ECC[276];
+} CDSector;
+
+typedef enum {
+    IdleState,
+    SeekingState,
+    ReadingState,
+    ReadingTableOfContentsState,
+} CDROMInternalState;
+
 typedef struct
 {
 	CDROMStatus status;
 	CDROMInterrupt interrupt;
 	CDROMStatusCode statusCode;
 	CDROMMode mode;
+	CDROMInterruptFlag interruptFlag;
+	CDROMInternalState internalState;
 
 	uint8_t m_interrupt_flag_register;
 
@@ -450,7 +506,7 @@ typedef struct
 	uint64_t m_count;
 
     CDSector currentSector;
-    uint32_t readBuffer[2048];
+    uint8_t readBuffer[0x920];
     uint32_t readBufferIndex;
 
 } m_psx_cdrom_t;

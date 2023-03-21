@@ -265,10 +265,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         printf("[DMA] Transfer size: %d words\n", m_size);*/
                         //bus.mem.CDROM.cd.buff_left = 0;
 
-                        /*uint8_t b1 = ReadDataByte(m_simplestation);
-                        uint8_t b2 = ReadDataByte(m_simplestation);
-                        uint8_t b3 = ReadDataByte(m_simplestation);
-                        uint8_t b4 = ReadDataByte(m_simplestation);*/
+                        
                         m_source = loadWordFromReadBuffer(m_simplestation);
 				
                         break;

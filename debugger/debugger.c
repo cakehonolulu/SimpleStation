@@ -15,7 +15,7 @@
 
 void m_printregs(m_simplestation_state *m_simplestation)
 {
-	printf(MAGENTA UNDERSCORE "\nGeneral Prupose Registers:\n" WHITE NORMAL);
+	printf(MAGENTA UNDERSCORE "\nGeneral Purpose Registers:\n" WHITE NORMAL);
 
 	for (size_t m_idx = 0; m_idx < M_R3000_REGISTERS; m_idx++)
 	{
@@ -31,7 +31,7 @@ void m_printregs(m_simplestation_state *m_simplestation)
 
 	if (m_simplestation->m_cpu->m_branch == true)
 	{
-		printf(BLUE "PC:" WHITE " 0x%08X   " GREEN "[DS]" NORMAL "\n", m_simplestation->m_cpu->m_pre_ds_pc);
+		//printf(BLUE "PC:" WHITE " 0x%08X   " GREEN "[DS]" NORMAL "\n", m_simplestation->m_cpu->m_pre_ds_pc);
 	}
 	else
 	{
@@ -60,7 +60,7 @@ void m_debugger(m_simplestation_state *m_simplestation)
 	
 		if (m_simplestation->m_cpu->m_branch == true)
 		{
-			printf(NORMAL "PC     " GREEN "[DS]" NORMAL " : 0x%08X\n\nOpcode      : 0x%08X\n", m_simplestation->m_cpu->m_pre_ds_pc, m_simplestation->m_cpu->m_opcode);
+			//printf(NORMAL "PC     " GREEN "[DS]" NORMAL " : 0x%08X\n\nOpcode      : 0x%08X\n", m_simplestation->m_cpu->m_pre_ds_pc, m_simplestation->m_cpu->m_opcode);
 		}
 		else
 		{
@@ -84,7 +84,7 @@ void m_debugger(m_simplestation_state *m_simplestation)
 		m_printregs(m_simplestation);
 
 		m_simplestation->m_cpu->m_branch = false;
-		m_simplestation->m_cpu->m_pre_ds_pc = 0;
+		//m_simplestation->m_cpu->m_pre_ds_pc = 0;
 
 		printf("\nPress ENTER to step\n");
 
@@ -104,7 +104,7 @@ void m_debugger(m_simplestation_state *m_simplestation)
 
 		if (m_simplestation->m_cpu->m_branch)
 		{
-			m_simplestation->m_cpu->m_pre_ds_pc = PC;
+			//m_simplestation->m_cpu->m_pre_ds_pc = PC;
 		}
 
 		m_cpu_delay_slot_handler(m_simplestation);

@@ -139,19 +139,10 @@ void m_cpu_exit(m_simplestation_state *m_simplestation)
 #endif
 }
 
+bool debugcpu = false;
+
 void m_cpu_fde(m_simplestation_state *m_simplestation)
 {
-#ifdef DEBUG_INSTRUCTIONS
-	if (NXT_PC > (PC + 4))
-	{
-		printf("\n" GREEN "[DS]" NORMAL " PC: 0x%08X\n", PC);
-	}
-	else
-	{
-		printf("\nPC: 0x%08X\n", PC);
-	}
-#endif
-
 	if (m_simplestation->m_tty == true)
 	{
 		// Check if next PC value equals 0xB0
@@ -218,21 +209,6 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cpu->m_delay = m_simplestation->m_cpu->m_branch;
 	m_simplestation->m_cpu->m_branch = false;
 
-#ifndef GDBSTUB_SUPPORT
-	if ((PC - 4) == m_simplestation->m_breakpoint)
-	{
-		if (m_simplestation->m_debugger)
-		{
-			m_debugger(m_simplestation);
-			m_simplestation_exit(m_simplestation, 1);
-		}
-		else
-		{
-			m_simplestation_exit(m_simplestation, 1);
-		}
-	}
-#endif
-
 	if (m_interrupts_pending(m_simplestation))
 	{
         m_exception(interrupt, m_simplestation);
@@ -255,9 +231,10 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	}
 	else
 	{
-		printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode);
-		m_exc_types m_exc = illegal;
-		m_exception(m_exc, m_simplestation);
+		printf(RED "[CPU] fde: Illegal Opcode: 0x%02X (Full Opcode: 0x%08X) -> PC: 0x%X\n" NORMAL, REGIDX_S, m_simplestation->m_cpu->m_opcode, PC);
+		m_simplestation_exit(m_simplestation, 1);
+		//m_exc_types m_exc = illegal;
+		//m_exception(m_exc, m_simplestation);
 	}
 }
 

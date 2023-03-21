@@ -124,6 +124,7 @@ void m_exception(m_exc_types m_exception, m_simplestation_state *m_simplestation
 	if (m_exception == illegal)
 	{
 		printf(RED "\n[CPU] fde: Illegal Opcode 0x%02X (Full Opcode: 0x%08X)\n" NORMAL, INSTRUCTION, m_simplestation->m_cpu->m_opcode);
+		return;
 	}
 
 	// BEV bit in COP0's SR register decides where
@@ -1542,7 +1543,7 @@ void m_lwc2(m_simplestation_state *m_simplestation)
 	printf("lwc2\n");
 #endif
 
-	COP2D[REGIDX_T] = m_memory_read(REGS[REGIDX_S] + SIMMDT, dword, m_simplestation);
+	cop2d[REGIDX_T] = m_memory_read(REGS[REGIDX_S] + SIMMDT, dword, m_simplestation);
 }
 
 void m_lwc3(m_simplestation_state *m_simplestation)
@@ -1584,7 +1585,7 @@ void m_swc2(m_simplestation_state *m_simplestation)
 	printf("swc2\n");
 #endif
 
-	m_memory_write(REGS[REGIDX_S] + SIMMDT, COP2D[REGIDX_T], dword, m_simplestation);
+	m_memory_write(REGS[REGIDX_S] + SIMMDT, cop2d[REGIDX_T], dword, m_simplestation);
 }
 
 void m_swc3(m_simplestation_state *m_simplestation)

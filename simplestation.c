@@ -279,7 +279,8 @@ int main(int argc, char **argv)
 												m_simplestation_exit(&m_simplestation, 1);
 											}
 										}
-										uint32_t systemClockStep = 21;
+										uint32_t emulationMagicNumber = 4;
+    									uint32_t systemClockStep = 21 * emulationMagicNumber;
 										uint32_t totalSystemClocksThisFrame = 0;
 										uint32_t videoSystemClockStep = systemClockStep*11/7;
 										uint32_t videoSystemClocksScanlineCounter = 0;
@@ -292,21 +293,23 @@ int main(int argc, char **argv)
 												for (uint32_t i = 0; i < systemClockStep / 3; i++)
 												{
 													m_cpu_fde(&m_simplestation);
-													dma_step(&m_simplestation);
 													totalSystemClocksThisFrame++;
 												}
 
-												cdrom_tick(&m_simplestation);
+												dma_step(&m_simplestation);
 
+												cdrom_tick(systemClockStep, &m_simplestation);
 												videoSystemClocksScanlineCounter += videoSystemClockStep;
 
 												if (videoSystemClocksScanlineCounter >= 3413)
 												{
+
 													totalScanlines++;
 													videoSystemClocksScanlineCounter = 0;
 												}
 												
 												if (totalScanlines >= 263) {
+												
 													m_interrupts_request(VBLANK, &m_simplestation);
 													totalScanlines = 0;
 												}
