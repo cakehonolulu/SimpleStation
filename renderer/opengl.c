@@ -861,14 +861,14 @@ void operationGp0TexturedShadedFourPointSemiTransparentTextureBlending(uint32_t 
 {
 	(void) m_value;
 
-    Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    /*Colour col = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
 
     ClutAttr clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
 	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
 
 	TextureColourDepth texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
 
-	GLubyte blend = (GLubyte) BlendTexture;
+	GLubyte blend = (GLubyte) BlendTexture;*/
 
     OpenGL_Vertex v1, v2, v3, v4;
 
@@ -877,51 +877,44 @@ void operationGp0TexturedShadedFourPointSemiTransparentTextureBlending(uint32_t 
     memset(&v3, 0, sizeof(OpenGL_Vertex));
     memset(&v4, 0, sizeof(OpenGL_Vertex));
     
+
     v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
-    v1.colour = col;
-    v1.texPage = texPage;
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
     v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
-    v1.clut = clut;
-    v1.texDepth = texDepth;
-    v1.blendMode = blend;
+    v1.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v1.texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v1.blendMode = RawTexture;
     v1.drawTexture = 1;
 
-    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
-    v2.colour = col;
-    v2.texPage = texPage;
-    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
-    v2.clut = clut;
-    v2.texDepth = texDepth;
-    v2.blendMode = blend;
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v2.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v2.blendMode = RawTexture;
     v2.drawTexture = 1;
 
-    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
-    v3.colour = col;
-    v3.texPage = texPage;
-    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
-    v3.clut = clut;
-    v3.texDepth = texDepth;
-    v3.blendMode = blend;
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+    v3.texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
+    v3.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v3.texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.blendMode = RawTexture;
     v3.drawTexture = 1;
 
+	v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[10]);
+	v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[9]);
+	v4.texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+	v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[11]);
+	v4.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	v4.texDepth = tcd_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+	v4.blendMode = RawTexture;
+	v4.drawTexture = 1;
 
-	if (m_simplestation->m_gpu_command_buffer->m_buffer[7] == 0)
-	{
-		v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
-		v4.colour = col;
-		v4.texPage = texPage;
-		v4.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
-		v4.clut = clut;
-		v4.texDepth = texDepth;
-		v4.blendMode = blend;
-		v4.drawTexture = 1;
-
-		put_quad(v1, v2, v3, v4, m_simplestation);
-	}
-	else
-	{
-		put_triangle(v1, v2, v3, m_simplestation);
-	}
+	put_quad(v1, v2, v3, v4, m_simplestation);
 }
 
 void m_gpu_draw_texture_blend_opaque_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
