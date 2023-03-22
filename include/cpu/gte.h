@@ -146,6 +146,10 @@ cop2d[14] |= ((uint16_t)(value))
 
 #define sf(instr) ((instr >> 19) & 1)
 #define lm(instr) ((instr >> 10) & 1)
+#define m(instr) ((instr >> 17) & 3)
+#define v(instr) ((instr >> 15) & 3)
+#define cv(instr) ((instr >> 13) & 3)
+
 #define MIN(x,y) ((x<y)?x:y)
 
 /* Function Definitions */

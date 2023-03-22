@@ -128,6 +128,8 @@ void m_memory_exit(m_simplestation_state *m_simplestation)
 	m_bios_exit(m_simplestation);
 }
 
+size_t xd = 0;
+
 /*
 	Function:
 	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
@@ -244,11 +246,13 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #endif
 			if (m_address == 0x1F801120)
 			{
-				m_return = 0x000016B0;
+				m_return = 0x000016B0 + xd;
+				xd++;
 			}
 			else
 			{
-				m_return = 0;
+				m_return = 0 + xd;
+				xd++;
 			}
 			break;
 
@@ -314,7 +318,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		default:
 			printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-			m_return = m_simplestation_exit(m_simplestation, 1);
+			//m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 
@@ -473,6 +477,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
 #endif
+			if (m_address == 0x1f802084)
+				return;
+
 			break;
 
 		case 0xFFFE0130:
@@ -486,7 +493,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		default:
 			printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-			m_return = m_simplestation_exit(m_simplestation, 1);
+			//m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 

@@ -306,7 +306,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 
                     default:
                         printf(RED "[DMA] run_block: Unimplemented block copy from RAM\n" NORMAL);
-                        m_simplestation_exit(m_simplestation, 1);
+                        //m_simplestation_exit(m_simplestation, 1);
                         break;
                 }
                 

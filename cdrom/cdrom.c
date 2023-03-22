@@ -13,6 +13,8 @@ const uint32_t SystemClocksPerCDROMInt1DoubleSpeed=33868800/ 100;
 
 bool rbuf_dirty = false;
 
+size_t file_size = 0;
+
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
     uint8_t m_result = 0;
@@ -29,8 +31,16 @@ uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 		m_cdrom_interrupt_fifo_init(m_simplestation);
 
 		if (m_simplestation->m_cdrom_in)
+		{
 			cd = fopen(m_simplestation->cd_name, "rb");
+			fseek(cd, 0L, SEEK_END);
+			file_size = ftell(cd);
+
+			fseek(cd, 0L, SEEK_SET);
+
 			m_simplestation->m_cdrom->statusCode.shellOpen = 0;
+		}
+
     }
     else
     {
@@ -190,8 +200,10 @@ void setRequestRegister(uint8_t value, m_simplestation_state *m_simplestation)
                 //copy(&currentSector.data[0], &currentSector.data[0x800], back_inserter(readBuffer));
             } else { // WholeSector924h
                 //copy(&currentSector.header[0], &currentSector.ECC[276], back_inserter(readBuffer));
-				printf(BOLD RED "[CDROM] setRequestRegister: Unimplemented whole sector copy!" NORMAL "\n");
-				m_simplestation_exit(m_simplestation, 1);
+
+				memcpy(m_simplestation->m_cdrom->readBuffer, &m_simplestation->m_cdrom->currentSector.header, 0x924);
+
+				rbuf_dirty = true;
             }
             m_simplestation->m_cdrom->readBufferIndex = 0;
             
@@ -334,6 +346,40 @@ void operationSetMode(m_simplestation_state *m_simplestation)
     interrupt_push(0x03, m_simplestation);
 }
 
+/* 0x13 */
+void operationGetTn(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] GetTn" NORMAL "\n");
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+	m_cdrom_response_fifo_push(0x01, m_simplestation);
+	m_cdrom_response_fifo_push(0x01, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+}
+
+/* 0x14 */
+void operationGetTd(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] GetTd" NORMAL "\n");
+
+    uint8_t param = param_front(m_simplestation);
+    param_pop(m_simplestation);
+	int lba = 150;
+	uint8_t track = BCD_DECODE(param);
+    if (track == 0) {
+		lba += file_size / 0x930;
+		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+		m_cdrom_response_fifo_push((lba / 75) / 60, m_simplestation);
+		m_cdrom_response_fifo_push((lba / 75) % 60, m_simplestation);
+    } else {
+		m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+		m_cdrom_response_fifo_push(0x00, m_simplestation);
+		m_cdrom_response_fifo_push(0x02, m_simplestation);
+    }
+
+    interrupt_push(0x03, m_simplestation);
+}
+
 /* 0x15 */
 void operationSeekL(m_simplestation_state *m_simplestation)
 {
@@ -389,6 +435,21 @@ void operationGetID(m_simplestation_state *m_simplestation)
     interrupt_push(0x02, m_simplestation);
 }
 
+/* 0x1B */
+void operationReadS(m_simplestation_state *m_simplestation)
+{
+	m_simplestation->m_cdrom->m_read_sector = m_simplestation->m_cdrom->m_seek_sector;
+
+	setState(Reading, m_simplestation);
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+
+    m_simplestation->m_cdrom->internalState = ReadingState;
+
+	printf(BOLD MAGENTA "[CDROM] ReadS" NORMAL "\n");
+}
+
 /* CDROM Commands */
 
 void execute(uint8_t command, m_simplestation_state *m_simplestation)
@@ -428,6 +489,14 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 			operationSetMode(m_simplestation);
 			break;
 
+		case 0x13:
+			operationGetTn(m_simplestation);
+			break;
+
+		case 0x14:
+			operationGetTd(m_simplestation);
+			break;
+
 		case 0x15:
 			operationSeekL(m_simplestation);
 			break;
@@ -438,6 +507,10 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 		
 		case 0x1A:
 			operationGetID(m_simplestation);
+			break;
+
+		case 0x1B:
+			operationReadS(m_simplestation);
 			break;
 
         default:

@@ -332,9 +332,16 @@ void m_jalr(m_simplestation_state *m_simplestation)
 	}
 #endif
 
+	if (REGS[REGIDX_S] & 3)
+	{
+		m_exception(load_error, m_simplestation);
+		return;
+	}
 	REGS[REGIDX_D] = NXT_PC;
-
-	m_jr(m_simplestation);}
+		
+	NXT_PC = REGS[REGIDX_S];
+	m_simplestation->m_cpu->m_branch = true;
+}
 
 /*
 	SYSCALL (MIPS I)
