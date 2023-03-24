@@ -709,6 +709,8 @@ typedef struct
 
 	m_psx_gte_t *m_gte;
 
+	float m_scale;
+
 } m_simplestation_state;
 
 typedef void (*sched_func)(m_simplestation_state *m_simplestation);

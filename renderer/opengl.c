@@ -160,12 +160,12 @@ uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
 	if (m_simplestation->m_vramview)
 	{
 		m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  1024, 512, SDL_WINDOW_OPENGL);
+							  1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale, SDL_WINDOW_OPENGL);
 	}
 	else
 	{
 		m_window = SDL_CreateWindow("SimpleStation (SDL2)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-							  640, 480, SDL_WINDOW_OPENGL);
+							  640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale, SDL_WINDOW_OPENGL);
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -349,11 +349,11 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	// ...allocate space for it...
 	if (m_simplestation->m_vramview)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	}
 	else
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	}
 
 	// ...and set the appropiate parameters (To fill the screen and the texture filters)
@@ -604,11 +604,11 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	// Set viewport back to window size
 	if (!m_simplestation->m_vramview)
 	{
-		glViewport(0, 0, 640, 480);
+		glViewport(0, 0, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale);
 	}
 	else
 	{
-		glViewport(0, 0, 1024, 512);
+		glViewport(0, 0, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale);
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);

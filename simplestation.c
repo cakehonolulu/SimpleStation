@@ -6,6 +6,7 @@
 #include <gpu/command_buffer.h>
 #include <cdrom/cdrom.h>
 #include <memory/memory.h>
+#include <stdlib.h>
 #include <ui/termcolour.h>
 #include <SDL2/SDL.h>
 #include <renderer/renderer.h>
@@ -58,6 +59,7 @@ int main(int argc, char **argv)
 		m_simplestation.m_tty = false;
 		m_simplestation.m_vramview = false;
 		m_simplestation.m_cdrom_in = false;
+		m_simplestation.m_scale = 1;
 
 		for (int m_args = 1; m_args < argc; m_args++)
 		{
@@ -181,6 +183,23 @@ int main(int argc, char **argv)
 				else
 				{
 					printf("You must specify a PSX-EXE filename!\n");
+				}
+			}
+			else if (!strcmp(argv[m_args], "-scale"))
+			{
+				if (argv[m_args + 1] != NULL)
+				{
+					char* end;
+
+					m_simplestation.m_scale = strtof(argv[m_args + 1], &end);
+
+					printf("Using x%.02f scale\n", m_simplestation.m_scale);
+
+					m_args++;
+				}
+				else
+				{
+					printf("Incorrect scale format (Decimal number)!\n");
 				}
 			}
 			else
