@@ -22,6 +22,18 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_draw_opaque_three_point_monochrome_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x22:
+                m_gpu_draw_monochrome_untextured_tri(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0x24:
+                m_gpu_draw_textured_three_point_opaque_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0x26:
+                m_gpu_draw_textured_three_point_opaque_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x28:
                 renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -48,12 +60,20 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 renderstack.gpu_draw_texture_raw_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x2E:
+                renderstack.gpu_draw_texture_blend_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x2F:
                 renderstack.gpu_draw_texture_raw_semitransparent_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x30:
                 renderstack.gpu_draw_shaded_opaque_triangle(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0x34:
+                m_gpu_draw_texture_blending_three_point_opaque_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x38:
@@ -77,6 +97,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 gpu_draw_monochrome_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x62:
+                renderstack.gpu_draw_texture_blend_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x63:
                 renderstack.gpu_draw_texture_blend_variable_size_rect(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -97,12 +121,16 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 renderstack.gpu_draw_monochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x74:
+                rect8by8_blend(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x75:
-                rect8by8(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                rect8by8_raw(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x7C:
-                // TODO
+                rect16by16_blend(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
             case 0x80:
@@ -178,6 +206,18 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation->m_gpu->m_gp0_words_remaining = 4;
                 break;
 
+            case 0x22:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 4;
+                break;
+
+            case 0x24:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 7;
+                break;
+
+            case 0x26:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 7;
+                break;
+
             case 0x28:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 5;
                 break;
@@ -202,12 +242,20 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation->m_gpu->m_gp0_words_remaining = 9;
                 break;
 
+            case 0x2E:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 9;
+                break;
+
             case 0x2F:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 9;
                 break;
 
             case 0x30:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 6;
+                break;
+
+            case 0x34:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 9;
                 break;
 
             case 0x38:
@@ -230,6 +278,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation->m_gpu->m_gp0_words_remaining = 3;
                 break;
 
+            case 0x62:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 4;
+                break;
+
             case 0x63:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 4;
                 break;
@@ -248,6 +300,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
 
             case 0x68:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 2;
+                break;
+
+            case 0x74:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 3;
                 break;
 
             case 0x75:

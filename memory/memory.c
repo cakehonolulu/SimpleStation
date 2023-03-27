@@ -334,6 +334,18 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 			break;
 		
+		case 0x1F801820:
+			printf("[MDEC] Write MDEC Data/Response Register\n");
+			//m_mdec_cmd(m_value, m_simplestation);
+			break;
+
+		case 0x1F801824:
+			printf("[MDEC] Write MDEC1 - MDEC Control/Reset Register\n");
+			m_return = m_simplestation->m_mdec->m_status;
+			break;
+
+
+
 		case 0x1F802000 ... 0x1F803FFF:
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Detected 'Expansion 2' memory read! Ignoring...\n" NORMAL);

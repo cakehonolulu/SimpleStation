@@ -1168,8 +1168,137 @@ void gpu_draw_texture_semi_transparent_opaque_texture_blend(uint32_t m_value, m_
 	put_rect(r0, m_simplestation);
 }
 
+void m_gpu_draw_textured_three_point_opaque_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    OpenGL_Vertex v1, v2, v3;
 
-void rect8by8(uint32_t m_value, m_simplestation_state *m_simplestation)
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    
+	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.blendMode = (GLubyte) BlendTexture;
+    v1.drawTexture = 1;
+    v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v1.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	v1.texPage = texPage;
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v2.blendMode = (GLubyte) BlendTexture;
+    v2.drawTexture = 1;
+    v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	v2.texPage = texPage;
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v3.blendMode = (GLubyte) BlendTexture;
+    v3.drawTexture = 1;
+    v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v3.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	v3.texPage = texPage;
+
+    put_triangle(v1, v2, v3, m_simplestation);
+}
+
+void m_gpu_draw_texture_blending_three_point_opaque_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+	OpenGL_Vertex v1, v2, v3;
+
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    
+	TexPage texPage = texpage_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.blendMode = (GLubyte) BlendTexture;
+    v1.drawTexture = 1;
+	v1.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+	v1.texPage = texPage;
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.blendMode = (GLubyte) BlendTexture;
+    v2.drawTexture = 1;
+	v2.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+	v2.texPage = texPage;
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+    v3.blendMode = (GLubyte) BlendTexture;
+    v3.drawTexture = 1;
+	v3.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[8]);
+	v3.texPage = texPage;
+
+    put_triangle(v1, v2, v3, m_simplestation);
+}
+
+void m_gpu_draw_monochrome_untextured_tri(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+
+    OpenGL_Vertex v1, v2, v3;
+
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+
+    put_triangle(v1, v2, v3, m_simplestation);
+}
+
+void rect8by8_blend(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    Rectangle r0;
+
+    memset(&r0, 0, sizeof(Rectangle));
+
+    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.blendMode = (GLubyte) BlendTexture;
+    r0.drawTexture = 1;
+	RectWidthHeight eightbyeight = { 8, 8 };
+    r0.widthHeight = eightbyeight;
+
+
+	put_rect(r0, m_simplestation);
+}
+
+void rect16by16_blend(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+	Rectangle r0;
+
+    memset(&r0, 0, sizeof(Rectangle));
+
+    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.blendMode = (GLubyte) BlendTexture;
+    r0.drawTexture = 1;
+	RectWidthHeight eightbyeight = { 16, 16 };
+    r0.widthHeight = eightbyeight;
+
+
+	put_rect(r0, m_simplestation);
+}
+
+void rect8by8_raw(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     Rectangle r0;
 
