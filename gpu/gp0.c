@@ -35,9 +35,6 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 break;
 
             case 0x28:
-                renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
-                break;
-            
             case 0x29:
                 renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
