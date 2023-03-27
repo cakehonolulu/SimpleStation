@@ -296,7 +296,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 
                     default:
                         printf(RED "[DMA] run_block: Unimplemented channel block copy to RAM (id: %d)\n" NORMAL, m_id);
-                        m_simplestation_exit(m_simplestation, 1);
+                        //m_simplestation_exit(m_simplestation, 1);
                         break;
                 }
 

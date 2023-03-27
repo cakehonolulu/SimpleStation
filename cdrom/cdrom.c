@@ -277,6 +277,22 @@ void operationSetloc(m_simplestation_state *m_simplestation)
 	printf(BOLD MAGENTA "[CDROM] SetLoc (%d, %d, %d | LBA: %d) (PC: 0x%0X)" NORMAL "\n", minute, second, sector, m_simplestation->m_cdrom->m_seek_sector, PC);
 }
 
+/* 0x03 */
+void operationPlay(m_simplestation_state *m_simplestation)
+{
+    uint8_t minute = BCD_DECODE(param_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+    uint8_t second = BCD_DECODE(param_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+	uint8_t sector = BCD_DECODE(param_front(m_simplestation));
+	m_cdrom_parameter_fifo_pop(m_simplestation);
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+
+	printf(BOLD MAGENTA "[CDROM] Play" NORMAL "\n");
+}
+
 /* 0x06 */
 void operationReadN(m_simplestation_state *m_simplestation)
 {
@@ -290,6 +306,20 @@ void operationReadN(m_simplestation_state *m_simplestation)
 
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
     interrupt_push(0x03, m_simplestation);
+}
+
+/* 0x08 */
+void operationStop(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] Stop" NORMAL "\n");
+
+	m_simplestation->m_cdrom->statusCode._value = 0;
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x02, m_simplestation);
 }
 
 /* 0x09 */
@@ -327,6 +357,15 @@ void operationInit(m_simplestation_state *m_simplestation)
 void operationDemute(m_simplestation_state *m_simplestation)
 {
 	printf(BOLD MAGENTA "[CDROM] Demute" NORMAL "\n");
+
+	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+    interrupt_push(0x03, m_simplestation);
+}
+
+/* 0x0D */
+void operationSetFilter(m_simplestation_state *m_simplestation)
+{
+	printf(BOLD MAGENTA "[CDROM] SetFilter" NORMAL "\n");
 
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
     interrupt_push(0x03, m_simplestation);
@@ -469,8 +508,16 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 			operationSetloc(m_simplestation);
 			break;
 
+		case 0x03:
+			operationPlay(m_simplestation);
+			break;
+
 		case 0x06:
 			operationReadN(m_simplestation);
+			break;
+
+		case 0x08:
+			operationStop(m_simplestation);
 			break;
 
 		case 0x09:
@@ -485,8 +532,17 @@ void execute(uint8_t command, m_simplestation_state *m_simplestation)
 			operationDemute(m_simplestation);
 			break;
 
+		case 0x0D:
+			operationSetFilter(m_simplestation);
+			break;
+
 		case 0x0E:
 			operationSetMode(m_simplestation);
+			break;
+
+		case 0x11:
+			interrupt_push(0x03, m_simplestation);
+			//operationPause(m_simplestation);
 			break;
 
 		case 0x13:

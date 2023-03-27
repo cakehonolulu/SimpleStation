@@ -30,6 +30,11 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
             
+            case 0x2A:
+                // Semitransparent
+                renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x2B:
                 // Semitransparent
                 renderstack.gpu_draw_monochrome_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
@@ -94,6 +99,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
 
             case 0x75:
                 rect8by8(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0x7C:
+                // TODO
                 break;
 
             case 0x80:
@@ -177,6 +186,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation->m_gpu->m_gp0_words_remaining = 5;
                 break;
 
+            case 0x2A:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 5;
+                break;
+
             case 0x2B:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 5;
                 break;
@@ -238,6 +251,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 break;
 
             case 0x75:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 3;
+                break;
+
+            case 0x7C:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 3;
                 break;
 
@@ -380,7 +397,7 @@ void m_gpu_set_draw_area_top_left(uint32_t m_value, m_simplestation_state *m_sim
 {
     uint32_t m_val = m_simplestation->m_gpu_command_buffer->m_buffer[0];
     m_simplestation->m_gpu->m_drawing_area_left = m_val & 0x3FF;
-    m_simplestation->m_gpu->m_drawing_area_top = ((m_val >> 10) & 0x1FF);
+    m_simplestation->m_gpu->m_drawing_area_top = ((m_val >> 10) & 0x3FF);
     m_renderer_update_display_area(m_simplestation);
 }
 
@@ -388,7 +405,7 @@ void m_gpu_set_draw_area_bottom_right(uint32_t m_value, m_simplestation_state *m
 {
     uint32_t m_val = m_simplestation->m_gpu_command_buffer->m_buffer[0];
     m_simplestation->m_gpu->m_drawing_area_right = m_val & 0x3FF;
-    m_simplestation->m_gpu->m_drawing_area_bottom = ((m_val >> 10) & 0x1FF);
+    m_simplestation->m_gpu->m_drawing_area_bottom = ((m_val >> 10) & 0x3FF);
     m_renderer_update_display_area(m_simplestation);
 }
 
