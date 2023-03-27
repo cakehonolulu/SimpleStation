@@ -220,6 +220,10 @@ int main(int argc, char **argv)
 		m_simplestation.m_gpu_state = OFF;
 
 		m_simplestation.m_gpu_command_buffer_state = OFF;
+		m_simplestation.dicr = 0;
+
+		m_simplestation.dcpr = 0;
+
 
 		// Check if BIOS file is specified
 		if (m_biosname)
@@ -240,6 +244,8 @@ int main(int argc, char **argv)
 							{
 								if (m_cdrom_init(&m_simplestation) == 0)
 								{
+									m_mdec_init(&m_simplestation);
+
 									scheduler_init(&m_simplestation);
 
 									glfwInit();

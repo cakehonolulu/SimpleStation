@@ -643,6 +643,10 @@ typedef enum {
     VULKAN
 } renderer_backends;
 
+typedef struct {
+	uint32_t m_status;
+} m_psx_mdec_t;
+
 /* Structures */
 typedef struct
 {
@@ -710,6 +714,11 @@ typedef struct
 	m_psx_gte_t *m_gte;
 
 	float m_scale;
+
+	m_psx_mdec_t *m_mdec;
+
+	uint32_t dcpr;
+	uint32_t dicr;
 
 } m_simplestation_state;
 

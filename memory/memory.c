@@ -231,13 +231,30 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			break;
 
 		case 0x1F801070 ... 0x1F801078:
+			//printf("Reading interrutps...\n");
 			m_return = m_interrupts_read(m_address & 0xF, m_simplestation);
 			break;
 		
+		
 		case 0x1F801080 ... 0x1F8010FF:
-			// DMA Registers Read
-			m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
+
+			if (m_address == 0x1f8010f0)
+			{
+				//printf("[MEM] read: DMA Control register\n");
+				m_return = m_simplestation->dcpr;
+			}
+			else if (m_address == 0x1f8010f4)
+			{
+				//printf("[MEM] read: DMA Interrupt register\n");
+				m_return = m_simplestation->dicr;
+			}
+			else
+			{
+				// DMA Registers Write
+				m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
+			}
 			break;
+
 
 		case 0x1F801100 ... 0x1F801130:
 			// Timer Registers Dummy Read
@@ -254,6 +271,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				m_return = 0 + xd;
 				xd++;
 			}
+			//printf("[MEM] read: Timers Read\n");
 			break;
 
 		case 0x1F801810 ... 0x1f801817:
@@ -287,7 +305,15 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 		// CDROM Read
 		case 0x1F801800 ... 0x1F801803:
-			m_return = m_cdrom_read(m_address & 0x0000000F, m_simplestation);
+			if (m_address == 0x1F801800)
+			{
+				m_return = rand() % 0xff;
+			}
+			else
+			{
+				m_return = m_cdrom_read(m_address & 0x0000000F, m_simplestation);
+			}
+			//printf("CDROM Read\n");
 			break;
 
 		case 0x1F801C00 ... 0x1F801FFF:
@@ -295,7 +321,17 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
 #endif
-			m_return = m_spu_read(m_address, m_simplestation);
+			if (m_address >= 0x1F801D80 && m_address <= 0x1F801DBC)
+			{
+				//printf("SPU Read\n");
+				m_return = rand() % 0xff;
+			}
+			else
+			{	
+				m_return = m_spu_read(m_address, m_simplestation);
+			}
+			
+
 			break;
 		
 		case 0x1F802000 ... 0x1F803FFF:
@@ -318,7 +354,7 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		default:
 			printf(RED "[MEM] read: Region not implemented!\n" NORMAL);
 			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-			//m_return = m_simplestation_exit(m_simplestation, 1);
+			m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 
@@ -426,12 +462,35 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F801070 ... 0x1F801078:
+			//printf("Writing interrutps...\n");
 			m_interrupts_write(m_address & 0xF, m_value, m_simplestation);
 			break;
 
 		case 0x1F801080 ... 0x1F8010FF:
-			// DMA Registers Write
-			m_dma_write((m_address - 0x1F801080), m_value, m_simplestation);
+
+			if (m_address == 0x1f8010f0)
+			{
+				//printf("[MEM] write: DMA Control register\n");
+				m_simplestation->dcpr = m_value;
+			}
+			else if (m_address == 0x1f8010f4)
+			{
+				//printf("[MEM] write: DMA Interrupt register\n");
+				m_simplestation->dicr = m_value;
+				m_simplestation->dicr &= ~(m_value & 0x7f000000);
+			}
+			else
+			{
+				//printf("[memory] dma_write @ 0x%X\n", m_address);
+				if (m_address == 0x1f8010c8)
+				{
+					m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
+					m_simplestation->dicr |= (1 << 28);
+				}
+
+				// DMA Registers Write
+				m_dma_write((m_address - 0x1F801080), m_value, m_simplestation);
+			}
 			break;
 
 		case 0x1F801100 ... 0x1F80112F:
@@ -473,6 +532,17 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			}
 		break;
 
+		case 0x1F801820:
+			printf("[MDEC] Write MDEC Data/Response Register\n");
+			//m_mdec_cmd(m_value, m_simplestation);
+			break;
+
+		case 0x1F801824:
+			printf("[MDEC] Write MDEC1 - MDEC Control/Reset Register\n");
+			m_simplestation->m_mdec->m_status |= ((m_value & (1 << 29)) ? 1 : 0) << 27;
+			m_simplestation->m_mdec->m_status |= ((m_value & (1 << 28)) ? 1 : 0) << 28;
+			break;
+
 		case 0x1F802000 ... 0x1F803FFF:
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Detected 'Expansion 2' memory write! Ignoring...\n" NORMAL);
@@ -493,7 +563,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		default:
 			printf(RED "[MEM] write: Region not implemented!\n" NORMAL);
 			printf("Address: 0x%08X; Offset: 0x%08X\n", m_address, m_memory_offset);
-			//m_return = m_simplestation_exit(m_simplestation, 1);
+			m_return = m_simplestation_exit(m_simplestation, 1);
 			break;
 	}
 

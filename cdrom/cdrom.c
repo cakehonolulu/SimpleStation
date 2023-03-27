@@ -577,7 +577,7 @@ void cdrom_tick(uint32_t cycles, m_simplestation_state *m_simplestation)
 			m_simplestation->m_cdrom->m_read_sector++;
 		}
 		case ReadingTableOfContentsState: {
-            printf("[CDROM] Unhandled reading TOC\n");
+            //printf("[CDROM] Unhandled reading TOC\n");
 			//m_simplestation_exit(m_simplestation, 1);
             break;
         }
