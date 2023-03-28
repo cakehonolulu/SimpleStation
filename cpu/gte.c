@@ -702,6 +702,90 @@ void commandNCDT(uint32_t opcode, m_simplestation_state *m_simplestation) {
 	pushColour(m_simplestation);
 }
 
+void commandNCCT(uint32_t opcode, m_simplestation_state *m_simplestation) {
+	const int shift = sf(opcode) * 12;
+	const int lm = lm(opcode);
+	MAC1 = (int32_t) ((int64_t)((int16_t)L11 * (int16_t)VX0) + (int64_t)((int16_t)L12 * (int16_t)VY0) + (int64_t)((int16_t)L13 * (int16_t)VZ0)) >> shift;
+	MAC2 = (int32_t) ((int64_t)((int16_t)L21 * (int16_t)VX0) + (int64_t)((int16_t)L22 * (int16_t)VY0) + (int64_t)((int16_t)L23 * (int16_t)VZ0)) >> shift;
+	MAC3 = (int32_t) ((int64_t)((int16_t)L31 * (int16_t)VX0) + (int64_t)((int16_t)L32 * (int16_t)VY0) + (int64_t)((int16_t)L33 * (int16_t)VZ0)) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = (int32_t) (((int64_t)RBK * 0x1000) + ((int64_t)((int16_t)LR1 * (int16_t)IR1) + (int64_t)((int16_t)LR2 * (int16_t)IR2) + (int64_t)((int16_t)LR3 * (int16_t)IR3))) >> shift;
+	MAC2 = (int32_t) (((int64_t)GBK * 0x1000) + ((int64_t)((int16_t)LG1 * (int16_t)IR1) + (int64_t)((int16_t)LG2 * (int16_t)IR2) + (int64_t)((int16_t)LG3 * (int16_t)IR3))) >> shift;
+	MAC3 = (int32_t) (((int64_t)BBK * 0x1000) + ((int64_t)((int16_t)LB1 * (int16_t)IR1) + (int64_t)((int16_t)LB2 * (int16_t)IR2) + (int64_t)((int16_t)LB3 * (int16_t)IR3))) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = ((int64_t)R * (int16_t)IR1) << 4;
+	MAC2 = ((int64_t)G * (int16_t)IR2) << 4;
+	MAC3 = ((int64_t)B * (int16_t)IR3) << 4;
+
+	MAC1 = (int32_t)MAC1 >> shift;
+	MAC2 = (int32_t)MAC2 >> shift;
+	MAC3 = (int32_t)MAC3 >> shift;
+
+	setIRFromMAC(lm, m_simplestation);
+	pushColour(m_simplestation);
+
+	MAC1 = (int32_t) ((int64_t)((int16_t)L11 * (int16_t)VX1) + (int64_t)((int16_t)L12 * (int16_t)VY1) + (int64_t)((int16_t)L13 * (int16_t)VZ1)) >> shift;
+	MAC2 = (int32_t) ((int64_t)((int16_t)L21 * (int16_t)VX1) + (int64_t)((int16_t)L22 * (int16_t)VY1) + (int64_t)((int16_t)L23 * (int16_t)VZ1)) >> shift;
+	MAC3 = (int32_t) ((int64_t)((int16_t)L31 * (int16_t)VX1) + (int64_t)((int16_t)L32 * (int16_t)VY1) + (int64_t)((int16_t)L33 * (int16_t)VZ1)) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = (int32_t) (((int64_t)RBK * 0x1000) + ((int64_t)((int16_t)LR1 * (int16_t)IR1) + (int64_t)((int16_t)LR2 * (int16_t)IR2) + (int64_t)((int16_t)LR3 * (int16_t)IR3))) >> shift;
+	MAC2 = (int32_t) (((int64_t)GBK * 0x1000) + ((int64_t)((int16_t)LG1 * (int16_t)IR1) + (int64_t)((int16_t)LG2 * (int16_t)IR2) + (int64_t)((int16_t)LG3 * (int16_t)IR3))) >> shift;
+	MAC3 = (int32_t) (((int64_t)BBK * 0x1000) + ((int64_t)((int16_t)LB1 * (int16_t)IR1) + (int64_t)((int16_t)LB2 * (int16_t)IR2) + (int64_t)((int16_t)LB3 * (int16_t)IR3))) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = ((int64_t)R * (int16_t)IR1) << 4;
+	MAC2 = ((int64_t)G * (int16_t)IR2) << 4;
+	MAC3 = ((int64_t)B * (int16_t)IR3) << 4;
+
+	MAC1 = (int32_t)MAC1 >> shift;
+	MAC2 = (int32_t)MAC2 >> shift;
+	MAC3 = (int32_t)MAC3 >> shift;
+
+	setIRFromMAC(lm, m_simplestation);
+	pushColour(m_simplestation);
+
+	MAC1 = (int32_t) ((int64_t)((int16_t)L11 * (int16_t)VX2) + (int64_t)((int16_t)L12 * (int16_t)VY2) + (int64_t)((int16_t)L13 * (int16_t)VZ2)) >> shift;
+	MAC2 = (int32_t) ((int64_t)((int16_t)L21 * (int16_t)VX2) + (int64_t)((int16_t)L22 * (int16_t)VY2) + (int64_t)((int16_t)L23 * (int16_t)VZ2)) >> shift;
+	MAC3 = (int32_t) ((int64_t)((int16_t)L31 * (int16_t)VX2) + (int64_t)((int16_t)L32 * (int16_t)VY2) + (int64_t)((int16_t)L33 * (int16_t)VZ2)) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = (int32_t) (((int64_t)RBK * 0x1000) + ((int64_t)((int16_t)LR1 * (int16_t)IR1) + (int64_t)((int16_t)LR2 * (int16_t)IR2) + (int64_t)((int16_t)LR3 * (int16_t)IR3))) >> shift;
+	MAC2 = (int32_t) (((int64_t)GBK * 0x1000) + ((int64_t)((int16_t)LG1 * (int16_t)IR1) + (int64_t)((int16_t)LG2 * (int16_t)IR2) + (int64_t)((int16_t)LG3 * (int16_t)IR3))) >> shift;
+	MAC3 = (int32_t) (((int64_t)BBK * 0x1000) + ((int64_t)((int16_t)LB1 * (int16_t)IR1) + (int64_t)((int16_t)LB2 * (int16_t)IR2) + (int64_t)((int16_t)LB3 * (int16_t)IR3))) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = ((int64_t)R * (int16_t)IR1) << 4;
+	MAC2 = ((int64_t)G * (int16_t)IR2) << 4;
+	MAC3 = ((int64_t)B * (int16_t)IR3) << 4;
+
+	MAC1 = (int32_t)MAC1 >> shift;
+	MAC2 = (int32_t)MAC2 >> shift;
+	MAC3 = (int32_t)MAC3 >> shift;
+
+	setIRFromMAC(lm, m_simplestation);
+	pushColour(m_simplestation);
+}
+
+void commandNCCS(uint32_t opcode, m_simplestation_state *m_simplestation) {
+	const int shift = sf(opcode) * 12;
+	const int lm = lm(opcode);
+	MAC1 = (int32_t) ((int64_t)((int16_t)L11 * (int16_t)VX0) + (int64_t)((int16_t)L12 * (int16_t)VY0) + (int64_t)((int16_t)L13 * (int16_t)VZ0)) >> shift;
+	MAC2 = (int32_t) ((int64_t)((int16_t)L21 * (int16_t)VX0) + (int64_t)((int16_t)L22 * (int16_t)VY0) + (int64_t)((int16_t)L23 * (int16_t)VZ0)) >> shift;
+	MAC3 = (int32_t) ((int64_t)((int16_t)L31 * (int16_t)VX0) + (int64_t)((int16_t)L32 * (int16_t)VY0) + (int64_t)((int16_t)L33 * (int16_t)VZ0)) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = (int32_t) (((int64_t)RBK * 0x1000) + ((int64_t)((int16_t)LR1 * (int16_t)IR1) + (int64_t)((int16_t)LR2 * (int16_t)IR2) + (int64_t)((int16_t)LR3 * (int16_t)IR3))) >> shift;
+	MAC2 = (int32_t) (((int64_t)GBK * 0x1000) + ((int64_t)((int16_t)LG1 * (int16_t)IR1) + (int64_t)((int16_t)LG2 * (int16_t)IR2) + (int64_t)((int16_t)LG3 * (int16_t)IR3))) >> shift;
+	MAC3 = (int32_t) (((int64_t)BBK * 0x1000) + ((int64_t)((int16_t)LB1 * (int16_t)IR1) + (int64_t)((int16_t)LB2 * (int16_t)IR2) + (int64_t)((int16_t)LB3 * (int16_t)IR3))) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	MAC1 = ((int64_t)R * (int16_t)IR1) << 4;
+	MAC2 = ((int64_t)G * (int16_t)IR2) << 4;
+	MAC3 = ((int64_t)B * (int16_t)IR3) << 4;
+
+	MAC1 = (int32_t)MAC1 >> shift;
+	MAC2 = (int32_t)MAC2 >> shift;
+	MAC3 = (int32_t)MAC3 >> shift;
+
+	setIRFromMAC(lm, m_simplestation);
+	pushColour(m_simplestation);	
+}
+
 void gte_execute(uint32_t opcode, m_simplestation_state *m_simplestation)
 {
 	switch (opcode & 0x3F)
@@ -753,6 +837,11 @@ void gte_execute(uint32_t opcode, m_simplestation_state *m_simplestation)
 			commandNCDT(opcode, m_simplestation);
 			break;
 
+		case 0x1B:
+			m_simplestation->m_gte->cop2c.raw[31] = 0;
+			commandNCCS(opcode, m_simplestation);
+			break;
+
 		case 0x1E:
 			m_simplestation->m_gte->cop2c.raw[31] = 0;
 			commandNCS(opcode, m_simplestation);
@@ -776,6 +865,11 @@ void gte_execute(uint32_t opcode, m_simplestation_state *m_simplestation)
 		case 0x30:
 			m_simplestation->m_gte->cop2c.raw[31] = 0;
 			commandRTPT(opcode, m_simplestation);
+			break;
+
+		case 0x3F:
+			m_simplestation->m_gte->cop2c.raw[31] = 0;
+			commandNCCT(opcode, m_simplestation);
 			break;
 
 		default:

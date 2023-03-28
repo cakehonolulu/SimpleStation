@@ -73,11 +73,19 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 m_gpu_draw_texture_blending_three_point_opaque_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x36:
+                m_gpu_draw_texture_blending_three_point_opaque_poly(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x38:
                 renderstack.gpu_draw_shaded_opaque_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
-            case 0x3c:
+            case 0x3A:
+                gpu_draw_untextured_quad(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
+            case 0x3C:
                 operationGp0TexturedShadedFourPointSemiTransparentTextureBlending(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
@@ -255,7 +263,15 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 m_simplestation->m_gpu->m_gp0_words_remaining = 9;
                 break;
 
+            case 0x36:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 9;
+                break;
+
             case 0x38:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 8;
+                break;
+
+            case 0x3A:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 8;
                 break;
 

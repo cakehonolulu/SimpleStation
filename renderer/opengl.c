@@ -1240,6 +1240,34 @@ void m_gpu_draw_texture_blending_three_point_opaque_poly(uint32_t m_value, m_sim
     put_triangle(v1, v2, v3, m_simplestation);
 }
 
+void gpu_draw_untextured_quad(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    OpenGL_Vertex v1, v2, v3, v4;
+
+    memset(&v1, 0, sizeof(OpenGL_Vertex));
+    memset(&v2, 0, sizeof(OpenGL_Vertex));
+    memset(&v3, 0, sizeof(OpenGL_Vertex));
+    memset(&v4, 0, sizeof(OpenGL_Vertex));
+
+    v1.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    v1.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    v1.drawTexture = 0;
+
+    v2.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+    v2.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    v2.drawTexture = 0;
+
+    v3.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[5]);
+    v3.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[4]);
+    v3.drawTexture = 0;
+
+    v4.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[7]);
+    v4.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[6]);
+    v4.drawTexture = 0;
+
+    put_quad(v1, v2, v3, v4, m_simplestation);
+}
+
 void m_gpu_draw_monochrome_untextured_tri(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
 
