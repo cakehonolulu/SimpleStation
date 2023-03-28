@@ -284,18 +284,24 @@ int main(int argc, char **argv)
 									else
 									{
 #endif
-									double last_time = glfwGetTime();
-									double delay_miliseconds = 0.0;
+
 									static double target_miliseconds = 1.0f / 60.0f;
-									int frames = 0;
-									
+
+											float interval = 1000;
+											interval /= 60;
+										uint32_t emulationMagicNumber = 4;
+    									uint32_t systemClockStep = 21 * emulationMagicNumber;
+										uint32_t totalSystemClocksThisFrame = 0;
+										uint32_t videoSystemClockStep = systemClockStep*11/7;
+										uint32_t videoSystemClocksScanlineCounter = 0;
+										uint32_t totalScanlines = 0;
+
+
+										    uint32_t initTicks = SDL_GetTicks();
+											
 									while (true)
 									{			
-										double current_time = glfwGetTime();
-  										double delta_time = current_time - last_time;
-										last_time = current_time;
-										delay_miliseconds += delta_time;
-
+		
 										while( SDL_PollEvent( &m_event ) )
 										{
 											if( m_event.type == SDL_QUIT )
@@ -304,14 +310,8 @@ int main(int argc, char **argv)
 												m_simplestation_exit(&m_simplestation, 1);
 											}
 										}
-										uint32_t emulationMagicNumber = 4;
-    									uint32_t systemClockStep = 21 * emulationMagicNumber;
-										uint32_t totalSystemClocksThisFrame = 0;
-										uint32_t videoSystemClockStep = systemClockStep*11/7;
-										uint32_t videoSystemClocksScanlineCounter = 0;
-										uint32_t totalScanlines = 0;
-
-										while (delay_miliseconds >= target_miliseconds)
+										uint32_t currentTicks = SDL_GetTicks();
+										if (initTicks + interval < currentTicks)
 										{
 											while (totalSystemClocksThisFrame < (33868800 / 60))
 											{
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
 												if (videoSystemClocksScanlineCounter >= 3413)
 												{
 
-												cdrom_tick(5000, &m_simplestation);
+												cdrom_tick(4000, &m_simplestation);
 													totalScanlines++;
 													videoSystemClocksScanlineCounter = 0;
 												}
@@ -336,17 +336,19 @@ int main(int argc, char **argv)
 												if (totalScanlines >= 263) {
 												
 													m_interrupts_request(VBLANK, &m_simplestation);
+													renderstack.display(&m_simplestation);	
+
 													totalScanlines = 0;
 												}
 											
 											}
-											
-												delay_miliseconds -= target_miliseconds;
-										}
-										
-										renderstack.display(&m_simplestation);
 
+											totalSystemClocksThisFrame = 0;
+											
+											initTicks = SDL_GetTicks();
+										}
 									}
+										
 #ifdef GDBSTUB_SUPPORT
 									}
 #endif
