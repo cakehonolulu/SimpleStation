@@ -443,6 +443,13 @@ void operationTest(m_simplestation_state *m_simplestation)
 
     switch (subfunction)
 	{
+		case 0x00:
+			m_simplestation->m_cdrom->statusCode.spindleMotor = 1;
+			m_simplestation->m_cdrom->statusCode.shellOpen = 0;
+            m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+			interrupt_push(0x03, m_simplestation);
+            break;
+           
         case 0x20:
 			printf(BOLD MAGENTA "[CDROM] INT3(yy,mm,dd,ver) (PC: 0x%X)" NORMAL "\n", PC);
             m_cdrom_response_fifo_push(0x94, m_simplestation);
@@ -451,7 +458,17 @@ void operationTest(m_simplestation_state *m_simplestation)
             m_cdrom_response_fifo_push(0xC0, m_simplestation);
 			interrupt_push(0x03, m_simplestation);
             break;
-        
+           
+		case 0x50:
+            m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
+			interrupt_push(0x03, m_simplestation);
+			break;
+
+		case 0x60:
+            m_cdrom_response_fifo_push(rand() % 0xFF, m_simplestation);
+			interrupt_push(0x03, m_simplestation);
+			break;
+
         default:
             printf(BOLD RED "[CDROM] test: Unhandled CDROM TEST Sub-Command 0x%X" NORMAL "\n", subfunction);
 			m_simplestation_exit(m_simplestation, 1);

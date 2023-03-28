@@ -16,14 +16,14 @@ uniform sampler2D vram_texture;
 #define RAW_TEXTURE     1U
 #define TEXTURE_BLEND   2U
 
-vec4 vram_read(uint x, uint y)
+vec4 vramRead(uint x, uint y)
 {
-    return texelFetch(vram_texture, ivec2(int(x), int(y)), 0);
+    return texelFetch(vram_texture, ivec2(x, y), 0);
 }
 
 // Thanks Avocado (https://github.com/JaCzekanski/Avocado)!
 
-uint unpack_texel(vec4 texel)
+uint internalToPsxColor(vec4 texel)
 {
     uint i0 = uint(texel.a);
 
@@ -36,53 +36,55 @@ uint unpack_texel(vec4 texel)
 }
 
 
+vec4 clut4bit(uvec2 clut) {
+    int texX = int(frag_texture_page.x) + int(frag_texture_coord.x / 4.0);
+    int texY = int(frag_texture_page.y) + int(frag_texture_coord.y);
+
+    vec4 vram = vramRead(uint(texX), uint(texY));
+
+    uint index = internalToPsxColor(vram);
+    uint which = (index >> ((uint(frag_texture_coord.x) & 3u) * 4u)) & 0xfu;
+
+    return vramRead(uint(clut.x) + uint(which), uint(clut.y));
+}
+
+vec4 clut8bit(uvec2 clut) {
+    int texX = int(frag_texture_page.x) + int(frag_texture_coord.x / 2.0);
+    int texY = int(frag_texture_page.y) + int(frag_texture_coord.y);
+
+    uint index = internalToPsxColor(vramRead(uint(texX), uint(texY)));
+    uint which = (index >> ((uint(frag_texture_coord.x) & 1u) * 8u)) & 0xffu;
+
+    return vramRead(uint(clut.x) + which, uint(clut.y));
+}
+
+vec4 read16bit() { return vramRead(uint(frag_texture_page.x) + uint(frag_texture_coord.x), uint(frag_texture_page.y) + uint(frag_texture_coord.y)); }
+
+vec2 calculateTexel(vec2 texcoord) {
+    uvec2 texel = uvec2(uint(texcoord.x) % 256u, uint(texcoord.y) % 256u);
+
+    uvec2 mask = uvec2((frag_blend_mode) & 0x1fu, (frag_blend_mode >> 5) & 0x1fu);
+    uvec2 offset = uvec2((frag_blend_mode >> 10) & 0x1fu, (frag_blend_mode >> 15) & 0x1fu);
+
+    texel.x = (texel.x & ~(mask.x * 8u)) | ((offset.x & mask.x) * 8u);
+    texel.y = (texel.y & ~(mask.y * 8u)) | ((offset.y & mask.y) * 8u);
+
+    return vec2(texel);
+}
+
 
 vec4 sample_texel(vec2 tc)
 {
     vec4 pixel = vec4(1.0, 0.0, 0.0, 1.0);
-    float stride_divisor = 16.0;
-
-    if (frag_texture_depth == 0u)
-    {
-        stride_divisor /= 4.0;
-        int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
-        int tc_y = int(frag_texture_page.y) + int(tc.y);
-
-        // Fetch texel from VRAM. Each 4-bits is an index into the CLUT
-        uint texel = unpack_texel(vram_read(uint(tc_x), uint(tc_y)));
-
-        // We now fetch each pixel (located in the clut) in the texel in
-        // 4bit chunks, based on the current texture co-ordinate's x value.
-        // Therefore, for each fragment on screen, we read out 4-pixels worth
-        // of data from VRAM (or so I think..) based on this texcoord x-value.
-        uint clut_index = ((texel >> ((uint(tc.x) % 4u) * 4u)) & 0xfu);
-        pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
-    }
-    else if (frag_texture_depth == 1u)
-    {
-        int tc_x = int(frag_texture_page.x) + int(tc.x / 2);
-        int tc_y = int(frag_texture_page.y) + int(tc.y);
-        
-        if (frag_blend_mode == RAW_TEXTURE)
-        {
-            uint texel = unpack_texel(texelFetch(vram_texture, ivec2(ivec2(tc.x / 2, tc.y) + ivec2(frag_texture_page)), 0));
-
-            uint clut_index = ((texel >> ((uint(tc.x) % 2u) * 8u)) & 0xFFu);
-            pixel = vram_read(frag_clut.x + clut_index, uint(frag_clut.y));
-        }
-    }
-    else if (frag_texture_depth == 2u)
-    {
-        stride_divisor /= 16.0;
-        int tc_x = int(frag_texture_page.x) + int(tc.x / stride_divisor);
-        int tc_y = int(frag_texture_page.y) + int(tc.y);
-        
-        if (frag_blend_mode == RAW_TEXTURE)
-        {
-            pixel = vram_read(uint(tc_x), uint(tc_y));
-        }
-    }
     
+    if (frag_texture_depth == 0u) {
+        pixel = clut4bit(frag_clut);
+    } else if (frag_texture_depth == 1u) {
+        pixel = clut8bit(frag_clut);
+    } else if (frag_texture_depth == 2u) {
+        pixel = read16bit();
+    }
+
     if (pixel == vec4(0))
         discard;
 

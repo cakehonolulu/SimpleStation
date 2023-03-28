@@ -130,6 +130,8 @@ void m_memory_exit(m_simplestation_state *m_simplestation)
 
 size_t xd = 0;
 
+uint16_t ctrl_reg = 0, baud_reg = 0, mode_reg = 0, stat_reg = 0, data_reg = 0;
+
 /*
 	Function:
 	m_memory_read(uint32_t m_memory_offset, m_memory_size m_size)
@@ -221,6 +223,10 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 			printf(YELLOW "[MEM] read: JOY_CTRL read, ignoring...\n" NORMAL);
 #endif
 			m_return = 0x0;
+			break;
+
+		case 0x1F801054:
+			m_return = stat_reg;
 			break;
 
 		case 0x1F801060:
@@ -463,6 +469,22 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: JOY_BAUD write (Value: 0x%08X), ignoring...\n" NORMAL, m_value);
 #endif
+			break;
+
+		case 0x1F801050:
+			data_reg = m_value;
+			break;
+
+		case 0x1F801058:
+			mode_reg = m_value;
+			break;
+
+		case 0x1F80105A:
+			ctrl_reg = m_value;
+			break;
+			
+		case 0x1F80105E:
+			baud_reg = m_value;
 			break;
 			
 		case 0x1F801060:
