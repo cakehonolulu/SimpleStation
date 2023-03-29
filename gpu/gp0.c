@@ -122,6 +122,10 @@ void m_gpu_gp0_handler(m_simplestation_state *m_simplestation)
                 gpu_draw_texture_semi_transparent_opaque_texture_blend(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
 
+            case 0x67:
+                gpu_draw_variable_size_semi_transparent_texture_rectangle(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
+                break;
+
             case 0x68:
                 renderstack.gpu_draw_monochrome_opaque_1x1(m_simplestation->m_gpu->m_gp0_instruction, m_simplestation);
                 break;
@@ -308,6 +312,10 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
                 break;
 
             case 0x66:
+                m_simplestation->m_gpu->m_gp0_words_remaining = 4;
+                break;
+
+            case 0x67:
                 m_simplestation->m_gpu->m_gp0_words_remaining = 4;
                 break;
 

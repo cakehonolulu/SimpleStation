@@ -1166,6 +1166,23 @@ void gpu_draw_texture_semi_transparent_opaque_texture_blend(uint32_t m_value, m_
 	put_rect(r0, m_simplestation);
 }
 
+void gpu_draw_variable_size_semi_transparent_texture_rectangle(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    Rectangle r0;
+
+    memset(&r0, 0, sizeof(Rectangle));
+
+    r0.position = pos_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[1]);
+    r0.colour = col_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[0]);
+    r0.texCoord = texcoord_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.clut = clutattr_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[2]);
+    r0.blendMode = (GLubyte) BlendTexture;
+    r0.drawTexture = 1;
+    r0.widthHeight = rwh_from_gp0(m_simplestation->m_gpu_command_buffer->m_buffer[3]);
+
+	put_rect(r0, m_simplestation);
+}
+
 void m_gpu_draw_textured_three_point_opaque_poly(uint32_t m_value, m_simplestation_state *m_simplestation)
 {
     OpenGL_Vertex v1, v2, v3;
