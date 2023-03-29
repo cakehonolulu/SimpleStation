@@ -254,6 +254,11 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 				//printf("[MEM] read: DMA Interrupt register\n");
 				m_return = m_simplestation->dicr;
 			}
+			else if (m_address == 0x1f8010f6)
+			{
+				//printf("[MEM] read: DMA Interrupt register\n");
+				m_return = m_simplestation->dicr & 0xFFFF0000;
+			}
 			else
 			{
 				// DMA Registers Write
@@ -512,6 +517,12 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 				//printf("[MEM] write: DMA Interrupt register\n");
 				m_simplestation->dicr = m_value;
 				m_simplestation->dicr &= ~(m_value & 0x7f000000);
+			}
+			else if (m_address == 0x1f8010f6)
+			{
+				//printf("[MEM] write: DMA Interrupt register\n");
+				m_simplestation->dicr = m_value & 0xFFFF0000;
+				m_simplestation->dicr &= ~((m_value & 0xFFFF0000) & 0x7f000000);
 			}
 			else
 			{
