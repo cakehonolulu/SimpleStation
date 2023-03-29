@@ -786,6 +786,17 @@ void commandNCCS(uint32_t opcode, m_simplestation_state *m_simplestation) {
 	pushColour(m_simplestation);	
 }
 
+void commandGPF(uint32_t opcode, m_simplestation_state *m_simplestation) {
+	const int shift = sf(opcode) * 12;
+	const int lm = lm(opcode);
+
+	MAC1 = (int32_t)(IR1 * IR0) >> shift;
+	MAC2 = (int32_t)(IR2 * IR0) >> shift;
+	MAC3 = (int32_t)(IR3 * IR0) >> shift;
+	setIRFromMAC(lm, m_simplestation);
+	pushColour(m_simplestation);	
+}
+
 void gte_execute(uint32_t opcode, m_simplestation_state *m_simplestation)
 {
 	switch (opcode & 0x3F)
@@ -865,6 +876,11 @@ void gte_execute(uint32_t opcode, m_simplestation_state *m_simplestation)
 		case 0x30:
 			m_simplestation->m_gte->cop2c.raw[31] = 0;
 			commandRTPT(opcode, m_simplestation);
+			break;
+
+		case 0x3D:
+			m_simplestation->m_gte->cop2c.raw[31] = 0;
+			commandGPF(opcode, m_simplestation);
 			break;
 
 		case 0x3F:
