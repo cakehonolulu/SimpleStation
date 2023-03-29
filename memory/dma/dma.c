@@ -65,7 +65,7 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
                     break;
 
                 default:
-                    printf(RED "[MEM] dma_read: Unhandled read! (@ 0x%08X)\n" NORMAL, m_addr);
+                    printf(RED "[MEM] dma_read: Unhandled read on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
                     m_simplestation_exit(m_simplestation, 1);
                     break;
             }
@@ -83,14 +83,14 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
                     break;
 
                 default:
-                    printf(RED "[MEM] dma_read: Unhandled read! (@ 0x%08X)\n" NORMAL, m_addr);
+                    printf(RED "[MEM] dma_read: Unhandled read on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
                     m_value = m_simplestation_exit(m_simplestation, 1);
                     break;
             }
             break;
 
         default:
-            printf(RED "[MEM] dma_read: Unhandled read! (@ 0x%08X)\n" NORMAL, m_addr);
+            printf(RED "[MEM] dma_read: Unhandled read on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
             m_value = m_simplestation_exit(m_simplestation, 1);
             break;
     }
@@ -133,7 +133,7 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     break;
 
                 default:
-                    printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+                    printf(RED "[MEM] dma_write: Unhandled write on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
                     m_simplestation_exit(m_simplestation, 1);
                     break;
             }
@@ -152,7 +152,7 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     break;
                 
                 default:
-                    printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+                    printf(RED "[MEM] dma_write: Unhandled write on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
                     m_simplestation_exit(m_simplestation, 1);
                     break;
             }
@@ -160,7 +160,7 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
             break;
 
         default:
-            printf(RED "[MEM] dma_write: Unhandled write! (@ 0x%08X)\n" NORMAL, m_addr);
+            printf(RED "[MEM] dma_write: Unhandled write on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
             m_simplestation_exit(m_simplestation, 1);
             break;
     }
