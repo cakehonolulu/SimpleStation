@@ -280,12 +280,7 @@ void operationSetloc(m_simplestation_state *m_simplestation)
 /* 0x03 */
 void operationPlay(m_simplestation_state *m_simplestation)
 {
-    uint8_t minute = BCD_DECODE(param_front(m_simplestation));
-	m_cdrom_parameter_fifo_pop(m_simplestation);
-    uint8_t second = BCD_DECODE(param_front(m_simplestation));
-	m_cdrom_parameter_fifo_pop(m_simplestation);
-	uint8_t sector = BCD_DECODE(param_front(m_simplestation));
-	m_cdrom_parameter_fifo_pop(m_simplestation);
+    setState(Playing, m_simplestation);
 
 	m_cdrom_response_fifo_push(m_simplestation->m_cdrom->statusCode._value, m_simplestation);
     interrupt_push(0x03, m_simplestation);
@@ -728,18 +723,7 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 			break;
 
 		case 1:
-			switch (m_simplestation->m_cdrom->status.index)
-			{
-				case 0:
-					execute(m_value, m_simplestation);
-					break;
-
-				default:
-					printf(RED "[CDROM] write: Unhandled Offset 0 CDROM Write (Index: %d, Value: 0x%08X)\n" NORMAL,
-							m_simplestation->m_cdrom->status.index, m_value);
-					//m_simplestation_exit(m_simplestation, 1);
-            		break;
-			}
+			execute(m_value, m_simplestation);
 			break;
 
 		// Status's Index-determined write
