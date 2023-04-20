@@ -23,9 +23,6 @@ GLuint m_fbo;
 // Texture containing the off-screen framebuffer
 GLuint m_psx_vram_texel;
 
-// Texture for the default (Visible) framebuffer
-GLuint m_window_texture;
-
 GLuint m_psx_gpu_vram;
 
 GLuint m_psx_aux_vram;
@@ -34,20 +31,11 @@ GLuint m_psx_aux_vram;
 // GLSL Off-Screen Program
 GLuint program = 0;
 
-// GLSL Visible Program
-GLuint fb_program = 0;
-
 // GLSL Off-Screen Vertex Shader
 GLuint vertex_shader = 0;
 
 // GLSL Off-Screen Fragment Shader
 GLuint fragment_shader = 0;
-
-// GLSL (Visible) Vertex Shader
-GLuint fb_vertex_shader = 0;
-
-// GLSL (Visible) Fragment Shader
-GLuint fb_fragment_shader = 0;
 
 /* OpenGL Uniforms */
 
@@ -55,19 +43,6 @@ GLint uniform_offset;
 
 /* Auxiliary variables */
 uint32_t count_vertices = 0;
-
-float output_window_vertices[] =
-{
-	// Coords    // texCoords
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	-1.0f, -1.0f,  0.0f, 0.0f,
-	-1.0f,  1.0f,  0.0f, 1.0f,
-
-	 1.0f,  1.0f,  1.0f, 1.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	-1.0f,  1.0f,  0.0f, 1.0f
-};
-
 
 SDL_Window   *m_window;
 SDL_GLContext *m_gl_context;
@@ -149,8 +124,6 @@ void m_window_changetitle(char *buffer)
 	SDL_SetWindowTitle(m_window, buffer);
 }
 
-unsigned int output_window_vao, output_window_vbo;
-
 uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -194,8 +167,6 @@ uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
 	// Store the original (Visible) framebuffer into an easily-accessible variable
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_original_fbo);
 
-	m_renderer_setup_onscreen();
-
 	m_renderer_setup_offscreen(m_simplestation);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -205,64 +176,6 @@ uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation)
 #endif
 
 	return 0;
-}
-
-void m_renderer_setup_onscreen()
-{
-	/* OpenGL On-Screen Framebuffer Configuration */
-
-	GLint m_opengl_status = 0;
-
-	/* Setup the on-screen VAO and VBO */
-
-	// First generate the Vertex Array...
-	glGenVertexArrays(1, &output_window_vao);
-
-	// ... then generate the Vertex Buffer.
-	glGenBuffers(1, &output_window_vbo);
-
-	// Bind to the new Vertex Array
-	glBindVertexArray(output_window_vao);
-
-	// Also bind to the Vertex Buffer...
-	glBindBuffer(GL_ARRAY_BUFFER, output_window_vbo);
-
-	// ...and tell the GPU which data to grab-off the memory
-	glBufferData(GL_ARRAY_BUFFER, sizeof(output_window_vertices), &output_window_vertices, GL_STATIC_DRAW);
-
-	// Specify the values for the VAO (2 triangles)
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-	// Compile the default framebuffer's shaders
-	fb_vertex_shader = renderer_LoadShader("fb_vertex.glsl", GL_VERTEX_SHADER);
-	fb_fragment_shader = renderer_LoadShader("fb_fragment.glsl", GL_FRAGMENT_SHADER);
-
-	// Create the default framebuffer program
-	fb_program = glCreateProgram();
-
-	// Attatch the compiled shaders
-	glAttachShader(fb_program, fb_vertex_shader);
-	glAttachShader(fb_program, fb_fragment_shader);
-
-	// Link the program...
-	glLinkProgram(fb_program);
-
-	glGetProgramiv(fb_program, GL_LINK_STATUS, &m_opengl_status);
-
-	if(m_opengl_status != GL_TRUE)
-	{
-    	printf("OpenGL program linking failed!\n");
-    	glDeleteProgram(fb_program);
-    	exit(1);
-	}
-
-	// ...and run it!
-	glUseProgram(fb_program);
-
-	glUniform1i(glGetUniformLocation(fb_program, "screenTexture"), 0);
 }
 
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
@@ -358,28 +271,6 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 
 	// Initialize the buffers
 	m_renderer_buffers_init();
-
-	// Generate a new texture that will contain the off-screen's pixel data...
-	glGenTextures(1, &m_window_texture);
-
-	// ...bind to it...
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-
-	// ...allocate space for it...
-	if (m_simplestation->m_vramview)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	}
-	else
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	}
-
-	// ...and set the appropiate parameters (To fill the screen and the texture filters)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// ...and run it!
 	glUseProgram(program);
@@ -616,6 +507,8 @@ void m_sync_vram(m_simplestation_state *m_simplestation, int32_t x, int32_t y, i
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
 }
 
+
+
 void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, bool isline)
 {
 	/* Off-screen Framebuffer */
@@ -633,8 +526,6 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(OpenGL_Vertex) * VERTEX_BUFFER_LEN, m_vertex_buffer, GL_DYNAMIC_DRAW);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
 	// Set viewport to accomodate VRAM
 	glViewport(0, 0, 1024, 512);
 	
@@ -647,6 +538,8 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	}
 	else
 	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+
 		// Off-screen shaders sample-off the off-screen VRAM Texture
 		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 	}
@@ -666,59 +559,27 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 		glDrawArrays(GL_TRIANGLES, 0, (GLsizei) (count_vertices));
 	}
 
-	// Copy the display area from the VRAM off to the on-screen texture
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
-
-	if (!m_simplestation->m_vramview)
-	{
-		glViewport(0, 0, res_w, res_h);
-		
-		// Copy the texture to the window
-		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, res_w, res_h, 0);
-	}
-	else
-	{
-		glViewport(0, 0, 1024, 512);
-		
-		// Copy the texture to the window
-		glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
-	}
-	
 	// Clear the vertex count
 	if (!part) count_vertices = 0;
 
-	// Bind GL_COLOR_ATTACHMENT0 w/the on-screen final texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_window_texture, 0);
-
 	/* On-screen Framebuffer */
 
-	// Bind to FBO
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 
-	// Use on-screen shaders
-	glUseProgram(fb_program);
-
-	// Bind to on-screen VAO
-	glBindVertexArray(output_window_vao);
-
-	// Bind to on-screen VBO
-	glBindBuffer(GL_ARRAY_BUFFER, output_window_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(output_window_vertices), &output_window_vertices, GL_STATIC_DRAW);
-
-	// Draw data-off the custom Framebuffer's Texture (GL_COLOR_ATTACHMENT0)
-	glBindTexture(GL_TEXTURE_2D, m_window_texture);
+    // Bind the on-screen framebuffer for drawing
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 	// Set viewport back to window size
 	if (!m_simplestation->m_vramview)
 	{
+		glBlitFramebuffer(0, res_h, res_w, 0, 0, 0, res_w * m_simplestation->m_scale, res_h * m_simplestation->m_scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		glViewport(0, 0, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale);
 	}
 	else
 	{
+		glBlitFramebuffer(0, 512, 1024, 0, 0, 0, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		glViewport(0, 0, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale);
 	}
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simplestation_state *m_simplestation) {
