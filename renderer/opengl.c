@@ -345,7 +345,11 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
 	glGenTextures(1, &m_psx_aux_vram);
 	glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
 
+#ifndef NO_DITHER
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
+#else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+#endif
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
@@ -533,9 +537,87 @@ void m_renderer_update_display_area(m_simplestation_state *m_simplestation)
 	//printf("vline_start: %d ; vline_end: %d\n\n", m_simplestation->m_gpu->m_display_line_start, m_simplestation->m_gpu->m_display_line_end);
 }
 
+void display(m_simplestation_state *m_simplestation)
+{
+	draw(m_simplestation, false, false, false);
+	SDL_GL_SwapWindow(m_window);
+}
+
+void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
+{
+    (void) m_value;
+
+    draw(m_simplestation, false, true, false);
+    
+
+    const uint32_t coords = m_simplestation->m_gpu_command_buffer->m_buffer[1];
+    const uint32_t res = m_simplestation->m_gpu_command_buffer->m_buffer[2];
+    // TODO: Sanitize this
+    const auto x = coords & 0x3ff;
+    const auto y = (coords >> 16) & 0x1ff;
+
+    uint32_t width = res & 0xffff;
+    uint32_t height = res >> 16;
+
+    width = ((width - 1) & 0x3ff) + 1;
+    height = ((height - 1) & 0x1ff) + 1;
+
+    // The size of the texture in 16-bit pixels. If the number is odd, force align it up
+    const uint32_t size = ((width * height) + 1) & ~1;
+
+    m_simplestation->m_gpu->m_gp0_read_mode = vram_to_cpu;
+    m_simplestation->m_gpu->m_vram_image_size = size / 2;
+
+    m_simplestation->m_gpu->m_vram_image_index = 0;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	if (m_simplestation->m_vramview)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
+	}
+	else
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+	}
+
+    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
+
+	if (m_simplestation->m_vramview)
+	{
+		glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
+	}
+	else
+	{
+		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
+	}
+}
+
+void m_sync_vram(m_simplestation_state *m_simplestation, int32_t x, int32_t y, int32_t width, int32_t height)
+{
+	(void) m_simplestation;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+	glViewport(0, 0, 1024, 512);
+
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+	
+    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
+	
+    glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
+}
+
 void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, bool isline)
 {
-
 	/* Off-screen Framebuffer */
 
 	// Bind to FBO
@@ -553,26 +635,26 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
 
-	if (clear_colour)
-	{
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-
 	// Set viewport to accomodate VRAM
 	glViewport(0, 0, 1024, 512);
 	
 	if (m_simplestation->m_vramview)
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-
-		glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
-		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 1024, 512);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
+		glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
+    	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
+		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	}
+	else
+	{
+		// Off-screen shaders sample-off the off-screen VRAM Texture
+		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 	}
 
-	// Off-screen shaders sample-off the off-screen VRAM Texture
-	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	if (clear_colour)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 
 	// Check if we need to draw lines
 	if (isline)
@@ -638,23 +720,6 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
-
-void m_sync_vram(m_simplestation_state *m_simplestation, int32_t x, int32_t y, int32_t width, int32_t height)
-{
-	(void) m_simplestation;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, 1024, 512);
-
-    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
-}
-
-void display(m_simplestation_state *m_simplestation) {
-  draw(m_simplestation, false, false, false);
-  SDL_GL_SwapWindow(m_window);
-}
-
 
 int put_triangle(OpenGL_Vertex v1, OpenGL_Vertex v2, OpenGL_Vertex v3, m_simplestation_state *m_simplestation) {
 	if (count_vertices + 3 > VERTEX_BUFFER_LEN)
@@ -1473,43 +1538,4 @@ void m_gpu_image_draw(uint32_t m_value, m_simplestation_state *m_simplestation)
     m_simplestation->m_gpu->m_gp0_words_remaining = m_image_sz / 2;
 
     m_simplestation->m_gpu->m_gp0_write_mode = cpu_to_vram;
-}
-
-void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
-{
-    (void) m_value;
-
-    draw(m_simplestation, false, true, false);
-    
-
-    const uint32_t coords = m_simplestation->m_gpu_command_buffer->m_buffer[1];
-    const uint32_t res = m_simplestation->m_gpu_command_buffer->m_buffer[2];
-    // TODO: Sanitize this
-    const auto x = coords & 0x3ff;
-    const auto y = (coords >> 16) & 0x1ff;
-
-    uint32_t width = res & 0xffff;
-    uint32_t height = res >> 16;
-
-    width = ((width - 1) & 0x3ff) + 1;
-    height = ((height - 1) & 0x1ff) + 1;
-
-    // The size of the texture in 16-bit pixels. If the number is odd, force align it up
-    const uint32_t size = ((width * height) + 1) & ~1;
-
-    m_simplestation->m_gpu->m_gp0_read_mode = vram_to_cpu;
-    m_simplestation->m_gpu->m_vram_image_size = size / 2;
-
-    m_simplestation->m_gpu->m_vram_image_index = 0;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
-    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
-
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-
-    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 }
