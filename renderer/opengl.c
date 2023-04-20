@@ -27,6 +27,8 @@ GLuint m_psx_vram_texel;
 GLuint m_window_texture;
 
 GLuint m_psx_gpu_vram;
+
+GLuint m_psx_aux_vram;
 /* OpenGL Shader Programs */
 
 // GLSL Off-Screen Program
@@ -337,6 +339,19 @@ void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+
+
+
+	glGenTextures(1, &m_psx_aux_vram);
+	glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 512, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	// Initialize the buffers
 	m_renderer_buffers_init();
 
@@ -546,6 +561,16 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	// Set viewport to accomodate VRAM
 	glViewport(0, 0, 1024, 512);
 	
+	if (m_simplestation->m_vramview)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
+
+		glBindTexture(GL_TEXTURE_2D, m_psx_aux_vram);
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 1024, 512);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
+
+	}
+
 	// Off-screen shaders sample-off the off-screen VRAM Texture
 	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
 
@@ -614,17 +639,15 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void m_sync_vram(m_simplestation_state *m_simplestation)
+void m_sync_vram(m_simplestation_state *m_simplestation, int32_t x, int32_t y, int32_t width, int32_t height)
 {
 	(void) m_simplestation;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, 640, 480);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_vram_texel, 0);
-	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 	glViewport(0, 0, 1024, 512);
+
+    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
 }
 
 void display(m_simplestation_state *m_simplestation) {

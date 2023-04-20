@@ -123,7 +123,7 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 void m_renderer_update_display_area(m_simplestation_state *m_simplestation);
 void m_renderer_setup_onscreen();
 void m_renderer_setup_offscreen(m_simplestation_state *m_simplestation);
-void m_sync_vram(m_simplestation_state *m_simplestation);
+void m_sync_vram(m_simplestation_state *m_simplestation, int32_t x, int32_t y, int32_t width, int32_t height);
 uint8_t init_opengl_renderer(m_simplestation_state *m_simplestation);
 void m_renderer_buffers_init();
 GLuint renderer_LoadShader(char *path, GLenum type);

@@ -409,10 +409,7 @@ void m_gpu_gp0(uint32_t m_value, m_simplestation_state *m_simplestation)
             {
                 if (m_simplestation->renderer == OPENGL)
                 {
-                    glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-                    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->write_buffer);
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    m_sync_vram(m_simplestation);
+                    m_sync_vram(m_simplestation,  x, y, width, height);
                 }
 
                 for (int i = 0; i < (1024 * 512); i++) m_simplestation->m_gpu->write_buffer[i] = 0;
