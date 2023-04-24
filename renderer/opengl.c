@@ -529,21 +529,11 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	// Set viewport to accomodate VRAM
 	glViewport(0, 0, 1024, 512);
 	
-	if (m_simplestation->m_vramview)
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
-		glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
-    	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
-		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-	}
-	else
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-
-		// Off-screen shaders sample-off the off-screen VRAM Texture
-		glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
-	}
-
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
+	glBindTexture(GL_TEXTURE_2D, m_psx_gpu_vram);
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1024, 512, 0);
+	glBindTexture(GL_TEXTURE_2D, m_psx_vram_texel);
+	
 	if (clear_colour)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -572,13 +562,11 @@ void draw(m_simplestation_state *m_simplestation, bool clear_colour, bool part, 
 	// Set viewport back to window size
 	if (!m_simplestation->m_vramview)
 	{
-		glBlitFramebuffer(0, res_h, res_w, 0, 0, 0, res_w * m_simplestation->m_scale, res_h * m_simplestation->m_scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glViewport(0, 0, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale);
+		glBlitFramebuffer(0, res_h, res_w, 0, 0, 0, 640 * m_simplestation->m_scale, 480 * m_simplestation->m_scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 	else
 	{
 		glBlitFramebuffer(0, 512, 1024, 0, 0, 0, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glViewport(0, 0, 1024 * m_simplestation->m_scale, 512 * m_simplestation->m_scale);
 	}
 }
 
