@@ -463,14 +463,7 @@ void m_gpu_image_store(uint32_t m_value, m_simplestation_state *m_simplestation)
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-	if (m_simplestation->m_vramview)
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
-	}
-	else
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_gpu_vram, 0);
-	}
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_psx_aux_vram, 0);
 
     glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, m_simplestation->m_gpu->read_buffer);
 
