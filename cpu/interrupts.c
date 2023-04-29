@@ -32,7 +32,12 @@ bool m_interrupt_isactive(m_simplestation_state *m_simplestation)
 void m_interrupts_request(m_int_types m_int, m_simplestation_state *m_simplestation)
 {
 	m_simplestation->m_cpu_ints->m_interrupt_stat |= 1 << (uint32_t) m_int;
-	m_interrupts_update(m_simplestation);
+	//m_interrupts_update(m_simplestation);
+}
+
+bool m_are_interrupts_pending(m_simplestation_state *m_simplestation)
+{
+	return (m_simplestation->m_cpu_ints->m_interrupt_stat & m_simplestation->m_cpu_ints->m_interrupt_mask) != 0;
 }
 
 bool m_interrupts_pending(m_simplestation_state *m_simplestation)
@@ -50,11 +55,11 @@ void m_interrupts_write(uint32_t m_int_addr, uint32_t m_int_val, m_simplestation
 	switch (m_int_addr)
 	{
 		case 0:
-			m_simplestation->m_cpu_ints->m_interrupt_stat &= m_int_val;
+			m_simplestation->m_cpu_ints->m_interrupt_stat &= m_int_val & 0x7FF;
 			break;
 
 		case 4:
-			m_simplestation->m_cpu_ints->m_interrupt_mask = m_int_val;
+			m_simplestation->m_cpu_ints->m_interrupt_mask = m_int_val & 0x7FF;
 			break;
 	
 		default:

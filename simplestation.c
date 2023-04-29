@@ -323,12 +323,13 @@ int main(int argc, char **argv)
 
 												dma_step(&m_simplestation);
 
+												cdrom_tick(systemClockStep, &m_simplestation);
+												
 												videoSystemClocksScanlineCounter += videoSystemClockStep;
 
 												if (videoSystemClocksScanlineCounter >= 3413)
 												{
 
-												cdrom_tick(4000, &m_simplestation);
 													totalScanlines++;
 													videoSystemClocksScanlineCounter = 0;
 												}

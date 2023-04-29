@@ -209,11 +209,18 @@ void m_cpu_fde(m_simplestation_state *m_simplestation)
 	m_simplestation->m_cpu->m_delay = m_simplestation->m_cpu->m_branch;
 	m_simplestation->m_cpu->m_branch = false;
 
-	if (m_interrupts_pending(m_simplestation))
-	{
+
+	if (m_are_interrupts_pending(m_simplestation)) {
+        COP0_CAUSE |= 0x400;
+    } else {
+        COP0_CAUSE &= ~0x400;
+    }
+    if (m_interrupts_pending(m_simplestation)) {
         m_exception(interrupt, m_simplestation);
+		
 		return;
     }
+	
 
 	// Check if the instruction is implemented
 	if (m_psx_instrs[INSTRUCTION].m_funct)
