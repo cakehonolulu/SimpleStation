@@ -131,6 +131,25 @@ void cmdSetLoc(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 }
 
+/* 0x0E */
+void cmdSetMode(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	// Send status
+	cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    m_simplestation->m_cdrom->mode = *cqueue_i_front(&m_simplestation->m_cdrom->paramFIFO);
+	cqueue_i_pop(&m_simplestation->m_cdrom->paramFIFO);
+
+	printf(BOLD MAGENTA "[CDROM    ] SetMode (0x%X) " NORMAL "\n", m_simplestation->m_cdrom->mode);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + 30000;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
 /* 0x15 */
 void cmdSeekL(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
@@ -228,6 +247,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case SetLoc:
 			cmdSetLoc(m_simplestation);
+			break;
+
+		case SetMode:
+			cmdSetMode(m_simplestation);
 			break;
 
 		case SeekL:
