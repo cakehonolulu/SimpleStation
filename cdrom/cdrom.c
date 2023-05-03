@@ -345,6 +345,24 @@ void cmdSetLoc(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 }
 
+/* 0x03 */
+void cmdPlay(m_simplestation_state *m_simplestation)
+{
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+	
+	printf(BOLD MAGENTA "[CDROM] Play " NORMAL "\n");
+
+	m_simplestation->m_cdrom->stat |= (uint8_t)(Play_);
+
+	// Send status
+	pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+	
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
 /* 0x06 */
 void cmdReadN(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
@@ -728,6 +746,29 @@ void cmdReadS(m_simplestation_state *m_simplestation) {
 
 }
 
+/* 0x1E */
+void cmdReadTOC(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+    printf(BOLD MAGENTA "[CDROM] ReadTOC" NORMAL "\n");
+
+
+    // Send status
+    pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+
+    // Send status
+	pushLateResponse(m_simplestation->m_cdrom->stat | (uint8_t)(Read), m_simplestation);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+	primary_event.time = m_simplestation->time + INT3_TIME + 20000;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
 void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
     m_simplestation->m_cdrom->cmd = m_value;
 
@@ -739,6 +780,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case SetLoc:
 			cmdSetLoc(m_simplestation);
+			break;
+
+		case Play:
+			cmdPlay(m_simplestation);
 			break;
 
 		case ReadN:
@@ -796,6 +841,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case ReadS:
 			cmdReadN(m_simplestation);
+			break;
+
+		case ReadTOC:
+			cmdReadTOC(m_simplestation);
 			break;
 
         default:

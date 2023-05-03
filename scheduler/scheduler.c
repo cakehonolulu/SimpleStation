@@ -2,7 +2,7 @@
 
 // Thanks @liuk7071
 
-#define MAX_ENTRIES 64
+#define MAX_ENTRIES 128
 
 extern event_t *events;
 

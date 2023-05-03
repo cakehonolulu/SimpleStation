@@ -246,6 +246,8 @@ int main(int argc, char **argv)
 								{
 									m_mdec_init(&m_simplestation);
 
+									timers_init();
+
 									scheduler_init(&m_simplestation);
 
 									glfwInit();
@@ -321,9 +323,12 @@ int main(int argc, char **argv)
 													totalSystemClocksThisFrame++;
 												}
 
+												timer_step(60, &m_simplestation);
 												dma_step(&m_simplestation);
 
-												scheduler_tick(systemClockStep, &m_simplestation);
+												scheduler_tick(systemClockStep , &m_simplestation);
+
+
 												
 												videoSystemClocksScanlineCounter += videoSystemClockStep;
 

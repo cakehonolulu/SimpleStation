@@ -272,17 +272,9 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Dummy Timer Registers memory read! Ignoring...\n" NORMAL);
 #endif
-			if (m_address == 0x1F801120)
-			{
-				m_return = 0x000016B0 + xd;
-				xd++;
-			}
-			else
-			{
-				m_return = 0 + xd;
-				xd++;
-			}
-			//printf("[MEM] read: Timers Read\n");
+			
+			m_return = timers_read(m_memory_offset, m_simplestation);
+			
 			break;
 
 		case 0x1F801810 ... 0x1f801817:
@@ -538,11 +530,14 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			}
 			break;
 
-		case 0x1F801100 ... 0x1F80112F:
+		case 0x1F801100 ... 0x1F801130:
 			// Timer Registers Dummy Write
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Dummy Timer Registers memory write! Ignoring...\n" NORMAL);
 #endif
+
+			timers_write(m_memory_offset, m_value, m_simplestation);
+
 			break;
 
 		// CDROM Write

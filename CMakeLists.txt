@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 project(SimpleStation C)
 
+set (CMAKE_C_STANDARD 23)
+
 set(CMAKE_C_FLAGS_DEBUG "-Wall -Wextra -g")
 set(CMAKE_C_FLAGS_MINSIZEREL "-Wall -Wextra -O0")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "-Wall -Wextra -g -O2")

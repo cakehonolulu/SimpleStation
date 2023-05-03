@@ -20,6 +20,7 @@
 typedef enum {
     GetStat = 0x01,
     SetLoc  = 0x02,
+    Play    = 0x03,
     ReadN   = 0x06,
     Stop    = 0x08,
     Pause   = 0x09,
@@ -33,7 +34,8 @@ typedef enum {
     SeekL   = 0x15,
     Test    = 0x19,
     GetID   = 0x1A,
-    ReadS   = 0x1B
+    ReadS   = 0x1B,
+    ReadTOC = 0x1E
 } Command;
 
 /* Seek parameters */
@@ -62,7 +64,7 @@ typedef enum {
     ShellOpen = 1 << 4,
     Read      = 1 << 5,
     Seek      = 1 << 6,
-    Play      = 1 << 7,
+    Play_     = 1 << 7,
 } Status;
 
 
