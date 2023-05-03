@@ -4,47 +4,56 @@
 #include <ui/termcolour.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
-#define CDROM_STATUS_REG        0x00
-#define CDROM_COMMAND_REG       0x01
-#define CDROM_PARAM_FIFO_REG	0x02
-#define CDROM_REQUEST_REG		0x03
+#define CPU_SPEED (44100 * 0x300)
+#define READ_TIME_SINGLE (CPU_SPEED / 75)
+#define READ_TIME_DOUBLE (CPU_SPEED / (2 * 75))
 
-/* CDROM Commands */
-#define CDROM_GETSTAT_CMD       0x01
-#define CDROM_SETLOC_CMD        0x02
-#define CDROM_READN_CMD         0x06
-#define CDROM_PAUSE_CMD         0x09
-#define CDROM_SETMODE_CMD       0x0E
-#define CDROM_SEEKL_CMD         0x15
-#define CDROM_TEST_CMD          0x19
-#define CDROM_GETID_CMD         0x1A
+#define _1MS (CPU_SPEED / 1000)
+
+#define INT3_TIME (_1MS)
+
+
 
 typedef enum {
-    Unknown = 0,
-    Reading = 5,
-    Seeking = 6,
-    Playing = 7,
-} CDROMState;
+    GetStat = 0x01,
+    Init    = 0x0A,
+    Test    = 0x19,
+    GetID   = 0x1A,
+} Command;
+
+/* Seek parameters */
+typedef struct {
+    int mins, secs, sector;
+} SeekParam;
+
+/* --- CD-ROM registers --- */
 
 typedef enum {
-    DataOnly800h = 0,
-    WholeSector924h = 1,
-} CDROMModeSectorSize;
+    CDDAOn     = 1 << 0,
+    AutoPause  = 1 << 1,
+    Report     = 1 << 2,
+    XAFilter   = 1 << 3,
+    Ignore     = 1 << 4,
+    FullSector = 1 << 5,
+    XAADPCMOn  = 1 << 6,
+    Speed      = 1 << 7,
+} Mode;
 
 typedef enum {
-    Normal = 0,
-    Double = 1,
-} CDROMModeSpeed;
+    Error     = 1 << 0,
+    MotorOn   = 1 << 1,
+    SeekError = 1 << 2,
+    IDError   = 1 << 3,
+    ShellOpen = 1 << 4,
+    Read      = 1 << 5,
+    Seek      = 1 << 6,
+    Play      = 1 << 7,
+} Status;
 
-#define BCD_DECODE(value) (((value >> 4) & 0xF) * 10 + (value & 0xF))
 
 /* Function Definitions */
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation);
 void m_cdrom_exit(m_simplestation_state *m_simplestation);
 void m_cdrom_setup(m_simplestation_state *m_simplestation);
-void m_cdrom_step(m_simplestation_state *m_simplestation);
-void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_simplestation);
-uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation);
-void m_cdrom_exec_cmd(uint8_t m_cmd, m_simplestation_state *m_simplestation);
-void m_cdrom_exec_test_subcmd(uint8_t m_subcmd, m_simplestation_state *m_simplestation);

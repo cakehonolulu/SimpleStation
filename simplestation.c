@@ -323,7 +323,7 @@ int main(int argc, char **argv)
 
 												dma_step(&m_simplestation);
 
-												cdrom_tick(systemClockStep, &m_simplestation);
+												scheduler_tick(systemClockStep, &m_simplestation);
 												
 												videoSystemClocksScanlineCounter += videoSystemClockStep;
 

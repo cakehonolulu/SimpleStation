@@ -388,195 +388,22 @@ typedef struct m_gpu
 
 } m_psx_gpu_t;
 
-
-/*
-	1F801800h - Index/Status Register (Bit0-1 R/W) (Bit2-7 Read Only)
-	0-1 Index   Port 1F801801h-1F801803h index (0..3 = Index0..Index3)   (R/W)
-	2   ADPBUSY XA-ADPCM fifo empty  (0=Empty) ;set when playing XA-ADPCM sound
-	3   PRMEMPT Parameter fifo empty (1=Empty) ;triggered before writing 1st byte
-	4   PRMWRDY Parameter fifo full  (0=Full)  ;triggered after writing 16 bytes
-	5   RSLRRDY Response fifo empty  (0=Empty) ;triggered after reading LAST byte
-	6   DRQSTS  Data fifo empty      (0=Empty) ;triggered after reading LAST byte
-	7   BUSYSTS Command/parameter transmission busy  (1=Busy)
-*/
-typedef union {
-	struct {
-		uint8_t index : 2;
-		uint8_t XAADCPMFifoEmpty : 1;
-		uint8_t parameterFifoEmpty : 1;
-		uint8_t parameterFifoFull : 1;
-		uint8_t responseFifoEmpty : 1;
-		uint8_t dataFifoEmpty : 1;
-		uint8_t transmissionBusy : 1;
-	};
-
-   	uint8_t _value;
-} CDROMStatus;
-
-/*
-	1F801803h.Index0 - Interrupt Enable Register (R)
-	1F801803h.Index2 - Interrupt Enable Register (R) (Mirror)
-	0-4  Interrupt Enable Bits (usually all set, ie. 1Fh=Enable All IRQs)
-	5-7  Unknown/unused (write: should be zero) (read: usually all bits set)
-*/
-typedef union
-	{
-		struct {
-			uint8_t enable : 5;
-       		uint8_t unknown : 3;
-		};
-
-   	uint8_t _value;
-} CDROMInterrupt;
-
-/*
-	1F801803h.Index1 - Interrupt Flag Register (R/W)
-	1F801803h.Index3 - Interrupt Flag Register (R) (Mirror)
-	0-2   Read: Response Received   Write: 7=Acknowledge   ;INT1..INT7
-	3     Read: Unknown (usually 0) Write: 1=Acknowledge   ;INT8  ;XXX CLRBFEMPT
-	4     Read: Command Start       Write: 1=Acknowledge   ;INT10h;XXX CLRBFWRDY
-	5     Read: Always 1 ;XXX "_"   Write: 1=Unknown              ;XXX SMADPCLR
-	6     Read: Always 1 ;XXX "_"   Write: 1=Reset Parameter Fifo ;XXX CLRPRM
-	7     Read: Always 1 ;XXX "_"   Write: 1=Unknown              ;XXX CHPRST
-*/
-typedef union
-	{
-   		struct {
-			uint8_t responseReceived : 3;
-			uint8_t unknown : 1;
-			uint8_t commandStart : 1;
-			uint8_t unknown2 : 1;
-			uint8_t unknown3 : 1;
-			uint8_t unknown4 : 1;
-		};
-
-    uint8_t _value;
-
-} CDROMInterruptFlag;
-
-
-
-/*
-	Status code (stat)
-	0  Error         Invalid Command/parameters (followed by Error Byte)
-	1  Spindle Motor (0=Motor off, or in spin-up phase, 1=Motor on)
-	2  SeekError     (0=Okay, 1=Seek error)     (followed by Error Byte)
-	3  IdError       (0=Okay, 1=GetID denied) (also set when Setmode.Bit4=1)
-	4  ShellOpen     Once shell open (0=Closed, 1=Is/was Open)
-	5  Read          Reading data sectors  ;/set until after Seek completion)
-	6  Seek          Seeking               ; at a time (ie. Read/Play won't get
-	7  Play          Playing CD-DA         ;\only ONE of these bits can be set
-*/
-typedef union {
-    struct {
-        uint8_t error : 1;
-        uint8_t spindleMotor : 1;
-        uint8_t seekError : 1;
-        uint8_t getIdError : 1;
-        uint8_t shellOpen : 1;
-        uint8_t read : 1;
-        uint8_t seek : 1;
-        uint8_t play : 1;
-    };
-
-    uint8_t _value;
-} CDROMStatusCode;
-
-/*
-	Setmode
-	0   CDDA        (0=Off, 1=Allow to Read CD-DA Sectors; ignore missing EDC)
-	1   AutoPause   (0=Off, 1=Auto Pause upon End of Track) ;for Audio Play
-	2   Report      (0=Off, 1=Enable Report-Interrupts for Audio Play)
-	3   XA-Filter   (0=Off, 1=Process only XA-ADPCM sectors that match Setfilter)
-	4   Ignore Bit  (0=Normal, 1=Ignore Sector Size and Setloc position)
-	5   Sector Size (0=800h=DataOnly, 1=924h=WholeSectorExceptSyncBytes)
-	6   XA-ADPCM    (0=Off, 1=Send XA-ADPCM sectors to SPU Audio Input)
-	7   Speed       (0=Normal speed, 1=Double speed)
-*/
-typedef union {
-	struct {
-		uint8_t CDDASectorsReadEnable : 1;
-        uint8_t endOfTrackAutoPauseEnable : 1;
-        uint8_t reportInterruptsForAudioPlayEnable : 1;
-        uint8_t XAFilterEnable : 1;
-        uint8_t unknown : 1;
-        uint8_t _sectorSize : 1;
-        uint8_t XAADPCMEnable : 1;
-        uint8_t _speed : 1;
-    };
-
-	uint8_t _value;
-} CDROMMode;
-
-/*
-    Mode2/Form1 (CD-XA)
-    000h 0Ch  Sync
-    00Ch 4    Header (Minute,Second,Sector,Mode=02h)
-    010h 4    Sub-Header (File, Channel, Submode AND DFh, Codinginfo)
-    014h 4    Copy of Sub-Header
-    018h 800h Data (2048 bytes)
-    818h 4    EDC (checksum accross [010h..817h])
-    81Ch 114h ECC (error correction codes)
-*/
-typedef struct {
-    uint8_t sync[12];
-    uint8_t header[4];
-    uint8_t subheader[4];
-    uint8_t subheaderCopy[4];
-    uint8_t data[2048];
-    uint8_t EDC[4];
-    uint8_t ECC[276];
-} CDSector;
-
-typedef enum {
-    IdleState,
-    SeekingState,
-    ReadingState,
-    ReadingTableOfContentsState,
-} CDROMInternalState;
+#define i_val uint8_t
+#define i_tag i
+#include <stc/cqueue.h>
 
 typedef struct
 {
-	CDROMStatus status;
-	CDROMInterrupt interrupt;
-	CDROMStatusCode statusCode;
-	CDROMMode mode;
-	CDROMInterruptFlag interruptFlag;
-	CDROMInternalState internalState;
+	uint8_t mode, stat;
+	uint8_t iEnable, iFlags; // Interrupt registers
 
-	uint8_t m_interrupt_flag_register;
+	uint8_t index_; // CD-ROM register index
 
-	// FIFOs
-
-	// Parameter FIFO
-	uint8_t m_parameter_fifo[16];
-	int8_t m_parameter_fifo_front;
-	int8_t m_parameter_fifo_rear;
-	int8_t m_parameter_fifo_count;
-
-	// Response FIFO
-	uint8_t m_response_fifo[16];
-	int8_t m_response_fifo_front;
-	int8_t m_response_fifo_rear;
-	int8_t m_response_fifo_count;
-
+	uint8_t cmd; // Current CD-ROM command
+	cqueue_i paramFIFO;
 	
-	uint8_t m_interrupt_fifo[64];
-	int8_t m_interrupt_fifo_front;
-	int8_t m_interrupt_fifo_rear;
-	int8_t m_interrupt_fifo_count;
-
-	int8_t m_queued_responses;
-
-	uint32_t m_seek_sector;
-	uint32_t m_read_sector;
-
-	uint64_t m_count;
-
-    CDSector currentSector;
-    uint8_t readBuffer[0x920];
-    uint32_t readBufferIndex;
-
+	cqueue_i responseFIFO;
+	
 } m_psx_cdrom_t;
 
 typedef struct {
