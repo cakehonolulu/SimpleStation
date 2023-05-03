@@ -61,6 +61,15 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
     }
 }
 
+void INT1(m_simplestation_state *m_simplestation)
+{
+    //printf("[CDROM    ] INT2\n");
+
+    m_simplestation->m_cdrom->iFlags |= (uint8_t) 1;
+
+    if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
+}
+
 void INT2(m_simplestation_state *m_simplestation)
 {
     //printf("[CDROM    ] INT2\n");
@@ -128,6 +137,32 @@ void cmdSetLoc(m_simplestation_state *m_simplestation) {
     // Send INT3
 	primary_event.time = m_simplestation->time + 30000;
 	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
+/* 0x06 */
+void cmdReadN(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM    ] ReadN" NORMAL "\n");
+
+	// Send status
+	cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + 30000;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+	m_simplestation->m_cdrom->stat |= (uint8_t)(Read);
+
+	// Send status
+	cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT2
+	primary_event.time = m_simplestation->time + (30000 + 250000 + 250000 * !(m_simplestation->m_cdrom->mode & (uint8_t)(Speed)));
+	primary_event.func = &INT1;
 	scheduler_push(primary_event, m_simplestation);
 }
 
@@ -249,6 +284,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 			cmdSetLoc(m_simplestation);
 			break;
 
+		case ReadN:
+			cmdReadN(m_simplestation);
+			break;
+
 		case SetMode:
 			cmdSetMode(m_simplestation);
 			break;
@@ -302,13 +341,18 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 		case 3:
 			switch (m_simplestation->m_cdrom->index_)
 			{
+				case 0:
+                    //printf("[CDROM    ] 8-bit read @ IE\n");
+                    m_value = m_simplestation->m_cdrom->iEnable;
+					break;
+
 				case 1:
 					//printf("[CDROM    ] 8-bit read @ IF\n");
                     m_value = m_simplestation->m_cdrom->iFlags;
 					break;
 
 				default:
-					printf("[CDROM    ] Unhandled 8-bit read @ 0x%08X.%u\n", m_offset, m_simplestation->m_cdrom->index_);
+					printf(BOLD RED "[CDROM    ] Unhandled 8-bit read at Offset %d (Index: %d)" NORMAL "\n", m_offset, m_simplestation->m_cdrom->index_);
                     m_value = m_simplestation_exit(m_simplestation, 1);
 					break;
 			}
@@ -343,7 +387,7 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 					break;
 
 				default:
-					printf("[CDROM    ] Unhandled 8-bit write @ offset %u = 0x%02X\n", m_offset, m_value);
+					printf(BOLD RED "[CDROM    ] Unhandled 8-bit write at Offset: %u (Index: %d) = 0x%02X" NORMAL "\n", m_offset, m_simplestation->m_cdrom->index_, m_value);
 					break;
 			}
 			break;
@@ -366,7 +410,7 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 					break;
 
 				default:
-					printf("[CDROM    ] Unhandled 8-bit write @ %u = 0x%02X\n", m_offset, m_value);
+					printf(BOLD RED "[CDROM    ] Unhandled 8-bit write at Offset: %u (Index: %d) = 0x%02X" NORMAL "\n", m_offset, m_simplestation->m_cdrom->index_, m_value);
 
 					m_simplestation_exit(m_simplestation, 1);
 					break;
@@ -376,6 +420,10 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 		case 3:
 			switch (m_simplestation->m_cdrom->index_)
 			{
+				case 0:
+                    // printf("[CDROM    ] 8-bit write @ REQUEST = 0x%02X\n", m_value);
+                    break;
+
 				case 1:
                     //printf("[CDROM    ] 8-bit write @ IF = 0x%02X\n", m_value);
 
@@ -383,7 +431,8 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
                     break;
 
 				default:
-					printf("[CDROM    ] Unhandled 8-bit write @ %u = 0x%02X\n", m_offset, m_value);
+					printf(BOLD RED "[CDROM    ] Unhandled 8-bit write at Offset: %u (Index: %d) = 0x%02X" NORMAL "\n", m_offset, m_simplestation->m_cdrom->index_, m_value);
+					m_simplestation_exit(m_simplestation, 1);
 					break;
 			}
 			break;
