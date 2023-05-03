@@ -22,6 +22,11 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
 {
     if (m_simplestation->scheduled < MAX_ENTRIES)
     {
+        if (event.func == NULL)
+        {
+            printf("Pushed event has NULL function, exiting...\n");
+            m_simplestation_exit(m_simplestattion, 1);
+        }
         events[m_simplestation->scheduled] = event;
         m_simplestation->scheduled++;
     }
@@ -34,7 +39,7 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
 void scheduler_clean(m_simplestation_state *m_simplestation)
 {
     memset(events, sizeof(event_t), MAX_ENTRIES);
-    
+
     m_simplestation->scheduled = 0;
 }
 
@@ -53,7 +58,7 @@ void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
         {
             if (m_simplestation->time >= events[i].time)
             {
-                events[i].func(m_simplestation);
+                if (events[i].func != NULL) events[i].func(m_simplestation);
                 memset(&events[i], 0, sizeof(event_t));
                 executed++;
                 m_simplestation->scheduled--;

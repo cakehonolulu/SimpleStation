@@ -401,9 +401,13 @@ typedef struct
 
 	uint8_t cmd; // Current CD-ROM command
 	cqueue_i paramFIFO;
-	
+
 	cqueue_i responseFIFO;
+
+	cqueue_i queuedResp;
 	
+	cqueue_i lateResp;
+
 } m_psx_cdrom_t;
 
 typedef struct {
