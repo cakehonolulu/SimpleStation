@@ -63,7 +63,7 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
 
 void INT2(m_simplestation_state *m_simplestation)
 {
-    printf("[CDROM    ] INT2\n");
+    //printf("[CDROM    ] INT2\n");
 
     m_simplestation->m_cdrom->iFlags |= (uint8_t) 2;
 
@@ -72,7 +72,7 @@ void INT2(m_simplestation_state *m_simplestation)
 
 void INT3(m_simplestation_state *m_simplestation)
 {
-    printf("[CDROM    ] INT3\n");
+    //printf("[CDROM    ] INT3\n");
 
     m_simplestation->m_cdrom->iFlags |= (uint8_t) 3;
 
@@ -84,7 +84,7 @@ void cmdGetStat(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
 	strcpy(primary_event.subsystem, "CDROM");
 
-    printf("[CDROM    ] Get Stat\n");
+    printf(BOLD MAGENTA "[CDROM    ] GetStat" NORMAL "\n");
 
     // Send status
 	if (m_simplestation->m_cdrom_in)
@@ -110,7 +110,7 @@ void cmdSetLoc(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
 	strcpy(primary_event.subsystem, "CDROM");
 
-	printf("[CDROM    ] SetLoc\n");
+	printf(BOLD MAGENTA "[CDROM    ] SetLoc " NORMAL "\n");
 
     // Send status
     cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
@@ -128,6 +128,32 @@ void cmdSetLoc(m_simplestation_state *m_simplestation) {
     // Send INT3
 	primary_event.time = m_simplestation->time + 30000;
 	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
+/* 0x15 */
+void cmdSeekL(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM    ] SeekL" NORMAL "\n");
+
+    // Send status
+    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + 30000;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+    m_simplestation->m_cdrom->stat |= (uint8_t) (Seek);
+
+    // Send status
+    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT2
+	primary_event.time = m_simplestation->time + 120000;
+	primary_event.func = &INT2;
 	scheduler_push(primary_event, m_simplestation);
 }
 
@@ -164,7 +190,7 @@ void cmdTest(m_simplestation_state *m_simplestation) {
 void cmdGetID(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
 	strcpy(primary_event.subsystem, "CDROM");
-    printf("[CDROM    ] Get ID\n");
+    printf(BOLD MAGENTA "[CDROM    ] GetID" NORMAL "\n");
 
     // Send status
 	cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
@@ -202,6 +228,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case SetLoc:
 			cmdSetLoc(m_simplestation);
+			break;
+
+		case SeekL:
+			cmdSeekL(m_simplestation);
 			break;
 
 		case Test:
