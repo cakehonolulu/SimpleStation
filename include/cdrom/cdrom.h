@@ -14,11 +14,13 @@
 
 #define INT3_TIME (_1MS)
 
-
-
 typedef enum {
     GetStat = 0x01,
+    SetLoc  = 0x02,
+    ReadN   = 0x06,
     Init    = 0x0A,
+    SetMode = 0x0E,
+    SeekL   = 0x15,
     Test    = 0x19,
     GetID   = 0x1A,
 } Command;
