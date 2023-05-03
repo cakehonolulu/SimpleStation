@@ -14,10 +14,14 @@
 
 #define INT3_TIME (_1MS)
 
+#define SECTOR_SIZE 2352
+#define READ_SIZE   0x818
+
 typedef enum {
     GetStat = 0x01,
     SetLoc  = 0x02,
     ReadN   = 0x06,
+    Pause   = 0x09,
     Init    = 0x0A,
     SetMode = 0x0E,
     SeekL   = 0x15,

@@ -31,6 +31,13 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
     }
 }
 
+void scheduler_clean(m_simplestation_state *m_simplestation)
+{
+    memset(events, sizeof(event_t), MAX_ENTRIES);
+    
+    m_simplestation->scheduled = 0;
+}
+
 void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
 {
     //printf("time: %ld, cycles to add: %d\n", m_simplestation->time, cycles);
@@ -61,7 +68,7 @@ void scheduler_tick(int cycles, m_simplestation_state *m_simplestation)
             {
                 break;
             }
-     }
+        }
     }
     
 }

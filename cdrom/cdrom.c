@@ -8,8 +8,13 @@ size_t file_size = 0;
 
 SeekParam seekParam;
 
-const int SECTOR_SIZE = 2352;
-const int READ_SIZE   = 0x818;
+uint8_t readBuf[SECTOR_SIZE];
+int readIdx = 0;
+
+uint8_t toChar(uint8_t bcd)
+{
+	return (bcd / 16) * 10 + (bcd % 16);
+}
 
 uint8_t m_cdrom_init(m_simplestation_state *m_simplestation)
 {
@@ -61,13 +66,66 @@ void m_cdrom_exit(m_simplestation_state *m_simplestation)
     }
 }
 
+void readSector(m_simplestation_state *m_simplestation) {
+    /* Calculate seek target (in sectors) */
+    uint32_t mm   = toChar(seekParam.mins) * 60 * 75; // 1min = 60sec
+    uint32_t ss   = toChar(seekParam.secs) * 75; // 1min = 75 sectors
+    uint32_t sect = toChar(seekParam.sector);
+
+    uint32_t seekTarget = mm + ss + sect - 150; // Starts at 2s, subtract 150 sectors to get start
+
+    printf("[CDROM    ] Seeking to [%02X:%02X:%02X] (LBA: %d)\n", seekParam.mins, seekParam.secs, seekParam.sector, seekTarget);
+
+	fseek(cd, seekTarget * SECTOR_SIZE, SEEK_SET);
+
+	fread(&readBuf, SECTOR_SIZE, sizeof(uint8_t), cd);
+
+    readIdx = (m_simplestation->m_cdrom->mode & (uint8_t)(FullSector)) ? 12 : 24;
+
+    seekParam.sector++;
+
+    /* Increment BCD values */
+    if ((seekParam.sector & 0xF) == 10) { seekParam.sector += 10; seekParam.sector &= 0xF0; }
+
+    if (seekParam.sector == 0x75) { seekParam.secs++; seekParam.sector = 0; }
+
+    if ((seekParam.secs & 0xF) == 10) { seekParam.secs += 10; seekParam.secs &= 0xF0; }
+
+    if (seekParam.secs == 0x60) { seekParam.mins++; seekParam.secs = 0; }
+
+    if ((seekParam.mins & 0xF) == 10) { seekParam.mins += 10; seekParam.mins &= 0xF0; }
+
+    printf("[CDROM    ] Next seek to [%02X:%02X:%02X]\n", seekParam.mins, seekParam.secs, seekParam.sector);
+}
+
+uint32_t getData32(m_simplestation_state *m_simplestation) {
+    //assert(readIdx < SECTOR_SIZE);
+
+    uint32_t data;
+
+    memcpy(&data, &readBuf[readIdx], 4);
+
+    readIdx += 4;
+
+    return data;
+}
+
 void INT1(m_simplestation_state *m_simplestation)
 {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
     //printf("[CDROM    ] INT2\n");
 
     m_simplestation->m_cdrom->iFlags |= (uint8_t) 1;
 
     if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
+
+	readSector(m_simplestation);
+
+	primary_event.time = m_simplestation->time + (250000 + 250000 * !(m_simplestation->m_cdrom->mode & (uint8_t)(Speed)));
+	primary_event.func = &INT1;
+	scheduler_push(primary_event, m_simplestation);
 }
 
 void INT2(m_simplestation_state *m_simplestation)
@@ -166,6 +224,34 @@ void cmdReadN(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 }
 
+/* 0x09 */
+void cmdPause(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM    ] Pause" NORMAL "\n");
+
+	scheduler_clean(m_simplestation);
+
+	cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + 20000;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+    m_simplestation->m_cdrom->stat &= ~(uint8_t)(Play);
+    m_simplestation->m_cdrom->stat &= ~(uint8_t)(Read);
+
+    // Send status
+    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, m_simplestation->m_cdrom->stat);
+
+    // Send INT2
+	primary_event.time = m_simplestation->time + 120000;
+	primary_event.func = &INT2;
+	scheduler_push(primary_event, m_simplestation);
+}
+
 /* 0x0E */
 void cmdSetMode(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
@@ -260,10 +346,10 @@ void cmdGetID(m_simplestation_state *m_simplestation) {
     cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 0x20);
     cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 0x00);
 
+    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'S');
     cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'C');
-    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'A');
-    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'K');
     cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'E');
+    cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, 'A');
 
     // Send INT2
 	primary_event.time = m_simplestation->time + 50000;
@@ -286,6 +372,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case ReadN:
 			cmdReadN(m_simplestation);
+			break;
+
+		case Pause:
+			cmdPause(m_simplestation);
 			break;
 
 		case SetMode:

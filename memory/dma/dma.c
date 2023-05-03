@@ -266,10 +266,7 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         //bus.mem.CDROM.cd.buff_left = 0;
 
                         
-                        //m_source = loadWordFromReadBuffer(m_simplestation);
-
-                        printf("CDROM DMA\n");
-                        exit(0);
+                        m_source = getData32(m_simplestation);
 
                         if (((m_simplestation->dicr >> 19) & 1) && ((m_simplestation->dicr >> 23) & 1)) {
                             m_simplestation->dicr |= (1 << 27);
