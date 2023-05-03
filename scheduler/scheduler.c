@@ -25,7 +25,7 @@ void scheduler_push(event_t event, m_simplestation_state *m_simplestation)
         if (event.func == NULL)
         {
             printf("Pushed event has NULL function, exiting...\n");
-            m_simplestation_exit(m_simplestattion, 1);
+            m_simplestation_exit(m_simplestation, 1);
         }
         events[m_simplestation->scheduled] = event;
         m_simplestation->scheduled++;

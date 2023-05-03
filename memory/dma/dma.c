@@ -275,6 +275,9 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 				
                         break;
 
+                    case spu:
+                        break;
+
                     case otc:
                         switch(m_size)
                         {
@@ -323,6 +326,11 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
 	                        m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
                         }
                         break;
+
+    
+                    case 4:
+                        break;
+
 
                     default:
                         printf(RED "[DMA] run_block: Unimplemented block copy from RAM (id: %d)\n" NORMAL, m_id);

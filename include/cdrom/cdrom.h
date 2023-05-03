@@ -23,10 +23,16 @@ typedef enum {
     ReadN   = 0x06,
     Pause   = 0x09,
     Init    = 0x0A,
+    Unmute  = 0x0C,
+    SetFilter = 0x0D,
     SetMode = 0x0E,
+    GetLocP = 0x11,
+    GetTN   = 0x13,
+    GetTD   = 0x14,
     SeekL   = 0x15,
     Test    = 0x19,
     GetID   = 0x1A,
+    ReadS   = 0x1B
 } Command;
 
 /* Seek parameters */

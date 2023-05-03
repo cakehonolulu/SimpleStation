@@ -111,6 +111,11 @@ void readSector(m_simplestation_state *m_simplestation) {
 uint8_t readResponse(m_simplestation_state *m_simplestation) {
     //assert(!responseFIFO.empty());
 
+	if (cqueue_i_empty(&m_simplestation->m_cdrom->responseFIFO))
+	{
+		return 0;
+	}
+
     const auto data = *cqueue_i_front(&m_simplestation->m_cdrom->responseFIFO);
 	cqueue_i_pop(&m_simplestation->m_cdrom->responseFIFO);
 
@@ -432,6 +437,41 @@ void cmdInit(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 }
 
+/* 0x0C */
+void cmdUnmute(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] Unmute" NORMAL "\n");
+
+	pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
+/* 0x0D */
+void cmdSetFilter(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] SetFilter" NORMAL "\n");
+
+	cqueue_i_pop(&m_simplestation->m_cdrom->paramFIFO);
+	cqueue_i_pop(&m_simplestation->m_cdrom->paramFIFO);
+
+    // Send status
+	pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+}
+
 /* 0x0E */
 void cmdSetMode(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
@@ -450,6 +490,104 @@ void cmdSetMode(m_simplestation_state *m_simplestation) {
 	primary_event.func = &INT3;
 	scheduler_push(primary_event, m_simplestation);
 }
+
+/* 0x11 */
+void cmdGetLocP(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] GetLocP" NORMAL "\n");
+
+    pushResponse(0x01, m_simplestation);
+    pushResponse(0x01, m_simplestation);
+    pushResponse(seekParam.mins, m_simplestation);
+    pushResponse(seekParam.secs, m_simplestation);
+    pushResponse(seekParam.sector, m_simplestation);
+    pushResponse(seekParam.mins, m_simplestation);
+    pushResponse(seekParam.secs, m_simplestation);
+    pushResponse(seekParam.sector, m_simplestation);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
+/* 0x13 */
+void cmdGetTN(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] GetTN" NORMAL "\n");
+
+   if (cqueue_i_size(&m_simplestation->m_cdrom->paramFIFO)) {
+        /* Too few/many parameters, send error */
+        clearParameters(m_simplestation);
+
+        pushResponse(m_simplestation->m_cdrom->stat | (uint8_t)(Error), m_simplestation);
+        pushResponse(0x20, m_simplestation);
+
+		primary_event.time = m_simplestation->time + INT3_TIME;
+		primary_event.func = &INT5;
+		scheduler_push(primary_event, m_simplestation);
+
+        return;
+    }
+    pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+    pushResponse(0x01, m_simplestation);
+    pushResponse(0x01, m_simplestation);
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
+/* 0x14 */
+void cmdGetTD(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] GetTD" NORMAL "\n");
+
+   if (cqueue_i_size(&m_simplestation->m_cdrom->paramFIFO) != 1) {
+        /* Too few/many parameters, send error */
+        clearParameters(m_simplestation);
+
+        pushResponse(m_simplestation->m_cdrom->stat | (uint8_t)(Error), m_simplestation);
+        pushResponse(0x20, m_simplestation);
+
+		primary_event.time = m_simplestation->time + INT3_TIME;
+		primary_event.func = &INT5;
+		scheduler_push(primary_event, m_simplestation);
+
+        return;
+    }
+
+	const auto track = *cqueue_i_front(&m_simplestation->m_cdrom->paramFIFO);
+
+	if (track > 0x26) {
+        /* Too few/many parameters, send error */
+		clearParameters(m_simplestation);
+
+        pushResponse(m_simplestation->m_cdrom->stat | (uint8_t)(Error), m_simplestation);
+        pushResponse(0x20, m_simplestation);
+
+		primary_event.time = m_simplestation->time + INT3_TIME;
+		primary_event.func = &INT5;
+		scheduler_push(primary_event, m_simplestation);
+
+        return;
+    }
+
+    pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+    pushResponse(0, m_simplestation);
+    pushResponse(0, m_simplestation);
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+}
+
 
 /* 0x15 */
 void cmdSeekL(m_simplestation_state *m_simplestation) {
@@ -504,6 +642,7 @@ void cmdTest(m_simplestation_state *m_simplestation) {
 			break;
 	}
 }
+
 /* 0x1A */
 void cmdGetID(m_simplestation_state *m_simplestation) {
 	event_t primary_event;
@@ -549,6 +688,11 @@ void cmdGetID(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 }
 
+/* 0x1B */
+void cmdReadS(m_simplestation_state *m_simplestation) {
+
+}
+
 void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
     m_simplestation->m_cdrom->cmd = m_value;
 
@@ -573,9 +717,29 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 		case Init:
 			cmdInit(m_simplestation);
 			break;
-			
+		
+		case Unmute:
+			cmdUnmute(m_simplestation);
+			break;
+
+		case SetFilter:
+			cmdSetFilter(m_simplestation);
+			break;
+
 		case SetMode:
 			cmdSetMode(m_simplestation);
+			break;
+
+		case GetLocP:
+			cmdGetLocP(m_simplestation);
+			break;
+
+		case GetTN:
+			cmdGetTN(m_simplestation);
+			break;
+		
+		case GetTD:
+			cmdGetTD(m_simplestation);
 			break;
 
 		case SeekL:
@@ -589,6 +753,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 
 		case GetID:
 			cmdGetID(m_simplestation);
+			break;
+
+		case ReadS:
+			cmdReadN(m_simplestation);
 			break;
 
         default:
