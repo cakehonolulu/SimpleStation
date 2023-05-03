@@ -6,7 +6,7 @@ FILE *cd = NULL;
 
 size_t file_size = 0;
 
-SeekParam seekParam;
+SeekParam seekParam = {0};
 
 uint8_t readBuf[SECTOR_SIZE];
 int readIdx = 0;
@@ -80,9 +80,11 @@ void readSector(m_simplestation_state *m_simplestation) {
     uint32_t ss   = toChar(seekParam.secs) * 75; // 1min = 75 sectors
     uint32_t sect = toChar(seekParam.sector);
 
-    uint32_t seekTarget = mm + ss + sect - 150; // Starts at 2s, subtract 150 sectors to get start
+    uint32_t seekTarget = mm + ss + sect; // Starts at 2s, subtract 150 sectors to get start
 
-    //printf("[CDROM] Seeking to [%02X:%02X:%02X] (LBA: %d)\n", seekParam.mins, seekParam.secs, seekParam.sector, seekTarget);
+	seekTarget -= (2 * 75);
+
+    //printf("[CDROM] Seeking to [%d:%d:%d] (LBA: %d)\n", seekParam.mins, seekParam.secs, seekParam.sector, seekTarget);
 
 	printf("[CDROM] Reading from LBA %d\n", seekTarget);
 
@@ -105,7 +107,7 @@ void readSector(m_simplestation_state *m_simplestation) {
 
     if ((seekParam.mins & 0xF) == 10) { seekParam.mins += 0x10; seekParam.mins &= 0xF0; }
 
-    //printf("[CDROM] Next seek to [%02X:%02X:%02X]\n", seekParam.mins, seekParam.secs, seekParam.sector);
+    //printf("[CDROM] Next seek to [%d:%d:%d]\n", seekParam.mins, seekParam.secs, seekParam.sector);
 }
 
 uint8_t readResponse(m_simplestation_state *m_simplestation) {
@@ -116,16 +118,17 @@ uint8_t readResponse(m_simplestation_state *m_simplestation) {
 		return 0;
 	}
 
-    const auto data = *cqueue_i_front(&m_simplestation->m_cdrom->responseFIFO);
+    uint8_t data = (uint8_t) *cqueue_i_front(&m_simplestation->m_cdrom->responseFIFO);
+	
 	cqueue_i_pop(&m_simplestation->m_cdrom->responseFIFO);
 
     return data;
 }
 
 uint8_t getData8(m_simplestation_state *m_simplestation) {
-    //assert(readIdx && (readIdx < READ_SIZE));
+    assert(readIdx && (readIdx < READ_SIZE));
 
-    const auto data = readBuf[readIdx++];
+    uint8_t data = readBuf[readIdx++];
 
     if (readIdx == READ_SIZE) readIdx = 0;
 
@@ -133,7 +136,7 @@ uint8_t getData8(m_simplestation_state *m_simplestation) {
 }
 
 uint32_t getData32(m_simplestation_state *m_simplestation) {
-    //assert(readIdx && (readIdx < READ_SIZE));
+    assert(readIdx && (readIdx < READ_SIZE));
 
     uint32_t data;
 
@@ -168,13 +171,13 @@ void clearResponse(m_simplestation_state *m_simplestation) {
 
 void loadResponse(m_simplestation_state *m_simplestation) {
     while (!cqueue_i_empty(&m_simplestation->m_cdrom->queuedResp)) {
-        cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, *cqueue_i_front(&m_simplestation->m_cdrom->queuedResp));
+        cqueue_i_push(&m_simplestation->m_cdrom->responseFIFO, (uint8_t) *cqueue_i_front(&m_simplestation->m_cdrom->queuedResp));
 
         cqueue_i_pop(&m_simplestation->m_cdrom->queuedResp);
     }
 
     while (!cqueue_i_empty(&m_simplestation->m_cdrom->lateResp)) {
-        cqueue_i_push(&m_simplestation->m_cdrom->queuedResp, *cqueue_i_front(&m_simplestation->m_cdrom->lateResp));
+        cqueue_i_push(&m_simplestation->m_cdrom->queuedResp, (uint8_t) *cqueue_i_front(&m_simplestation->m_cdrom->lateResp));
 
         cqueue_i_pop(&m_simplestation->m_cdrom->lateResp);
     }
@@ -196,7 +199,7 @@ void INT1(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-    m_simplestation->m_cdrom->iFlags |= (uint8_t) 1;
+    m_simplestation->m_cdrom->iFlags = (uint8_t) 1;
 
     if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
 
@@ -229,11 +232,11 @@ void INT2(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-    m_simplestation->m_cdrom->iFlags |= (uint8_t) 2;
-
-	loadResponse(m_simplestation);
+    m_simplestation->m_cdrom->iFlags = (uint8_t) 2;
 
     if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
+
+	loadResponse(m_simplestation);
 }
 
 void INT3(m_simplestation_state *m_simplestation)
@@ -249,11 +252,11 @@ void INT3(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-    m_simplestation->m_cdrom->iFlags |= (uint8_t) 3;
-
-	loadResponse(m_simplestation);
+    m_simplestation->m_cdrom->iFlags = (uint8_t) 3;
 
     if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
+
+	loadResponse(m_simplestation);
 }
 
 void INT5(m_simplestation_state *m_simplestation)
@@ -269,11 +272,11 @@ void INT5(m_simplestation_state *m_simplestation)
 		return;
 	}
 
-    m_simplestation->m_cdrom->iFlags |= (uint8_t) 5;
-
-	loadResponse(m_simplestation);
+    m_simplestation->m_cdrom->iFlags = (uint8_t) 5;
 
     if (m_simplestation->m_cdrom->iEnable & m_simplestation->m_cdrom->iFlags) m_interrupts_request(CDROM, m_simplestation);
+
+	loadResponse(m_simplestation);
 }
 
 /* 0x01 */
@@ -357,7 +360,7 @@ void cmdReadN(m_simplestation_state *m_simplestation) {
 	primary_event.func = &INT3;
 	scheduler_push(primary_event, m_simplestation);
 
-    const auto int1Time = INT3_TIME + (m_simplestation->m_cdrom->mode & (uint8_t)(Speed)) ? READ_TIME_DOUBLE : READ_TIME_SINGLE;
+    uint32_t int1Time = INT3_TIME + (m_simplestation->m_cdrom->mode & (uint8_t)(Speed)) ? READ_TIME_DOUBLE : READ_TIME_SINGLE;
 
 	m_simplestation->m_cdrom->stat |= (uint8_t)(Read);
 	primary_event.func = &INT1;
@@ -365,6 +368,34 @@ void cmdReadN(m_simplestation_state *m_simplestation) {
 	scheduler_push(primary_event, m_simplestation);
 
 	pushLateResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+}
+
+/* 0x08 */
+void cmdStop(m_simplestation_state *m_simplestation) {
+	event_t primary_event;
+	strcpy(primary_event.subsystem, "CDROM");
+
+	printf(BOLD MAGENTA "[CDROM] Stop" NORMAL "\n");
+
+	scheduler_clean(m_simplestation);
+
+	clearResponse(m_simplestation);
+
+	pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
+
+    // Send INT3
+	primary_event.time = m_simplestation->time + INT3_TIME;
+	primary_event.func = &INT3;
+	scheduler_push(primary_event, m_simplestation);
+
+	primary_event.time = m_simplestation->time + CPU_SPEED;
+	primary_event.func = &INT2;
+	scheduler_push(primary_event, m_simplestation);
+
+    m_simplestation->m_cdrom->stat &= ~(uint8_t)(MotorOn);
+    m_simplestation->m_cdrom->stat &= ~(uint8_t)(Read);
+
+    pushLateResponse(m_simplestation->m_cdrom->stat, m_simplestation);
 }
 
 /* 0x09 */
@@ -429,7 +460,7 @@ void cmdInit(m_simplestation_state *m_simplestation) {
     m_simplestation->m_cdrom->mode = (uint8_t)(FullSector);
 
     // Send mode
-    pushLateResponse(m_simplestation->m_cdrom->mode, m_simplestation);
+    pushLateResponse(m_simplestation->m_cdrom->stat, m_simplestation);
 
     // Send INT2
 	primary_event.time = m_simplestation->time + INT3_TIME + 120 * _1MS;
@@ -536,6 +567,7 @@ void cmdGetTN(m_simplestation_state *m_simplestation) {
     pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
     pushResponse(0x01, m_simplestation);
     pushResponse(0x01, m_simplestation);
+
     // Send INT3
 	primary_event.time = m_simplestation->time + INT3_TIME;
 	primary_event.func = &INT3;
@@ -563,7 +595,9 @@ void cmdGetTD(m_simplestation_state *m_simplestation) {
         return;
     }
 
-	const auto track = *cqueue_i_front(&m_simplestation->m_cdrom->paramFIFO);
+	uint8_t track = (uint8_t) *cqueue_i_front(&m_simplestation->m_cdrom->paramFIFO);
+
+	cqueue_i_pop(&m_simplestation->m_cdrom->paramFIFO);
 
 	if (track > 0x26) {
         /* Too few/many parameters, send error */
@@ -582,6 +616,7 @@ void cmdGetTD(m_simplestation_state *m_simplestation) {
     pushResponse(m_simplestation->m_cdrom->stat, m_simplestation);
     pushResponse(0, m_simplestation);
     pushResponse(0, m_simplestation);
+
     // Send INT3
 	primary_event.time = m_simplestation->time + INT3_TIME;
 	primary_event.func = &INT3;
@@ -710,6 +745,10 @@ void doCmd(uint8_t m_value, m_simplestation_state *m_simplestation) {
 			cmdReadN(m_simplestation);
 			break;
 
+		case Stop:
+			cmdStop(m_simplestation);
+			break;
+
 		case Pause:
 			cmdPause(m_simplestation);
 			break;
@@ -786,15 +825,14 @@ uint32_t m_cdrom_read(uint8_t m_offset, m_simplestation_state *m_simplestation)
 
 			break;
 
-		case 2:
-			m_value = getData8(m_simplestation);
-			break;
-
 		case 1:
 			//printf("[CDROM] 8-bit read @ RESPONSE\n");
 
             m_value = readResponse(m_simplestation);
+			break;
 
+		case 2:
+			m_value = getData8(m_simplestation);
 			break;
 
 		case 3:
@@ -845,6 +883,9 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
                     doCmd(m_value, m_simplestation);
 					break;
 
+				case 3:
+					break;
+
 				default:
 					printf(BOLD RED "[CDROM] Unhandled 8-bit write at Offset: %u (Index: %d) = 0x%02X" NORMAL "\n", m_offset, m_simplestation->m_cdrom->index_, m_value);
 					break;
@@ -857,7 +898,7 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 				case 0:
 					//printf("[CDROM] 8-bit write @ PARAM = 0x%02X\n", m_value);
 
-                    //assert(paramFIFO.size() < 16);
+                    assert(cqueue_i_size(&m_simplestation->m_cdrom->paramFIFO) < 16);
 
 					cqueue_i_push(&m_simplestation->m_cdrom->paramFIFO, m_value);
 					break;
@@ -909,6 +950,10 @@ void m_cdrom_write(uint8_t m_offset, uint32_t m_value, m_simplestation_state *m_
 
 							case 3:
 								primary_event.func = &INT3;
+								break;
+							
+							case 5:
+								primary_event.func = &INT5;
 								break;
 							
 							default:

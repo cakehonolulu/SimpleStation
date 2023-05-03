@@ -21,6 +21,7 @@ typedef enum {
     GetStat = 0x01,
     SetLoc  = 0x02,
     ReadN   = 0x06,
+    Stop    = 0x08,
     Pause   = 0x09,
     Init    = 0x0A,
     Unmute  = 0x0C,
