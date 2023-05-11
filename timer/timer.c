@@ -1,115 +1,223 @@
 #include <timer/timer.h>
 
-typedef enum {
-    COUNT = 0x1F801100,
-    MODE  = 0x1F801104,
-    COMP  = 0x1F801108,
-} TimerReg;
+typedef union {
+    struct {
+        uint32_t value : 16;
+        uint32_t garbage : 16;
+    };
 
-/* Timer mode register */
-typedef struct {
-    bool gate; // GATE enable
-    uint8_t   gats; // GATe Select
-    bool zret; // Zero RETurn
-    bool cmpe; // CoMPare Enable
-    bool ovfe; // OVerFlow Enable
-    bool rept; // REPeaT interrupt
-    bool levl; // LEVL
-    uint8_t   clks; // CLocK Select
-    bool intf; // INTerrupt Flag
-    bool equf; // EQUal Flag
-    bool ovff; // OVerFlow Flag
-} Mode;
+    uint32_t _value;
 
-/* Timer */
-typedef struct {
-    Mode mode; // T_MODE
+} TimerCounterValue;
 
-    uint32_t count; // T_COUNT
-    uint16_t comp;  // T_COMP
+typedef union {
+    struct {
+        uint32_t syncEnable : 1;
+        uint32_t _syncMode : 2;
+        uint32_t _resetCounter : 1;
+        uint32_t IRQWhenTarget : 1;
+        uint32_t IRQWhenOverflow : 1;
+        uint32_t _IRQOnceOrRepeatMode : 1;
+        uint32_t _IRQPulseOrToggle : 1;
+        uint32_t _clockSource : 2;
+        uint32_t IRQ : 1;
+        uint32_t rearchedTarget : 1;
+        uint32_t rearchedOverflow : 1;
+        uint32_t unknown : 3;
+        uint32_t garbage : 16;
+    };
 
-    // Prescaler
-    uint16_t subcount;
-    uint16_t prescaler;
+    uint32_t _value;
 
-    bool isPaused;
-} Timer;
+} TimerCounterMode;
 
-Timer timers[3];
+typedef union {
+    struct {
+        uint32_t target : 16;
+        uint32_t garbage : 16;
+    };
 
-/* Returns timer ID from address */
-int getTimer(uint32_t addr) { 
-    switch ((addr >> 4) & 0xFF) {
-        case 0x10: return 0;
-        case 0x11: return 1;
-        case 0x12: return 2;
-        default:
-            printf("[Timer     ] Invalid timer\n");
+    uint32_t _value;
 
-            exit(0);
-            break;
-    }
+} TimerCounterTarget;
+
+bool oneShotTimerFired = false;
+uint32_t counter = 0;
+
+/* TIMER0 */
+TimerCounterValue tmr0_counterValue = { 0 };
+
+TimerCounterMode tmr0_counterMode = { 0 };
+
+TimerCounterTarget tmr0_counterTarget = { 0 };
+
+uint32_t tmr0_counterValueRegister(m_simplestation_state *m_simplestation) {
+    return tmr0_counterValue._value;
 }
 
-void sendInterrupt(int tmID, m_simplestation_state *m_simplestation) {
+uint32_t tmr0_counterModeRegister(m_simplestation_state *m_simplestation) {
+    return tmr0_counterMode._value;
+}
 
-    if (timers[tmID].mode.intf) m_interrupts_request((m_int_types) (tmID + 4), m_simplestation);
+uint32_t tmr0_counterTargetRegister(m_simplestation_state *m_simplestation) {
+    return tmr0_counterTarget._value;
+}
 
-    if (timers[tmID].mode.rept && timers[tmID].mode.levl) {
-        timers[tmID].mode.intf = !timers[tmID].mode.intf; // Toggle interrupt flag
-    } else {
-        timers[tmID].mode.intf = false;
-    }
+void tmr0_setCounterValueRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr0_counterValue._value = value;
+}
+
+void tmr0_setCounterModeRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr0_counterMode._value = value;
+    tmr0_counterValue._value = 0;
+}
+
+void tmr0_setCounterTargetRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr0_counterTarget._value = value;
+}
+
+/* TIMER1 */
+TimerCounterValue tmr1_counterValue = { 0 };
+
+TimerCounterMode tmr1_counterMode = { 0 };
+
+TimerCounterTarget tmr1_counterTarget = { 0 };
+
+uint32_t tmr1_counterValueRegister(m_simplestation_state *m_simplestation) {
+    return tmr1_counterValue._value;
+}
+
+uint32_t tmr1_counterModeRegister(m_simplestation_state *m_simplestation) {
+    return tmr1_counterMode._value;
+}
+
+uint32_t tmr1_counterTargetRegister(m_simplestation_state *m_simplestation) {
+    return tmr1_counterTarget._value;
+}
+
+void tmr1_setCounterValueRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr1_counterValue._value = value;
+}
+
+void tmr1_setCounterModeRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr1_counterMode._value = value;
+    tmr1_counterValue._value = 0;
+}
+
+void tmr1_setCounterTargetRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr1_counterTarget._value = value;
+}
+
+/* TIMER2 */
+TimerCounterValue tmr2_counterValue = { 0 };
+
+TimerCounterMode tmr2_counterMode = { 0 };
+
+TimerCounterTarget tmr2_counterTarget = { 0 };
+
+uint32_t tmr2_counterValueRegister(m_simplestation_state *m_simplestation) {
+    return tmr2_counterValue._value;
+}
+
+uint32_t tmr2_counterModeRegister(m_simplestation_state *m_simplestation) {
+    return tmr2_counterMode._value;
+}
+
+uint32_t tmr2_counterTargetRegister(m_simplestation_state *m_simplestation) {
+    return tmr2_counterTarget._value;
+}
+
+void tmr2_setCounterValueRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr2_counterValue._value = value;
+}
+
+void tmr2_setCounterModeRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr1_counterMode._value = value;
+    tmr1_counterValue._value = 0;
+}
+
+void tmr2_setCounterTargetRegister(uint32_t value, m_simplestation_state *m_simplestation) {
+    tmr2_counterTarget._value = value;
 }
 
 void timers_init() {
-    memset(&timers, 0, 3 * sizeof(Timer));
 
-    for (int i = 0; i < sizeof(timers); i++)
-    {
-        timers[i].prescaler = 1;
-    }
 }
 
 uint16_t timers_read(uint32_t addr, m_simplestation_state *m_simplestation) {
     uint16_t data;
 
-    // Get channel ID
-    const auto chn = getTimer(addr);
+    switch ((addr & 0x000000F0) >> 4) {
 
-    switch ((addr & ~0xFF0) | (1 << 8)) {
-        case COUNT:
-            //printf("[Timer     ] 16-bit read @ T%d_COUNT\n", chn);
-            return timers[chn].count;
-        case MODE:
+        case 0:
+            switch (addr & 0xF)
             {
-                //printf("[Timer     ] 16-bit read @ T%d_MODE\n", chn);
+                case 0:
+                    data = tmr0_counterValueRegister(m_simplestation);
+                    break;
 
-                data  = timers[chn].mode.gate;
-                data |= timers[chn].mode.gats << 1;
-                data |= timers[chn].mode.zret << 3;
-                data |= timers[chn].mode.cmpe << 4;
-                data |= timers[chn].mode.ovfe << 5;
-                data |= timers[chn].mode.rept << 6;
-                data |= timers[chn].mode.levl << 7;
-                data |= timers[chn].mode.clks << 8;
-                data |= timers[chn].mode.intf << 10;
-                data |= timers[chn].mode.equf << 11;
-                data |= timers[chn].mode.ovff << 12;
+                case 4:
+                    data = tmr0_counterModeRegister(m_simplestation);
+                    break;
 
-                /* Clear interrupt flags */
+                case 8:
+                    data = tmr0_counterTargetRegister(m_simplestation);
+                    break;
 
-                timers[chn].mode.equf = false;
-                timers[chn].mode.ovff = false;
+                default:
+                    printf(BOLD RED "[TIMER0] Unhandled read at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
             }
             break;
-        case COMP:
-            //printf("[Timer     ] 16-bit read @ T%d_COMP\n", chn);
-            return timers[chn].comp;
-        default:
-            printf("[Timer     ] Unhandled 16-bit read @ 0x%08X\n", addr);
+        
+        case 1:
+            switch (addr & 0xF)
+            {
+                case 0:
+                    data = tmr1_counterValueRegister(m_simplestation);
+                    break;
 
-            exit(0);
+                case 4:
+                    data = tmr1_counterModeRegister(m_simplestation);
+                    break;
+
+                case 8:
+                    data = tmr1_counterTargetRegister(m_simplestation);
+                    break;
+
+                default:
+                    printf(BOLD RED "[TIMER1] Unhandled read at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
+            break;
+
+        case 2:
+            switch (addr & 0xF)
+            {
+                case 0:
+                    data = tmr2_counterValueRegister(m_simplestation);
+                    break;
+
+                case 4:
+                    data = tmr2_counterModeRegister(m_simplestation);
+                    break;
+
+                case 8:
+                    data = tmr2_counterTargetRegister(m_simplestation);
+                    break;
+
+                default:
+                    printf(BOLD RED "[TIMER2] Unhandled read at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
+            break;
+        
+        default:
+            printf(BOLD RED "[TIMER ] Unhandled read where timer source is invalid: 0x%X" NORMAL "\n", addr);
+            m_simplestation_exit(m_simplestation, 1);
             break;
     }
 
@@ -117,129 +225,295 @@ uint16_t timers_read(uint32_t addr, m_simplestation_state *m_simplestation) {
 }
 
 void timers_write(uint32_t addr, uint16_t data, m_simplestation_state *m_simplestation) {
-    // Get channel ID
-    const auto chn = getTimer(addr);
+    switch ((addr & 0x000000F0) >> 4) {
 
-    switch ((addr & ~0xFF0) | (1 << 8)) {
-        case COUNT:
-            //printf("[Timer     ] 16-bit write @ T%d_COUNT = 0x%04X\n", chn, data);
-
-            timers[chn].count = data;
-            break;
-        case MODE:
+        case 0:
+            switch (addr & 0x0000000F)
             {
-                //printf("[Timer     ] 16-bit write @ T%d_MODE = 0x%04X\n", chn, data);
+                case 0:
+                    tmr0_setCounterValueRegister(data, m_simplestation);
+                    break;
 
-                timers[chn].mode.gate = data & 1;
-                timers[chn].mode.gats = (data >> 1) & 3;
-                timers[chn].mode.zret = data & (1 << 3);
-                timers[chn].mode.cmpe = data & (1 << 4);
-                timers[chn].mode.ovfe = data & (1 << 5);
-                timers[chn].mode.rept = data & (1 << 6);
-                timers[chn].mode.levl = data & (1 << 7);
-                timers[chn].mode.clks = (data >> 8) & 3;
+                case 4:
+                    tmr0_setCounterModeRegister(data, m_simplestation);
+                    break;
 
-                timers[chn].mode.intf = true; // Always reset to 1
+                case 8:
+                    tmr0_setCounterTargetRegister(data, m_simplestation);
+                    break;
 
-                timers[chn].isPaused = false;
-
-                if (timers[chn].mode.gate) {
-                    switch (chn) {
-                        case 0: // HBLANK gate
-                            printf("[Timer     ] Unhandled timer 0 gate\n");
-
-                            exit(0);
-                        case 1: // VBLANK gate
-                            switch (timers[chn].mode.gats) {
-                                case 0: break; // Pause during VBLANK
-                                case 1: break; // Reset counter at VBLANK start
-                                case 2: // Reset counter at VBLANK start, pause outside of VBLANK
-                                    timers[chn].isPaused = true;
-                                    break;
-                                case 3: // Pause ONCE until VBLANK start
-                                    timers[chn].isPaused = true;
-                                    break;
-                            }
-                            break;
-                        case 2:
-                            switch (timers[chn].mode.gats) {
-                                case 0: case 3: // Pause forever
-                                    timers[chn].isPaused = true;
-                                    break;
-                                case 1: case 2: // Nothing
-                                    break;
-                            }
-                            break;
-                    }
-                }
-
-                if (timers[chn].mode.clks) {
-                    switch (chn) {
-                        case 1: break;
-                        case 2: timers[chn].prescaler = 1 + 7 * (uint16_t)(timers[chn].mode.clks > 1); break;
-                        default:
-                            printf("[Timer     ] Unhandled clock source\n");
-
-                            exit(0);
-                    }
-                }
-
-                timers[chn].subcount = 0;
-                timers[chn].count = 0;    // Always cleared
+                default:
+                    printf(BOLD RED "[TIMER0] Unhandled write at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
             }
             break;
-        case COMP:
-            //printf("[Timer     ] 16-bit write @ T%d_COMP = 0x%04X\n", chn, data);
 
-            timers[chn].comp = data;
+        case 1:
+            switch (addr & 0x0000000F)
+            {
+                case 0:
+                    tmr1_setCounterValueRegister(data, m_simplestation);
+                    break;
 
-            if (!timers[chn].mode.levl) timers[chn].mode.intf = true; // Set INTF if in toggle mode
+                case 4:
+                    tmr1_setCounterModeRegister(data, m_simplestation);
+                    break;
+
+                case 8:
+                    tmr1_setCounterTargetRegister(data, m_simplestation);
+                    break;
+
+                default:
+                    printf(BOLD RED "[TIMER1] Unhandled write at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
             break;
-        default:
-            printf("[Timer     ] Unhandled 16-bit write @ 0x%08X = 0x%04X\n", addr, data);
 
-            exit(0);
+        case 2:
+            switch (addr & 0x0000000F)
+            {
+                case 0:
+                    tmr2_setCounterValueRegister(data, m_simplestation);
+                    break;
+
+                case 4:
+                    tmr2_setCounterModeRegister(data, m_simplestation);
+                    break;
+
+                case 8:
+                    tmr2_setCounterTargetRegister(data, m_simplestation);
+                    break;
+
+                default:
+                    printf(BOLD RED "[TIMER2] Unhandled write at 0x%X" NORMAL "\n", addr);
+                    m_simplestation_exit(m_simplestation, 1);
+                    break;
+            }
+            break;
+
+        default:
+            printf(BOLD RED "[TIMER ] Unhandled write where timer source is invalid: 0x%X, tmr: %X" NORMAL "\n", addr, (addr & 0x000000F0) >> 4);
+            m_simplestation_exit(m_simplestation, 1);
+            break;
     }
 }
 
-/* Steps timers */
-void timer_step(int64_t c, m_simplestation_state *m_simplestation) {
-    for (int i = 0; i < 3; i++) {
+void tmr0_checkInterruptRequest(m_simplestation_state *m_simplestation) {
+    if (((TimerPulseOrToggleMode) tmr0_counterMode._IRQPulseOrToggle) == Toggle) {
+        tmr0_counterMode.IRQ = !tmr0_counterMode.IRQ;
+    } else {
+        tmr0_counterMode.IRQ = false;
+    }
 
-        /* Timers 0 and 1 have a different clock source if CLKS is odd */
-        if ((timers[i].mode.clks & 1) && ((i == 0) || (i == 1))) continue;
+    if (((TimerOnceOrRepeatMode) tmr0_counterMode._IRQOnceOrRepeatMode) == OneShot && oneShotTimerFired) {
+        return;
+    }
 
-        if (timers[i].isPaused) continue;
+    if (!tmr0_counterMode.IRQ) {
+        m_interrupts_request(TMR0, m_simplestation);
+        oneShotTimerFired = true;
+    }
+    tmr0_counterMode.IRQ = true;
+}
 
-        timers[i].subcount += c;
+void tmr1_checkInterruptRequest(m_simplestation_state *m_simplestation) {
+    if (((TimerPulseOrToggleMode) tmr1_counterMode._IRQPulseOrToggle) == Toggle) {
+        tmr1_counterMode.IRQ = !tmr0_counterMode.IRQ;
+    } else {
+        tmr1_counterMode.IRQ = false;
+    }
 
-        while (timers[i].subcount > timers[i].prescaler) {
-               
-            timers[i].count++;
+    if (((TimerOnceOrRepeatMode) tmr1_counterMode._IRQOnceOrRepeatMode) == OneShot && oneShotTimerFired) {
+        return;
+    }
 
-            if (timers[i].count & (1 << 16)) {
-                if (timers[i].mode.ovfe && !timers[i].mode.ovff) {
-                    // Checking OVFF is necessary because timer IRQs are edge-triggered
-                    timers[i].mode.ovff = true;
+    if (!tmr1_counterMode.IRQ) {
+        m_interrupts_request(TMR1, m_simplestation);
+        oneShotTimerFired = true;
+    }
+    tmr1_counterMode.IRQ = true;
+}
 
-                    sendInterrupt(i, m_simplestation);
-                }
-            }
+void tmr2_checkInterruptRequest(m_simplestation_state *m_simplestation) {
+    if (((TimerPulseOrToggleMode) tmr2_counterMode._IRQPulseOrToggle) == Toggle) {
+        tmr2_counterMode.IRQ = !tmr2_counterMode.IRQ;
+    } else {
+        tmr2_counterMode.IRQ = false;
+    }
 
-            timers[i].count &= 0xFFFF;
+    if (((TimerOnceOrRepeatMode) tmr2_counterMode._IRQOnceOrRepeatMode) == OneShot && oneShotTimerFired) {
+        return;
+    }
 
-            if (timers[i].count == timers[i].comp) {
-                if (timers[i].mode.cmpe && !timers[i].mode.equf) {
-                    // Checking EQUF is necessary because timer IRQs are edge-triggered
-                    timers[i].mode.equf = true;
+    if (!tmr2_counterMode.IRQ) {
+        m_interrupts_request(TMR2, m_simplestation);
+        oneShotTimerFired = true;
+    }
+    tmr2_counterMode.IRQ = true;
+}
 
-                    sendInterrupt(i, m_simplestation);
-                }
+void tmr0_checkTargetsAndOverflows(m_simplestation_state *m_simplestation) {
+    bool checkIRQ = false;
 
-                if (timers[i].mode.zret) timers[i].count = 0;
-            }
-
-            timers[i].subcount -= timers[i].prescaler;
+    if (tmr0_counterValue.value >= tmr0_counterTarget.target) {
+        tmr0_counterMode.rearchedTarget = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr0_counterMode._resetCounter;
+        if (timerResetCounter == AfterTarget) {
+            tmr0_counterValue._value = 0;
+        }
+        if (tmr0_counterMode.IRQWhenTarget) {
+            checkIRQ = true;
         }
     }
+
+    if (tmr0_counterValue.value >= 0xffff) {
+        tmr0_counterMode.rearchedOverflow = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr0_counterMode._resetCounter;
+        if (timerResetCounter == AfterOverflow) {
+            tmr0_counterValue._value = 0;
+        }
+        if (tmr0_counterMode.IRQWhenOverflow) {
+            checkIRQ = true;
+        }
+    }
+
+    if (!checkIRQ) {
+        return;
+    }
+
+    tmr0_checkInterruptRequest(m_simplestation);
+}
+
+void tmr1_checkTargetsAndOverflows(m_simplestation_state *m_simplestation) {
+    bool checkIRQ = false;
+
+    if (tmr1_counterValue.value >= tmr1_counterTarget.target) {
+        tmr1_counterMode.rearchedTarget = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr1_counterMode._resetCounter;
+        if (timerResetCounter == AfterTarget) {
+            tmr1_counterValue._value = 0;
+        }
+        if (tmr1_counterMode.IRQWhenTarget) {
+            checkIRQ = true;
+        }
+    }
+
+    if (tmr1_counterValue.value >= 0xffff) {
+        tmr1_counterMode.rearchedOverflow = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr1_counterMode._resetCounter;
+        if (timerResetCounter == AfterOverflow) {
+            tmr1_counterValue._value = 0;
+        }
+        if (tmr1_counterMode.IRQWhenOverflow) {
+            checkIRQ = true;
+        }
+    }
+
+    if (!checkIRQ) {
+        return;
+    }
+
+    tmr1_checkInterruptRequest(m_simplestation);
+}
+
+void tmr2_checkTargetsAndOverflows(m_simplestation_state *m_simplestation) {
+    bool checkIRQ = false;
+
+    if (tmr2_counterValue.value >= tmr2_counterTarget.target) {
+        tmr2_counterMode.rearchedTarget = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr2_counterMode._resetCounter;
+        if (timerResetCounter == AfterTarget) {
+            tmr2_counterValue._value = 0;
+        }
+        if (tmr2_counterMode.IRQWhenTarget) {
+            checkIRQ = true;
+        }
+    }
+
+    if (tmr2_counterValue.value >= 0xffff) {
+        tmr2_counterMode.rearchedOverflow = true;
+        TimerResetCounter timerResetCounter = (TimerResetCounter) tmr2_counterMode._resetCounter;
+        if (timerResetCounter == AfterOverflow) {
+            tmr2_counterValue._value = 0;
+        }
+        if (tmr2_counterMode.IRQWhenOverflow) {
+            checkIRQ = true;
+        }
+    }
+
+    if (!checkIRQ) {
+        return;
+    }
+
+    tmr2_checkInterruptRequest(m_simplestation);
+}
+
+Timer0ClockSource timer0ClockSource(m_simplestation_state *m_simplestation) {
+    if (tmr0_counterMode._clockSource == 0 || tmr0_counterMode._clockSource == 3) {
+        return T0SystemClock;
+    } else {
+        return DotClock;
+    }
+}
+
+Timer1ClockSource timer1ClockSource(m_simplestation_state *m_simplestation) {
+    if (tmr1_counterMode._clockSource == 0 || tmr1_counterMode._clockSource == 3) {
+        return T1SystemClock;
+    } else {
+        return Hblank;
+    }
+}
+
+Timer2ClockSource timer2ClockSource(m_simplestation_state *m_simplestation) {
+    if (tmr2_counterMode._clockSource == 0 || tmr2_counterMode._clockSource == 3) {
+        return T2SystemClock;
+    } else {
+        return SystemClockByEight;
+    }
+}
+
+void tmr0_step(uint32_t cycles, m_simplestation_state *m_simplestation) {
+    Timer0ClockSource clockSource = timer0ClockSource(m_simplestation);
+    if (clockSource == DotClock) {
+        uint32_t videoCycles = cycles*11/7;
+        counter += videoCycles;
+        tmr0_counterValue.value += counter / VideoSystemClocksPerDot;
+        counter %= VideoSystemClocksPerDot;
+    } else {
+        counter += cycles;
+        tmr0_counterValue.value += cycles;
+    }
+
+    tmr0_checkTargetsAndOverflows(m_simplestation);
+}
+
+void tmr1_step(uint32_t cycles, m_simplestation_state *m_simplestation) {
+    Timer1ClockSource clockSource = timer1ClockSource(m_simplestation);
+    if (clockSource == Hblank) {
+        uint32_t videoCycles = cycles*11/7;
+        counter += videoCycles;
+        tmr1_counterValue.value += counter / VideoSystemClocksPerScanline;
+        counter %= VideoSystemClocksPerScanline;
+    } else {
+        counter += cycles;
+        tmr1_counterValue.value += cycles;
+    }
+
+    tmr1_checkTargetsAndOverflows(m_simplestation);
+}
+
+void tmr2_step(uint32_t cycles, m_simplestation_state *m_simplestation) {
+    Timer2ClockSource clockSource = timer2ClockSource(m_simplestation);
+    if (clockSource == SystemClockByEight) {
+        counter += cycles;
+        tmr2_counterValue.value += counter / 8;
+        counter %= 8;
+    } else {
+        counter += cycles;
+        tmr2_counterValue.value += cycles;
+    }
+
+    tmr2_checkTargetsAndOverflows(m_simplestation);
 }

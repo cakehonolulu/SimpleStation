@@ -323,8 +323,11 @@ int main(int argc, char **argv)
 													totalSystemClocksThisFrame++;
 												}
 
-												timer_step(60, &m_simplestation);
 												dma_step(&m_simplestation);
+
+												tmr0_step(systemClockStep, &m_simplestation);
+												tmr1_step(systemClockStep, &m_simplestation);
+												tmr2_step(systemClockStep, &m_simplestation);
 
 												scheduler_tick(systemClockStep , &m_simplestation);
 
