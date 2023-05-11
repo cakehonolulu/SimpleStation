@@ -82,6 +82,10 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
                     m_value = m_get_interrupt(m_simplestation);
                     break;
 
+                case 6:
+                    m_value = m_get_interrupt(m_simplestation) >> 16;
+                    break;
+
                 default:
                     printf(RED "[MEM] dma_read: Unhandled read on m_major %d, m_minor %d! (@ 0x%08X)\n" NORMAL, m_major, m_minor, m_addr);
                     m_value = m_simplestation_exit(m_simplestation, 1);
@@ -96,17 +100,6 @@ uint32_t m_dma_read(uint32_t m_addr, m_simplestation_state *m_simplestation)
     }
 
     return m_value;
-}
-
-void dma_step(m_simplestation_state *m_simplestation)
-{
-    for (int m_id = 0; m_id < 7; m_id++)
-    {
-        if (m_channel_get_active(m_simplestation, m_id))
-        {
-            m_dma_run(m_simplestation, m_id);
-        }
-    }
 }
 
 void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_simplestation)
@@ -138,6 +131,11 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
                     break;
             }
 
+            if (m_channel_get_active(m_simplestation, m_major))
+            {
+                m_dma_run(m_simplestation, m_major);
+            }
+
             break;
         
         case 7:
@@ -149,6 +147,10 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
 
                 case 4:
                     m_set_interrupt(m_value, m_simplestation);
+                    break;
+
+                case 6:
+                    m_set_interrupt((m_value >> 16  | (m_simplestation->m_memory->m_dma->m_irq_force ? 1U : 0) << 15), m_simplestation);
                     break;
                 
                 default:
@@ -167,6 +169,67 @@ void m_dma_write(uint32_t m_addr, uint32_t m_value, m_simplestation_state *m_sim
 
 }
 
+bool m_irq(m_simplestation_state *m_simplestation)
+{
+    /*
+        interrupt.IRQFlagsStatus().value
+        is
+        m_simplestation->m_memory->m_dma->m_irq_channel_flags
+
+        interrupt.IRQEnableStatus().value
+        is
+        m_simplestation->m_memory->m_dma->m_irq_channel_enable
+
+        interrupt.masterIRQFlag
+        is
+        m_simplestation->m_memory->m_dma->m_irq_force
+
+        interrupt.IRQEnableStatus().value
+        is
+        m_simplestation->m_memory->m_dma->m_irq_enable
+    */
+    uint8_t channel_status = m_simplestation->m_memory->m_dma->m_irq_channel_flags & m_simplestation->m_memory->m_dma->m_irq_channel_enable;
+    return m_simplestation->m_memory->m_dma->m_irq_force || ((m_simplestation->m_memory->m_dma->m_irq_enable && channel_status) != 0);
+}
+
+uint32_t calculateInterruptRegister(m_simplestation_state *m_simplestation)
+{
+    uint32_t value = m_get_interrupt(m_simplestation);
+
+    uint32_t interrupts = m_simplestation->m_memory->m_dma->m_irq_channel_enable & m_simplestation->m_memory->m_dma->m_irq_channel_flags;
+   
+    if (m_simplestation->m_memory->m_dma->m_irq_force || (m_simplestation->m_memory->m_dma->m_irq_enable && interrupts > 0)) {
+        value |= (1UL << 31);
+    }
+   
+    return value;
+}
+
+
+bool shouldTriggerInterrupt = false;
+
+void m_dma_interrupt(uint8_t m_port, m_simplestation_state *m_simplestation)
+{
+    if (m_simplestation->m_memory->m_dma->m_irq_channel_enable & (1 << m_port))
+    {
+        m_simplestation->m_memory->m_dma->m_irq_channel_flags |= (1UL << m_port);
+
+        uint8_t interruptValue =  calculateInterruptRegister(m_simplestation) >> 31 & 1;
+
+        if (interruptValue) {
+            shouldTriggerInterrupt = true;
+        }
+    }
+}
+
+void dma_step(m_simplestation_state *m_simplestation)
+{
+    if (shouldTriggerInterrupt) {
+        shouldTriggerInterrupt = false;
+        m_interrupts_request(DMA, m_simplestation);
+    }
+}
+
 void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)
 {
     m_simplestation->m_memory->m_dma->m_irq_dummy = (uint8_t) (m_val & 0x3F);
@@ -177,12 +240,6 @@ void m_set_interrupt(uint32_t m_val, m_simplestation_state *m_simplestation)
     uint8_t m_ack = ((m_val >> 24) & 0x3F);
 
     m_simplestation->m_memory->m_dma->m_irq_channel_flags &= ~m_ack;
-}
-
-bool m_irq(m_simplestation_state *m_simplestation)
-{
-    return m_simplestation->m_memory->m_dma->m_irq_force || ((m_simplestation->m_memory->m_dma->m_irq_enable &&
-        (m_simplestation->m_memory->m_dma->m_irq_channel_flags & m_simplestation->m_memory->m_dma->m_irq_channel_enable)) != 0);
 }
 
 uint32_t m_get_interrupt(m_simplestation_state *m_simplestation)
@@ -217,6 +274,8 @@ void m_dma_run(m_simplestation_state *m_simplestation, uint8_t m_id)
             m_dma_run_block(m_simplestation, m_id);
             break;
     }
+
+    m_dma_interrupt(m_id, m_simplestation);
 }
 
 extern uint8_t ReadDataByte(m_simplestation_state *m_simplestation);

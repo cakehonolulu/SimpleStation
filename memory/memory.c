@@ -243,27 +243,9 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 		
 		
 		case 0x1F801080 ... 0x1F8010FF:
-
-			if (m_address == 0x1f8010f0)
-			{
-				//printf("[MEM] read: DMA Control register\n");
-				m_return = m_simplestation->dcpr;
-			}
-			else if (m_address == 0x1f8010f4)
-			{
-				//printf("[MEM] read: DMA Interrupt register\n");
-				m_return = m_simplestation->dicr;
-			}
-			else if (m_address == 0x1f8010f6)
-			{
-				//printf("[MEM] read: DMA Interrupt register\n");
-				m_return = m_simplestation->dicr & 0xFFFF0000;
-			}
-			else
-			{
-				// DMA Registers Write
-				m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
-			}
+			// DMA Registers Write
+			m_return = m_dma_read((m_address - 0x1F801080), m_simplestation);
+			
 			break;
 
 
@@ -498,36 +480,9 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			break;
 
 		case 0x1F801080 ... 0x1F8010FF:
-
-			if (m_address == 0x1f8010f0)
-			{
-				//printf("[MEM] write: DMA Control register\n");
-				m_simplestation->dcpr = m_value;
-			}
-			else if (m_address == 0x1f8010f4)
-			{
-				//printf("[MEM] write: DMA Interrupt register\n");
-				m_simplestation->dicr = m_value;
-				m_simplestation->dicr &= ~(m_value & 0x7f000000);
-			}
-			else if (m_address == 0x1f8010f6)
-			{
-				//printf("[MEM] write: DMA Interrupt register\n");
-				m_simplestation->dicr = m_value & 0xFFFF0000;
-				m_simplestation->dicr &= ~((m_value & 0xFFFF0000) & 0x7f000000);
-			}
-			else
-			{
-				//printf("[memory] dma_write @ 0x%X\n", m_address);
-				if (m_address == 0x1f8010c8)
-				{
-					m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
-					m_simplestation->dicr |= (1 << 28);
-				}
-
-				// DMA Registers Write
-				m_dma_write((m_address - 0x1F801080), m_value, m_simplestation);
-			}
+			// DMA Registers Write
+			m_dma_write((m_address - 0x1F801080), m_value, m_simplestation);
+			
 			break;
 
 		case 0x1F801100 ... 0x1F801130:
