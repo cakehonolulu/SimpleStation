@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 
 
 										    uint32_t initTicks = SDL_GetTicks();
-											
+												spu_init();
 									while (true)
 									{			
 		
@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 												tmr1_step(systemClockStep, &m_simplestation);
 												tmr2_step(systemClockStep, &m_simplestation);
 
-												scheduler_tick(systemClockStep , &m_simplestation);
+												scheduler_tick(335 , &m_simplestation);
 
 
 												

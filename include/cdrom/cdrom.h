@@ -12,7 +12,7 @@
 
 #define _1MS (CPU_SPEED / 1000)
 
-#define INT3_TIME (_1MS)
+#define INT3_TIME (_1MS * 10)
 
 #define SECTOR_SIZE 2352
 #define READ_SIZE   0x818
