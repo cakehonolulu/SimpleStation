@@ -474,8 +474,49 @@ typedef enum {
     VULKAN
 } renderer_backends;
 
+typedef enum {
+    NOP,
+    DecodeMacroblock,
+    SetQuantTables,
+    SetScaleTable,
+} MDCommand;
+
+typedef enum {
+    Idle,
+    ReceiveMacroblock,
+    ReceiveQuantTables,
+    ReceiveScaleTable,
+} MDECState;
+
+/* --- MDEC registers --- */
+
 typedef struct {
-	uint32_t m_status;
+    uint16_t  rem;   // Words remaining
+    uint8_t   blk;   // Current block
+    bool b15;   // Bit 15 set/clear (15-bit depth only)
+    bool sign;  // Signed
+    uint8_t   dep;   // Output depth
+    bool oreq;  // Output request
+    bool ireq;  // Input request
+    bool busy;
+    bool empty; // Out FIFO empty
+    bool full;  // In FIFO full/last word received
+} MDECStatus;
+
+typedef struct {
+	MDECStatus stat;
+
+	/* Quant tables (0-63 = lum, 64-127 = col) */
+	uint8_t  quantTable[128];
+	int quantIdx;
+
+	/* Scale table */
+	int16_t scaleTable[64];
+	int scaleIdx;
+
+	int cmdLen;
+
+	MDECState state;
 } m_psx_mdec_t;
 
 /* Structures */

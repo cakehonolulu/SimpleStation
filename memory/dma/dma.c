@@ -327,15 +327,9 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         
                         m_source = getData32(m_simplestation);
 
-                        if (((m_simplestation->dicr >> 19) & 1) && ((m_simplestation->dicr >> 23) & 1)) {
-                            m_simplestation->dicr |= (1 << 27);
-                            m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
-                        }
 				
                         break;
 
-                    case spu:
-                        break;
 
                     case otc:
                         switch(m_size)
@@ -347,11 +341,6 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                             default:
                                 m_source = (m_address - 4) & 0x1FFFFF;
                                 break;
-                        }
-
-                        if (((m_simplestation->dicr >> 22) & 1) && ((m_simplestation->dicr >> 23) & 1)) {
-	                    	m_simplestation->dicr |= (1 << 30);
-	                        m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
                         }
 
                         break;
@@ -378,18 +367,12 @@ void m_dma_run_block(m_simplestation_state *m_simplestation, uint8_t m_id)
                         printf(CYAN "[DMA] run_block: GPU Data Command 0x%08X\n" NORMAL, m_source);
 #endif
                         m_gpu_gp0(m_source, m_simplestation);
-
-
-                        if (((m_simplestation->dicr >> 18) & 1) && ((m_simplestation->dicr >> 23) & 1)) {
-	                    	m_simplestation->dicr |= (1 << 26);
-	                        m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
-                        }
                         break;
 
-    
-                    case 4:
+                    case spu:
+                        writeRAM(m_source);
+                        writeRAM(m_source >> 16);
                         break;
-
 
                     default:
                         printf(RED "[DMA] run_block: Unimplemented block copy from RAM (id: %d)\n" NORMAL, m_id);
@@ -453,11 +436,6 @@ void m_dma_run_linked_list(m_simplestation_state *m_simplestation, uint8_t m_id)
         }
 
         m_address = m_header & 0x1FFFFC;
-    }
-
-    if (((m_simplestation->dicr >> 18) & 1) && ((m_simplestation->dicr >> 23) & 1)) {
-		m_simplestation->dicr |= (1 << 26);
-	    m_simplestation->m_cpu_ints->m_interrupt_stat |= 0b1000;
     }
 
     m_channel_set_done(m_simplestation, m_id);

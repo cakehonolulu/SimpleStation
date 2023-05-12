@@ -290,43 +290,24 @@ uint32_t m_memory_read(uint32_t m_memory_offset, m_memory_size m_size, m_simples
 
 		// CDROM Read
 		case 0x1F801800 ... 0x1F801803:
-			if (m_address == 0x1F801800)
-			{
-				m_return = rand() % 0xff;
-			}
-			else
-			{
-				m_return = m_cdrom_read(m_address & 0x0000000F, m_simplestation);
-			}
-			//printf("CDROM Read\n");
+			m_return = m_cdrom_read(m_address, m_simplestation);
 			break;
 
-		case 0x1F801C00 ... 0x1F801FFF:
+		case 0x1F801C00 ... (0x1F801C00 + 0x280):
 			// SPU Dummy Read
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] read: Dummy SPU memory read! Ignoring...\n" NORMAL);
 #endif
-			if (m_address >= 0x1F801D80 && m_address <= 0x1F801DBC)
-			{
-				//printf("SPU Read\n");
-				m_return = rand() % 0xff;
-			}
-			else
-			{	
-				m_return = m_spu_read(m_address, m_simplestation);
-			}
-			
 
+			m_return = m_spu_read(m_address, m_simplestation);
 			break;
 		
 		case 0x1F801820:
-			printf("[MDEC] Write MDEC Data/Response Register\n");
 			//m_mdec_cmd(m_value, m_simplestation);
 			break;
 
 		case 0x1F801824:
-			printf("[MDEC] Write MDEC1 - MDEC Control/Reset Register\n");
-			m_return = m_simplestation->m_mdec->m_status;
+			m_return = readStat(m_simplestation);
 			break;
 
 
@@ -500,7 +481,7 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 			m_cdrom_write(m_address & 0x0000000F, m_value, m_simplestation);
 			break;
 
-		case 0x1F801C00 ... 0x1F801FFF:
+		case 0x1F801C00 ... (0x1F801C00 + 0x280):
 			// SPU Dummy Write
 #ifdef DEBUG_MEMORY
 			printf(YELLOW "[MEM] write: Dummy SPU memory write! Ignoring...\n" NORMAL);
@@ -528,14 +509,11 @@ uint32_t m_memory_write(uint32_t m_memory_offset, uint32_t m_value, m_memory_siz
 		break;
 
 		case 0x1F801820:
-			printf("[MDEC] Write MDEC Data/Response Register\n");
-			//m_mdec_cmd(m_value, m_simplestation);
+			writeCmd(m_value, m_simplestation);
 			break;
 
 		case 0x1F801824:
-			printf("[MDEC] Write MDEC1 - MDEC Control/Reset Register\n");
-			m_simplestation->m_mdec->m_status |= ((m_value & (1 << 29)) ? 1 : 0) << 27;
-			m_simplestation->m_mdec->m_status |= ((m_value & (1 << 28)) ? 1 : 0) << 28;
+			writeCtrl(m_value, m_simplestation);
 			break;
 
 		case 0x1F802000 ... 0x1F803FFF:
